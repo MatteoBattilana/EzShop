@@ -56,12 +56,12 @@ EZShop is a software application to:
 | OWNER | Own the shop. want to use the application in order to make more efficient the shop's administration and to check  the performance of the shop and the employees   |
 | MANAGER| Manages the application, can insert or delete products from the inventory, order products to the suppliers, supervise the shop and the others employees (cashier/salesmen)|
 | CASHIER | Handle the sales and the costumers|
-| CUSTOMER | wants to buy product |
+| CUSTOMERS | wants to buy products |
 | DB ADMINISTRATOR | ?? |
 | SOFTWARE DEVELOPER | Writes the code by which the system is built |
 | SYSTEM DEVELOPER | Define the hardware that must be include in the final system in order to handle the payment and the product scan |
-| CREDIT CARD SYSTEM | Service used by the application perform payment with credit/debit card |
-| PRODUCT | The product that have to be sold to the customer |
+| CREDIT CARD SYSTEM | Service provided by merchant services and used by the application perform payment with credit/debit card |
+| PRODUCTS |  Products that have to be sold to the customers |
 
 
 # Context Diagram and interfaces
