@@ -56,12 +56,12 @@ EZShop is a software application to:
 | OWNER | Own the shop. want to use the application in order to make more efficient the shop's administration and to check  the performance of the shop and the employees   |
 | MANAGER| Manages the application, can insert or delete products from the inventory, order products to the suppliers, supervise the shop and the others employees (cashier)|
 | CASHIER | Handle the sales and handle the costumers|
-| CUSTOMERS | wants to buy products |
+| CUSTOMERS | Person that want to buy products in the shop |
 | DB ADMINISTRATOR | ?? |
-| SOFTWARE DEVELOPER | Writes the code by which the system is built |
+| SOFTWARE DEVELOPER | Writes the code by which the system is built, that installs also the application |
 | SYSTEM DEVELOPER | Define the hardware that must be include in the final system in order to handle the payment and the product scan |
 | CREDIT CARD SYSTEM | Service provided by merchant services and used by the application perform payment with credit/debit card |
-| PRODUCT |  Product that have to be sold to the customers |
+| PRODUCT |  Product that has to be sold to the customers |
 | SUPPLIER | Who supplies or delivers goods to the shop |
 
 
@@ -91,7 +91,7 @@ PRODUCT -- S
 |OWNER |GUI| Screen Keyboard on PC, mouse|
 |CASHIER |GUI| Touchscreen, Keyboard on PC, mouse|
 | CREDIT CARD SYSTEM | Web services (data exchange, soap + XML) | Internet connection |
-| PRODUCT | Bar code reader laser | Bar coder |
+| PRODUCT | Bar code reader laser | Bar code |
 
 # Stories and personas
 
@@ -127,10 +127,10 @@ efficient way.
 | ------------- |-------------|
 |  FR1 |Manage rights. Authorize access to functions to specific actors according to axcesss rights|
 |FR2|	Manage employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1| Define or modify a new employee (ex: promotion to manager, hiring)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Delete employee (fire)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1| Modify or define a new employee (manager or cashier)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Delete employee|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |List of all the employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee-> cashier(daily earnings)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee, (for cashier daily earnings)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |Search Employee|
 |FR3|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
@@ -161,14 +161,14 @@ efficient way.
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Monthly income|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Year income|
 |FR8|Register a sale payment |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.1| scan product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.2 |Compute the sum|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.3 |apply possible discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.4 |use possible gift card|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.5 | get the receipt|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.6 |get paid (credit card, cash)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.7 |store the information about sales, cashier and customer|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.8 |update inventory|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.1| Scan product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.2 |Apply possible discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.3 |Use possible gift card|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.4 | Get the receipt|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.5 | Compute the sum|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.6 |Get paid (credit card, cash)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.7 |Store the information about the transaction (sale, cashier and customer) |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.8 |Update inventory|
 
 ## Access right, actor vs function
 
@@ -184,7 +184,7 @@ efficient way.
 |FR4| &check;| &check; ||
 |FR5 |&check;| &check; ||
 |FR6 |&check;| &check; |&check;|
-|FR7 |&check;| &check;?||
+|FR7 |&check;| &check;||
 |FR8 |&check;| &check; |&check;|
 
 
@@ -192,16 +192,17 @@ efficient way.
 
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
-|NFR1| USABILITY | Every customer with at least 3+ years experience in using a PC must be able to use all functions with no training in less than 30 minutes|??|
-|NFR2| PERFORMANCE| All function should respond in <0.5 sec|??|
-|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure |??|           
-|NFR4| AVAILABILITY | The system must be available for least 99% of the time|??|
-|NFR5| PORTABILITY| The application should be working in a Windows 10 operating system, build version 1809|??|
-|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager.The data should be disclosed to other cashiers at the same or lower level. The system must be protected from an unauthorized access by using id and password|??|    
-|NFR7| SECURITY | The credit card information should never be recorded into the system |??|    
-|NFR8| DOMAIN | The prices are managed and displayed with the local currency with two decimals. This includes also the |??|
-|NFR9| DOMAIN | VAT application on the final price depends on the local national law |??|
-|NFR10| DOMAIN | Data protection must be in accordance with the local law (for Eurpose is GDPR)|??|
+|NFR1| USABILITY | Every customer with at least 3+ years experience in using a PC must be able to use all functions with no training in less than 30 minutes| All FR |
+|NFR2| PERFORMANCE| All function should respond in <0.5 sec| All FR, excluded FR8.5, FR8.6, FR8.4 |
+|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure | FR2, FR3, FR4.5, FR7, FR8.7 |           
+|NFR4| AVAILABILITY | The system must be available for least 99% of the time|All FR|
+|NFR5| PORTABILITY| The application should be working in a Windows 10 operating system, build version 1809|All FR|
+|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager. The data should be disclosed to other cashiers at the same or lower level. |FR2|
+|NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR6|    
+|NFR8| SECURITY | The credit card information should never be recorded into the system | FR8.6 |    
+|NFR9| DOMAIN | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR8.5 |
+|NFR10| DOMAIN | VAT application on the final price depends on the local national law | FR8.5 |
+|NFR11| DOMAIN | Data protection must be in accordance with the local law (GDPR for Europe)| FR2, FR3, FR4.5, FR7, FR8.7 |
 
 # Use case diagram and use cases
 ## Use case diagram
@@ -210,14 +211,14 @@ efficient way.
 \<ideas of use cases>
 | UC     | Description |
 | ------------- |:-------------:|
-|UC1.| Create account for new employee (hire employee and manager and owner)|
-|UC2. |Modify account for employee (ex promotion)|
-|UC3. |Delete account for employee (fire employee)|
+|UC1.| Create account for new employee |
+|UC2. |Modify account for employee|
+|UC3. |Delete account for employee|
 |UC4. |Add product to the inventory|
 |UC5. |Order product to the supplier|
 |UC6. |Create an offer|
-|UC7. |Delete an offer ?|
-|UC8. |Add new fidelity card (Add new customer)|
+|UC7. |Remove an offer|
+|UC8. |Add new fidelity card (add new customer)|
 |UC9. |Mark point to the fidelity card (modify customer)|
 |UC10.|Give a discount|
 |UC11.|Search item|
@@ -229,39 +230,51 @@ efficient way.
 
 
 \<next describe here each use case in the UCD>
-### Use case 1, UC1
+### Use case 1, UC1 - Create a new employee
+| Actors Involved        |  |
+| ------------- |:-------------:|
+|  Precondition     | The owner is logged in |  
+|  Post condition     | A new employee is added into the system |
+|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information. |
+|  Variants     | Owner provide person's information that already match with one employee in the system. The application will notify this information in the same window. |
+
+
+##### Scenario 1.1
+
+| Scenario 1.1 | |
+| ------------- |:-------------:|
+| Description | Owner wants to add a new employee to ones already in the system for the EZShop|
+| Precondition |  Owner is logged in|
+| Postcondition |  A new employee is added to into the system |
+|  1     | Owner click on the employees section |  
+|  2     | Owner click on the create new employee button |
+|  3     | A window is opened with all necessary fields to be filled |
+|  4     | Owner enters the new employee information and select if it is a manager or a cashier |
+|  5     | Owner confirm the operation by clicking on the appropriate button |
+
+##### Scenario 1.2
+
+| Scenario 1.2 | |
+| ------------- |:-------------:|
+| Description | Owner wants to add a new employee to ones already in the system for the EZShop|
+| Precondition |  Owner is logged in|
+| Postcondition |  The entered employee is already in the system, the new employee is not added |
+|  1     | Owner click on the employees section |  
+|  2     | Owner click on the create new employee button |
+|  3     | A window is opened with all necessary fields to be filled |
+|  4     | Owner enters the new employee information and select if it is a manager or a cashier |
+|  5     | Owner confirm the operation by clicking on the appropriate button |
+|  6     | An alert notify that the employee is already in the system |
+|  5     | Owner cancel the operation by clicking on the appropriate button |
+
+### Use case 2, UC2 -
+### Use case 2, UC2
 | Actors Involved        |  |
 | ------------- |:-------------:|
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
 |  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
 |  Nominal Scenario     | \<Textual description of actions executed by the UC> |
 |  Variants     | \<other executions, ex in case of errors> |
-
-##### Scenario 1.1
-
-\<describe here scenarios instances of UC1>
-
-\<a scenario is a sequence of steps that corresponds to a particular execution of one use case>
-
-\<a scenario is a more formal description of a story>
-
-\<only relevant scenarios should be described>
-
-| Scenario 1.1 | |
-| ------------- |:-------------:|
-|  Precondition     | \<Boolean expression, must evaluate to true before the scenario can start> |
-|  Post condition     | \<Boolean expression, must evaluate to true after scenario is finished> |
-| Step#        | Description  |
-|  1     |  |  
-|  2     |  |
-|  ...     |  |
-
-##### Scenario 1.2
-
-##### Scenario 1.x
-
-### Use case 2, UC2
-..
 
 ### Use case x, UCx
 ..
