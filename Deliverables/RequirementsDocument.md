@@ -127,10 +127,10 @@ efficient way.
 | ------------- |-------------|
 |  FR1 |Manage rights. Authorize access to functions to specific actors according to axcesss rights|
 |FR2|	Manage employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1| Modify or define a new employee (ex: promotion to manager, hiring)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1| Modify or define a new employee (manager or cashier)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Delete employee|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |List of all the employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee-> cashier (daily earnings)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee, (for cashier daily earnings)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |Search Employee|
 |FR3|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
@@ -211,14 +211,14 @@ efficient way.
 \<ideas of use cases>
 | UC     | Description |
 | ------------- |:-------------:|
-|UC1.| Create account for new employee (hire employee and manager and owner)|
-|UC2. |Modify account for employee (ex promotion)|
-|UC3. |Delete account for employee (fire employee)|
+|UC1.| Create account for new employee |
+|UC2. |Modify account for employee|
+|UC3. |Delete account for employee|
 |UC4. |Add product to the inventory|
 |UC5. |Order product to the supplier|
 |UC6. |Create an offer|
-|UC7. |Delete an offer ?|
-|UC8. |Add new fidelity card (Add new customer)|
+|UC7. |Remove an offer|
+|UC8. |Add new fidelity card (add new customer)|
 |UC9. |Mark point to the fidelity card (modify customer)|
 |UC10.|Give a discount|
 |UC11.|Search item|
@@ -230,39 +230,51 @@ efficient way.
 
 
 \<next describe here each use case in the UCD>
-### Use case 1, UC1
+### Use case 1, UC1 - Create a new employee
+| Actors Involved        |  |
+| ------------- |:-------------:|
+|  Precondition     | The owner is logged in |  
+|  Post condition     | A new employee is added into the system |
+|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information. |
+|  Variants     | Owner provide person's information that already match with one employee in the system. The application will notify this information in the same window. |
+
+
+##### Scenario 1.1
+
+| Scenario 1.1 | |
+| ------------- |:-------------:|
+| Description | Owner wants to add a new employee to ones already in the system for the EZShop|
+| Precondition |  Owner is logged in|
+| Postcondition |  A new employee is added to into the system |
+|  1     | Owner click on the employees section |  
+|  2     | Owner click on the create new employee button |
+|  3     | A window is opened with all necessary fields to be filled |
+|  4     | Owner enters the new employee information and select if it is a manager or a cashier |
+|  5     | Owner confirm the operation by clicking on the appropriate button |
+
+##### Scenario 1.2
+
+| Scenario 1.2 | |
+| ------------- |:-------------:|
+| Description | Owner wants to add a new employee to ones already in the system for the EZShop|
+| Precondition |  Owner is logged in|
+| Postcondition |  The entered employee is already in the system, the new employee is not added |
+|  1     | Owner click on the employees section |  
+|  2     | Owner click on the create new employee button |
+|  3     | A window is opened with all necessary fields to be filled |
+|  4     | Owner enters the new employee information and select if it is a manager or a cashier |
+|  5     | Owner confirm the operation by clicking on the appropriate button |
+|  6     | An alert notify that the employee is already in the system |
+|  5     | Owner cancel the operation by clicking on the appropriate button |
+
+### Use case 2, UC2 -
+### Use case 2, UC2
 | Actors Involved        |  |
 | ------------- |:-------------:|
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
 |  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
 |  Nominal Scenario     | \<Textual description of actions executed by the UC> |
 |  Variants     | \<other executions, ex in case of errors> |
-
-##### Scenario 1.1
-
-\<describe here scenarios instances of UC1>
-
-\<a scenario is a sequence of steps that corresponds to a particular execution of one use case>
-
-\<a scenario is a more formal description of a story>
-
-\<only relevant scenarios should be described>
-
-| Scenario 1.1 | |
-| ------------- |:-------------:|
-|  Precondition     | \<Boolean expression, must evaluate to true before the scenario can start> |
-|  Post condition     | \<Boolean expression, must evaluate to true after scenario is finished> |
-| Step#        | Description  |
-|  1     |  |  
-|  2     |  |
-|  ...     |  |
-
-##### Scenario 1.2
-
-##### Scenario 1.x
-
-### Use case 2, UC2
-..
 
 ### Use case x, UCx
 ..
