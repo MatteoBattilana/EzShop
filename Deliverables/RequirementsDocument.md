@@ -54,14 +54,15 @@ EZShop is a software application to:
 | Stakeholder name  | Description |
 | ----------------- |:-----------:|
 | OWNER | Own the shop. want to use the application in order to make more efficient the shop's administration and to check  the performance of the shop and the employees   |
-| MANAGER| Manages the application, can insert or delete products from the inventory, order products to the suppliers, supervise the shop and the others employees (cashier/salesmen)|
-| CASHIER | Handle the sales and the costumers|
+| MANAGER| Manages the application, can insert or delete products from the inventory, order products to the suppliers, supervise the shop and the others employees (cashier)|
+| CASHIER | Handle the sales and handle the costumers|
 | CUSTOMERS | wants to buy products |
 | DB ADMINISTRATOR | ?? |
 | SOFTWARE DEVELOPER | Writes the code by which the system is built |
 | SYSTEM DEVELOPER | Define the hardware that must be include in the final system in order to handle the payment and the product scan |
 | CREDIT CARD SYSTEM | Service provided by merchant services and used by the application perform payment with credit/debit card |
-| PRODUCTS |  Products that have to be sold to the customers |
+| PRODUCT |  Product that have to be sold to the customers |
+| SUPPLIER | Who supplies or delivers goods to the shop |
 
 
 # Context Diagram and interfaces
@@ -88,7 +89,7 @@ PRODUCT -- S
 | ------------- |:-------------:| -----:|
 |MANAGER| GUI | Screen Keyboard on PC, mouse|
 |OWNER |GUI| Screen Keyboard on PC, mouse|
-|CASHIER/SALESMAN |GUI| Touchscreen, Keyboard on PC, mouse|
+|CASHIER |GUI| Touchscreen, Keyboard on PC, mouse|
 | CREDIT CARD SYSTEM | Web services (data exchange, soap + XML) | Internet connection |
 | PRODUCT | Bar code reader laser | Bar coder |
 
@@ -171,7 +172,7 @@ efficient way.
 
 ## Access right, actor vs function
 
-| Function        | Owner | Manager | Salesman|
+| Function        | Owner | Manager | Cashier|
 | ------------- |:-------------:| ------------- |:-------------:|
 |FR2.1| &check; | | |
 |FR2.2| &check;|  ||
@@ -184,6 +185,7 @@ efficient way.
 |FR5 |&check;| &check; ||
 |FR6 |&check;| &check; |&check;|
 |FR7 |&check;| &check;?||
+|FR8 |&check;| &check; |&check;|
 
 
 ## Non Functional Requirements
@@ -193,15 +195,15 @@ efficient way.
 |NFR1| USABILITY | Every customer with at least 3+ years experience in using a PC must be able to use all functions with no training in less than 30 minutes|??|
 |NFR2| PERFORMANCE| All function should respond in <0.5 sec|??|
 |NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure |??|           
-|NFR4| AVAILABILITY | At least 99%|??|
+|NFR4| AVAILABILITY | The system must be available for least 99% of the time|??|
 |NFR5| PORTABILITY| The application should be working in a Windows 10 operating system, build version 1809|??|
-|NFR6| SECURITY| The data of one salesman can be visible and modifiable only by the owner and the manager.The data should be disclosed to other salesmen at the same or lower level. The system must be protected from an unauthorized access by using id and password|??|    
-|NFR7| DOMAIN | The prices are managed and displayed with the local currency with two decimals. This includes also the |??|
-|NFR8| DOMAIN | VAT application on the final price depends on the local national law |??|
-|NFR9| DOMAIN | Data protection must be in accordance with the local law (for Eurpose is GDPR)|??|
+|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager.The data should be disclosed to other cashiers at the same or lower level. The system must be protected from an unauthorized access by using id and password|??|    
+|NFR7| SECURITY | The credit card information should never be recorded into the system |??|    
+|NFR8| DOMAIN | The prices are managed and displayed with the local currency with two decimals. This includes also the |??|
+|NFR9| DOMAIN | VAT application on the final price depends on the local national law |??|
+|NFR10| DOMAIN | Data protection must be in accordance with the local law (for Eurpose is GDPR)|??|
+
 # Use case diagram and use cases
-
-
 ## Use case diagram
 \<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
 
