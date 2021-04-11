@@ -136,8 +136,8 @@ efficient way.
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Order product to the suppliers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |Add product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Remove product (automatically+ manually)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |List of products + prices+ number of products orderd by some criterion(list of multiple choices)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Remove product (automatically + manually)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |List of products + prices + number of products orderd by some criterion (list of multiple choices)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.6| Notification when product is out of stock|
 |FR4|Manage customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1 |Create a new fidelity card (with an ID)|
@@ -174,14 +174,19 @@ efficient way.
 
 | Function        | Owner | Manager | Cashier|
 | ------------- |:-------------:| ------------- |:-------------:|
+|FR1| &check;|  ||
 |FR2.1| &check; | | |
 |FR2.2| &check;|  ||
 |FR2.3|&check;| &check;||  
 |FR2.4|&check;| &check;||
-|FR1| &check;|  ||
+|FR3.1|&check;| &check;| &check;|
 |FR3.2|&check;| &check;||  
 |FR3.3| &check;| &check;||
+|FR3.4| &check;| &check;||
+|FR3.5| &check;| &check;||
 |FR4| &check;| &check; ||
+|FR4.1| &check;| &check; |&check;|
+|FR4.4| &check;| &check; |&check;|
 |FR5 |&check;| &check; ||
 |FR6 |&check;| &check; |&check;|
 |FR7 |&check;| &check;||
@@ -206,7 +211,56 @@ efficient way.
 
 # Use case diagram and use cases
 ## Use case diagram
-\<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
+
+```plantuml
+@startuml
+rectangle System {
+	left to right direction
+	usecase "Manage Employee" as UC2
+	usecase "Delete Employee" as UC2.1
+	usecase "Add Employee" as UC2.2
+	usecase "List Employees" as UC2.3
+	usecase "Statistics of Employee" as UC2.4
+	usecase "Search Employee" as UC2.5
+	UC2.1 <-up- UC2: <<include>>
+	UC2.2 <-up- UC2: <<include>>
+	UC2.3 <-up- UC2: <<include>>
+	UC2.4 <-up- UC2: <<include>>
+	UC2.5 <-up- UC2: <<include>>
+
+	usecase "Handle inventory" as UC3
+	usecase "Search product" as UC3.1
+  usecase "Add product" as UC3.2
+  usecase "Remove product" as UC3.3
+  usecase "Order by some criterion" as UC3.4
+	UC3.4 <-up- UC3: <<extend>>
+	UC3.3 <-up- UC3: <<include>>
+	UC3.2 <-up- UC3: <<include>>
+	UC3.1 <-up- UC3: <<include>>
+
+	usecase "Access to the system" as UC4
+	usecase "Log in" as UC4.1
+  usecase "Log out" as UC4.2
+	UC4.1 <-up- UC4: <<include>>
+	UC4.2 <-up- UC4: <<include>>
+
+	usecase "Monitor incomes" as UC5
+
+	usecase "Manage customers" as UC6
+
+	usecase "Register a sale payment" as UC7
+
+	usecase "Manage sales"
+
+}
+actor Product
+actor :Credit Card System:
+Cashier -up-|> Employee
+Manager -up-|> Employee
+Owner -up-|> Employee
+
+@enduml
+```
 
 \<ideas of use cases>
 | UC     | Description |
@@ -235,17 +289,17 @@ efficient way.
 | ------------- |:-------------:|
 |  Precondition     | The owner is logged in |  
 |  Post condition     | A new employee is added into the system |
-|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information. |
-|  Variants     | Owner provide person's information that already match with one employee in the system. The application will notify this information in the same window. |
+|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information |
+|  Variants     | Owner provide person's information that already match with one employee in the system The application will notify this information in the same window |
 
 
 ##### Scenario 1.1
 
 | Scenario 1.1 | |
 | ------------- |:-------------:|
-| Description | Owner wants to add a new employee to ones already in the system for the EZShop|
+| Description | Owner wants to add a new employee to the ones already in the system for the EZShop|
 | Precondition |  Owner is logged in|
-| Postcondition |  A new employee is added to into the system |
+| Post condition |  A new employee is added to into the system |
 |  1     | Owner click on the employees section |  
 |  2     | Owner click on the create new employee button |
 |  3     | A window is opened with all necessary fields to be filled |
@@ -256,9 +310,9 @@ efficient way.
 
 | Scenario 1.2 | |
 | ------------- |:-------------:|
-| Description | Owner wants to add a new employee to ones already in the system for the EZShop|
+| Description | Owner wants to add a new employee that is already in the system for the EZShop|
 | Precondition |  Owner is logged in|
-| Postcondition |  The entered employee is already in the system, the new employee is not added |
+| Post condition |  The entered employee is already in the system, the new employee is not added |
 |  1     | Owner click on the employees section |  
 |  2     | Owner click on the create new employee button |
 |  3     | A window is opened with all necessary fields to be filled |
@@ -267,7 +321,74 @@ efficient way.
 |  6     | An alert notify that the employee is already in the system |
 |  5     | Owner cancel the operation by clicking on the appropriate button |
 
-### Use case 2, UC2 -
+
+### Use case 8, UC8 - Create a new fidelity card
+| Actors Involved        |  |
+| ------------- |:-------------:|
+|  Precondition     | The cashier wants to create a new fidelity card for a customer |  
+|  Post condition     | A new customer and the related fidelity card is added to the system |
+|  Nominal Scenario     | The cashier select with the appropriate button the custom section, then he click over a button that prompt a windows that must be filled with the new customer information |
+|  Variants     | Owner insert customer's information that already match with one customer in the system The application will notify this information in the same window |
+
+
+##### Scenario 8.1 - Nominal
+
+| Scenario 8.1 | |
+| ------------- |:-------------:|
+| Description | The cashier wants to add a new customer and its fidelity card|
+|  Precondition     | The cashier wants to create a new fidelity card for a customer |  
+|  Post condition     | A new customer and the related fidelity card is added to the system |
+|  1     | Cashier clicks on the customer section |  
+|  2     | Cashier clicks on the create new customer button |
+|  3     | A window is opened with all necessary fields to be filled |
+|  4     | Cashier enters the new customer information |
+|  5     | Owner confirm the operation by clicking on the appropriate button |
+
+##### Scenario 8.2
+
+| Scenario 8.2 | |
+| ------------- |:-------------:|
+| Description | Owner wants to add a new employee that is already in the system for the EZShop|
+|  Precondition     | The cashier wants to create a new fidelity card for a customer |  
+|  Post condition     | The customer is not added to the system because already present |
+|  1     | Cashier clicks on the customer section |  
+|  2     | Cashier clicks on the create new customer button |
+|  3     | A window is opened with all necessary fields to be filled |
+|  4     | Cashier enters the new customer information |
+|  5     | Owner confirm the operation by clicking on the appropriate button |
+
+
+### Use case 12, UC12 - Log in
+| Actors Involved        |  |
+| ------------- |:-------------:|
+|  Precondition     | The employee is not logged in |  
+|  Post condition     | The employee is logged into the system, all functions based on the access rights are available  |
+|  Nominal Scenario     | The employee enters his user id and password in the login form and then clicks on the confirmation button |
+|  Variants     | The employee enters wrong a wrong user id or password, the system notifies a login error |
+
+
+##### Scenario 12.1 - Nominal
+
+| Scenario 12.1 | |
+| ------------- |:-------------:|
+| Description | The employee wants to log in to the system in order to use its functions  |
+| Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
+| Postcondition |  The employee is logged in |
+|  1     | The user click on the login button and a form is opened |  
+|  2     | The user enter his credential |
+|  3     | The user confirm with the appropriate button |
+
+##### Scenario 12.2
+
+| Scenario 12.2 | |
+| ------------- |:-------------:|
+| Description | The employee wants to log in to the system in order to use its functions  |
+| Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
+| Postcondition |  The employee is not logged in |
+|  1     | The user click on the login button and a form is opened |  
+|  2     | The user enter wrong credential |
+|  3     | The user can enter again the credential |
+
 ### Use case 2, UC2
 | Actors Involved        |  |
 | ------------- |:-------------:|
@@ -287,11 +408,106 @@ efficient way.
 
 \<concepts are used consistently all over the document, ex in use cases, requirements etc>
 
-# System Design
-\<describe here system design>
+```plantuml
+@startuml
+class Employee {
+	+ name
+	+ surname
+	+ id
+}
+class Right {
+	+ type
+}
+class "Product descriptor" {
+	+ id
+}
+class Offer {
+	+ start date
+	+ end date
+	+ percentage
+}
+class "Product" {
+	+ id
+}
+class Notification {
+	+ id
+	+ type
+	+ text
+}
+class "Gift card" {
+	+ id
+	+ value
+}
 
-\<must be consistent with Context diagram>
+class Customer {
+	+ name
+	+ surname
+}
+
+class "Fidelity card" {
+	+ id
+	+ points
+}
+
+class Sale {
+	+ id
+	+ data
+	+ total
+}
+
+EZShop -- "*" Employee
+Cashier -up-|> Employee
+Manager -up-|> Employee
+Owner -up-|> Employee
+Cashier "*"-- "*" Right
+Manager "*"-- "*" Right
+Owner "*" -- "*" Right
+Cashier -down- "*" Statistic
+EZShop -right- "*" "Gift card"
+
+EZShop -- Inventory
+EZShop -- Catalogue
+Inventory -- "*" Notification
+
+Inventory -right- "*" Product
+Product "*" -right- "Product descriptor" : is described by
+Catalogue -down- "Product descriptor"
+
+"Product descriptor" "*" -right- Offer
+
+EZShop -left- "*" Customer
+Customer -left- "Fidelity card"
+
+Cashier -- "*" Sale
+Sale "*" -- "1..*" "Product descriptor"
+"Fidelity card" -- "*" Sale
+
+note left of "Fidelity card" : A customer can have only\none fidelity card that Contains\nall the points.
+note right of "Gift card" : The shop can sell gift cards\nwith different values.
+note bottom of Notification : A notification contains information\nabout the products that are\ngoing to be out of stock
+note bottom of Right : Different rights are\nassociated depending\non the employee type.
+note bottom of Statistic : For each cashier a list\n of possible statistics\nis availabe in order to\neavaluate the performance.
+
+@enduml
+```
+
+# System Design
+
 
 # Deployment Diagram
+```plantuml
+@startuml
 
-\<describe here deployment diagram >
+node "Server" as server
+node "Computer" as computer1
+node "Cash register" as computer2
+
+server -up- computer1
+server -up- computer2
+artifact "DBMS" as dbms
+artifact "EZShop Application" as application
+dbms .left.> server
+application ..> computer1
+application ..> computer2
+@enduml
+```
