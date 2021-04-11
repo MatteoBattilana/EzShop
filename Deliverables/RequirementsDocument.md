@@ -250,7 +250,7 @@ rectangle System {
 
 	usecase "Register a sale payment" as UC7
 
-	usecase "Manage sales"
+	usecase "Manage sales" as UC8
 
 }
 actor Product
