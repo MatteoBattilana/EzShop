@@ -418,9 +418,6 @@ class Employee {
 class Right {
 	+ type
 }
-class "Product descriptor" {
-	+ id
-}
 class Offer {
 	+ start date
 	+ end date
@@ -466,32 +463,42 @@ Cashier -down- "*" Statistic
 EZShop -right- "*" "Gift card"
 
 EZShop -- Inventory
-EZShop -- Catalogue
 Inventory -- "*" Notification
-
 Inventory -right- "*" Product
-Product "*" -right- "Product descriptor" : is described by
-Catalogue -down- "Product descriptor"
-
-"Product descriptor" "*" -right- Offer
+Product "*" -right- Offer
 
 EZShop -left- "*" Customer
 Customer -left- "Fidelity card"
 
 Cashier -- "*" Sale
-Sale "*" -- "1..*" "Product descriptor"
+Sale "*" -- "1..*" Product
 "Fidelity card" -- "*" Sale
 
-note left of "Fidelity card" : A customer can have only\none fidelity card that Contains\nall the points.
+note left of "Fidelity card" : A customer can have only\none fidelity card that contains\nall the points.
 note right of "Gift card" : The shop can sell gift cards\nwith different values.
 note bottom of Notification : A notification contains information\nabout the products that are\ngoing to be out of stock
 note bottom of Right : Different rights are\nassociated depending\non the employee type.
-note bottom of Statistic : For each cashier a list\n of possible statistics\nis availabe in order to\neavaluate the performance.
+note bottom of Statistic : For each cashier a list\nof possible statistics\nis available in order to\nevaluate the performance.
 
 @enduml
 ```
 
 # System Design
+
+```plantuml
+@startuml
+"EZShop System" o-- Computer: is composed
+"EZShop System" o-- Server: is composed
+
+Computer o-- "Bar code scanner"
+Computer o-- "Keyboard"
+Computer o-- "Touchscreen"
+Computer o-- "Software"
+
+Server o-- "DBMS"
+
+@enduml
+```
 
 
 # Deployment Diagram
