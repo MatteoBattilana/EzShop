@@ -63,6 +63,7 @@ EZShop is a software application to:
 | CREDIT CARD SYSTEM | Service provided by merchant services and used by the application perform payment with credit/debit card |
 | PRODUCT |  Product that has to be sold to the customers |
 | SUPPLIER | Who supplies or delivers goods to the shop |
+| EMAIL GATEWAY | This is the service used to send the email notifications |
 
 
 # Context Diagram and interfaces
@@ -80,7 +81,8 @@ CASHIER -up- S
 OWNER -up- S
 MANAGER -- S
 PRODUCT -- S
-:CREDIT CARD SYSTEM: -right- S
+:CREDIT CARD SYSTEM: -down- S
+:EMAIL GATEWAY: -up- S
 @enduml
 ```
 ## Interfaces
@@ -92,29 +94,30 @@ PRODUCT -- S
 |CASHIER |GUI| Touchscreen, Keyboard on PC, mouse|
 | CREDIT CARD SYSTEM | Web services (data exchange, soap + XML) | Internet connection |
 | PRODUCT | Bar code reader laser | Bar code |
+| EMAIL GATEWAY | IMAP (Internet Message Access Protocol) | Internet connection |
 
 # Stories and personas
 
 1. **Sharon**, 37, single mother of two girls aged 3 and 6 years, owner of a small
  grocery store is committed to providing hers customers seasonal and quality fruit and vegetables but admits that often reconcile management an activity and life as a mother is not so easy.
- This affects the organization of products in the warehouse that ends up rotting and must be thrown. For this reason,she would like to know, week by week which are the  goods that have been sold less than the other, so that the next week she will order a bit less, according to the numbers.
+ This affects the organization of products in the warehouse that ends up rotting and must be thrown. For this reason,she would like to know, week by week which are the  goods that have been sold less than the other, so that the next week she will order a bit less, according to the numbers.<hr>
 
 2. **Fabio**, 30, sporty, busy and dynamic man,is a owner of a several small sports supplement stores.
   He has made fitness and wellness his purpose of life and given the great demand
   of the market for these products his revenue is increasing considerably. For this reason he
   is thinking of hiring a manager to help him manage one of his shops.
-  His main interest is to continue to manage every aspect of the shop at his best even if will not be always present.
+  His main interest is to continue to manage every aspect of the shop at his best even if will not be always present.<hr>
+
 
 3. **Alicia**, 44, a small businesswoman from Turin, owns a lovely shoes boutique.
   With the pandemic and with the economic crisis she is facing hard times but she does not give up to close permanently.
-  Every day she searches in the list of sold product, written in the receipts, which one have been sold in order to compute manually the remaining inventory. She would    like to  have a software that helps her to keep track of all products, so that her shop will be never out of stock and never excess.
+  Every day she searches in the list of sold product, written in the receipts, which one have been sold in order to compute manually the remaining inventory. She would    like to  have a software that helps her to keep track of all products, so that her shop will be never out of stock and never excess.<hr>
 
 4. **Tom**, 22, an economics student to pay for his studies, works in a small hardware store,
  thanks to his skills with numbers and bureaucracy, he was recently promoted to manager of the activity.
  So now he has to take care of monitoring all aspects of the store, from inventory, to sales, to relationships with suppliers.
  He is very happy with his new role but he is aware of the responsibilities it entails
- and he would like to be able to combine work and studies well. So he is looking for an application that  allow him to satisfy the same tasks in less time and in a more
-efficient way.
+ and he would like to be able to combine work and studies well. So he is looking for an application that  allow him to satisfy the same tasks in less time and in a more efficient way.<hr>
 
 5. **Jonathan**, 32, is the owner of a small book shop in an town; he has a tight budget and in order to cut the costs he has one stable cashier and some students that work on call, when they are free. He would like to have a software that is simply able to record his employees work shifts.
 
@@ -138,7 +141,7 @@ efficient way.
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |Add product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Remove product (automatically + manually)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |List of products + prices + number of products orderd by some criterion (list of multiple choices)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.6| Notification when product is out of stock|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.6| Email notification when product is out of stock|
 |FR4|Manage customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1 |Create a new fidelity card (with an ID)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Add new customer + unique id |
@@ -472,11 +475,11 @@ Customer -left- "Fidelity card"
 
 Cashier -- "*" Sale
 Sale "*" -- "1..*" Product
-"Fidelity card" -- "*" Sale
+"Fidelity card" "0..1" -- "*" Sale
 
 note left of "Fidelity card" : A customer can have only\none fidelity card that contains\nall the points.
 note right of "Gift card" : The shop can sell gift cards\nwith different values.
-note bottom of Notification : A notification contains information\nabout the products that are\ngoing to be out of stock
+note bottom of Notification : An email notification contains information\nabout the products that are\ngoing to be out of stock
 note bottom of Right : Different rights are\nassociated depending\non the employee type.
 note bottom of Statistic : For each cashier a list\nof possible statistics\nis available in order to\nevaluate the performance.
 
@@ -506,15 +509,12 @@ Server o-- "DBMS"
 @startuml
 
 node "Server" as server
-node "Computer" as computer1
-node "Cash register" as computer2
+node "Computer" as computer2
 
-server -up- computer1
-server -up- computer2
+server -- computer2
 artifact "DBMS" as dbms
 artifact "EZShop Application" as application
-dbms .left.> server
-application ..> computer1
+dbms .right.> server
 application ..> computer2
 @enduml
 ```
