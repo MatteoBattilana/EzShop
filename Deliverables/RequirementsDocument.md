@@ -208,9 +208,9 @@ PRODUCT -- S
 |NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager. The data should be disclosed to other cashiers at the same or lower level. |FR2|
 |NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR6|    
 |NFR8| SECURITY | The credit card information should never be recorded into the system | FR8.6 |    
-|NFR9| DOMAIN | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR8.5 |
-|NFR10| DOMAIN | VAT application on the final price depends on the local national law | FR8.5 |
-|NFR11| DOMAIN | Data protection must be in accordance with the local law (GDPR for Europe)| FR2, FR3, FR4.5, FR7, FR8.7 |
+|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR8.5 |
+|NFR10| LOCALISATION | VAT application on the final price depends on the local national law | FR8.5 |
+|NFR11| LOCALISATION | Data protection must be in accordance with the local law (GDPR for Europe)| FR2, FR3, FR4.5, FR7, FR8.7 |
 
 # Use case diagram and use cases
 ## Use case diagram
