@@ -152,9 +152,9 @@ PRODUCT -- S
 |FR5|Manage sales|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.1| List of best selling products|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.2 |List of daily sales|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.3 |List of offers (ex with products in expiration)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.4 |Create an offer|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.5 |Delete offer|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.3 |List of discounts (ex with products in expiration)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.4 |Create a discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.5 |Delete discount|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.7 |Create a gift card|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.8 |Delete gift card|
 |FR6|Access to the system|
@@ -303,7 +303,7 @@ Manager <|-up- Owner
 |  6     | An alert notify that the employee is already in the system |
 |  5     | Owner cancel the operation by clicking on the appropriate button |
 
-### Use case 2, UC2 - Modify Employee Account
+### Use case 2, UC2 - Modify Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | The owner must be logger to the EZShop Application and the account that requires modifications must exists |
@@ -314,7 +314,7 @@ Manager <|-up- Owner
 ##### Scenario 2.1 - Nominal
 |  Scenario 2.1  | |
 | ------------- |:-------------:|
-| Description | The owner wants modify an employee information due to a typo error. The employee is already in the system for the EZShop (e.g. password, Access Level, etc.)|
+| Description | The owner wants modify the employee's information due to a typo error. The employee is already in the system for the EZShop (e.g. password, Access Level, etc.)|
 | Precondition |  Owner is logged in|
 | Post condition | The existing account has been modified |
 |  Step#     | Description |  
@@ -325,7 +325,7 @@ Manager <|-up- Owner
 |5 | Owner modifies the employee account information|
 |6 | Owner saves the changes by clicking the confirm button |
 
-### Use case 3, UC3 - Disable Employee account
+### Use case 3, UC3 - Disable Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | Owner is logged |
@@ -347,42 +347,42 @@ Manager <|-up- Owner
 |6 |Owner saves the changes|
 
 
-### Use case 4, UC4 - Create an offer
+### Use case 4, UC4 - Create a discount
 | Actors Involved        | Manager |
 | ------------- |:-------------:|
 |  Precondition | Manager is logged in |  
-|  Post condition | The offer is successfully created a product and the EZShop inventory is updated |
-|  Nominal Scenario     | The manger search a product from the list, clicks over it and create an offer |
-|  Variants     | For that product another offer is still valid, a confirmation alert is promoted to the manager |
+|  Post condition | The discount is successfully created a product and the EZShop inventory is updated |
+|  Nominal Scenario     | The manger search a product from the list, clicks over it and create a discount |
+|  Variants     | For that product another discount is still valid, a confirmation alert is promoted to the manager |
 
 ##### Scenario 4.1 - Nominal
 |  Scenario 4.1  | |
 | ------------- |:-------------:|
-|  Description | Manager wants to create an offer on a products in the inventory   |
+|  Description | Manager wants to create a discount on a products in the inventory   |
 | Precondition |  Manager is logged in |
-|  Post condition | The offer is successfully created a product and the EZShop inventory is updated |
+|  Post condition | The discount is successfully created a product and the EZShop inventory is updated |
 |  Step#     | Description |  
 | 1 | Manager searches the product from the list in the inventory section|
 | 2 | Select products |
-| 3 | Create an Offer |
+| 3 | Create a discount |
 | 4 | Manager saves the changes |
 | 5 | The system re-calculate the product price |
-| 6 | The system updates the product inventory with the offer|
+| 6 | The system updates the product inventory with the discount|
 
 ##### Scenario 4.2
 |  Scenario 4.1  | |
 | ------------- |:-------------:|
-|  Description | Manager wants to create an offer on a products in the inventory, but the product has already a valid offer  |
+|  Description | Manager wants to create a discount on a products in the inventory, but the product has already a valid discount  |
 | Precondition |  Manager is logged in |
-|  Post condition | The old offer is replace with the new one |
+|  Post condition | The old discount is replace with the new one |
 |  Step#     | Description |  
 | 1 | Manager searches the product from the list in the inventory section|
 | 2 | Select products |
-| 3 | Create an Offer |
-| 4 | System prompt an alert because there is a valid offer on the product and the manager confirmation  |
+| 3 | Create a discount |
+| 4 | System prompt an alert because there is a valid discount on the product and the manager confirmation  |
 | 4 | Manager click of the confirmation button |
 | 5 | The system re-calculate the product price |
-| 6 | The system updates the product inventory with the offer|
+| 6 | The system updates the product inventory with the discount|
 
 
 ### Use case 5, UC5 - Create a new fidelity card
@@ -418,8 +418,6 @@ Manager <|-up- Owner
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Cashier enters the new customer information |
 |  5     | Owner confirm the operation by clicking on the appropriate button |
-
-
 
 
 ### Use case 6, UC6 - Manage a sale transaction
@@ -496,7 +494,7 @@ Manager <|-up- Owner
 
 ##### Scenario 7.1 - Nominal
 
-| Scenario 11.1 | |
+| Scenario 7.1 | |
 | ------------- |:-------------:|
 | Description | The employee wants to log in to the system in order to use its functions  |
 | Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
@@ -574,7 +572,7 @@ class Cashier {
 class Right {
 	+ type
 }
-class Offer {
+class Discount {
 	+ start date
 	+ end date
 	+ percentage
@@ -624,7 +622,7 @@ EZShop -right- "*" "Gift card"
 EZShop -- Inventory
 Inventory -up- "*" Notification
 Inventory -right- "*" Product
-Product "*" -right- Offer
+Product "*" -right- Discount
 Supplier "*" -up- "*" Product
 EZShop -left- "*" Customer
 Customer -left- "Fidelity card"
