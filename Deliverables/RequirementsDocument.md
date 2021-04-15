@@ -24,7 +24,7 @@ Version: 1.0
 - [Stories and personas](#stories-and-personas)
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
 	- [Functional Requirements](#functional-requirements)
-- [access right, actor vs function](#access-right-actor-vs-function)
+- [Access rights, actor vs function](#access-right-actor-vs-function)
 	- [Non Functional Requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	- [Use case diagram](#use-case-diagram)
@@ -57,7 +57,7 @@ EZShop is a software application to:
 | MANAGER| Manages the application, can insert or delete products from the inventory, order products to the suppliers, supervise the shop and the others employees (cashier)|
 | CASHIER | Handle the sales and handle the costumers|
 | CUSTOMERS | Person that want to buy products in the shop |
-| DB ADMINISTRATOR | ?? |
+| DB ADMINISTRATOR | The database administrator configure the database of the system |
 | SOFTWARE DEVELOPER | Writes the code by which the system is built, that installs also the application |
 | SYSTEM DEVELOPER | Define the hardware that must be include in the final system in order to handle the payment and the product scan |
 | CREDIT CARD SYSTEM | Service provided by merchant services and used by the application perform payment with credit/debit card |
@@ -135,6 +135,7 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |List of all the employees|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee, (for cashier daily earnings)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |Search Employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6 |Disable Employee|
 |FR3|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Order product to the suppliers|
@@ -173,7 +174,7 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.7 |Store the information about the transaction (sale, cashier and customer) |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.8 |Update inventory|
 
-## Access right, actor vs function
+## Access rights, actor vs function
 
 | Function        | Owner | Manager | Cashier|
 | ------------- |:-------------:| ------------- |:-------------:|
@@ -258,37 +259,16 @@ rectangle System {
 }
 actor Product
 actor :Credit Card System:
-Cashier -up-|> Employee
-Manager -up-|> Employee
-Owner -up-|> Employee
+Cashier <|-up- Manager
+Manager <|-up- Owner
 
 @enduml
 ```
 
-\<ideas of use cases>
-| UC     | Description |
-| ------------- |:-------------:|
-|UC1.| Create account for new employee |
-|UC2. |Modify account for employee|
-|UC3. |Delete account for employee|
-|UC4. |Add product to the inventory|
-|UC5. |Order product to the supplier|
-|UC6. |Create an offer|
-|UC7. |Remove an offer|
-|UC8. |Add new fidelity card (add new customer)|
-|UC9. |Mark point to the fidelity card (modify customer)|
-|UC10.|Give a discount|
-|UC11.|Search item|
-|UC12 |Log in|
-|UC13 |Modify price of an item|
-|UC14 |Show the inventory of all items|
-|UC15 |Check daily sales|
-|UC16 |Accounting (per day, week, month, year)|
+TODO: sale transaction
 
-
-\<next describe here each use case in the UCD>
 ### Use case 1, UC1 - Create a new employee
-| Actors Involved        |  |
+| Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | The owner is logged in |  
 |  Post condition     | A new employee is added into the system |
@@ -296,13 +276,14 @@ Owner -up-|> Employee
 |  Variants     | Owner provide person's information that already match with one employee in the system The application will notify this information in the same window |
 
 
-##### Scenario 1.1
+##### Scenario 1.1 - Nominal
 
 | Scenario 1.1 | |
 | ------------- |:-------------:|
 | Description | Owner wants to add a new employee to the ones already in the system for the EZShop|
 | Precondition |  Owner is logged in|
 | Post condition |  A new employee is added to into the system |
+|  Step#     | Description |  
 |  1     | Owner click on the employees section |  
 |  2     | Owner click on the create new employee button |
 |  3     | A window is opened with all necessary fields to be filled |
@@ -310,12 +291,12 @@ Owner -up-|> Employee
 |  5     | Owner confirm the operation by clicking on the appropriate button |
 
 ##### Scenario 1.2
-
 | Scenario 1.2 | |
 | ------------- |:-------------:|
-| Description | Owner wants to add a new employee that is already in the system for the EZShop|
+| Description | Owner tries to add a new employee that is already in the system for the EZShop|
 | Precondition |  Owner is logged in|
 | Post condition |  The entered employee is already in the system, the new employee is not added |
+|  Step#     | Description |  
 |  1     | Owner click on the employees section |  
 |  2     | Owner click on the create new employee button |
 |  3     | A window is opened with all necessary fields to be filled |
@@ -324,36 +305,116 @@ Owner -up-|> Employee
 |  6     | An alert notify that the employee is already in the system |
 |  5     | Owner cancel the operation by clicking on the appropriate button |
 
+### Use case 2, UC2 - Modify Employee Account
+| Actors Involved        | Owner |
+| ------------- |:-------------:|
+|  Precondition     | The owner must be logger to the EZShop Application and the account that requires modifications must exists |
+| Post condition | The existing account has been modified |
+|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that allows to change the employee information |
 
-### Use case 8, UC8 - Create a new fidelity card
-| Actors Involved        |  |
+
+##### Scenario 2.1 - Nominal
+|  Scenario 2.1  | |
+| ------------- |:-------------:|
+| Description | The owner wants modify an employee information due to a typo error. The employee is already in the system for the EZShop (e.g. password, Access Level, etc.)|
+| Precondition |  Owner is logged in|
+| Post condition | The existing account has been modified |
+|  Step#     | Description |  
+|  1     | Owner click on the employees section |  
+|  2     | Owner search the user that wants to modify |  
+| 3 | Owner selects the modify command for that employee|
+|4 | System presents the employee details. The screen opens in edit mode|
+|5 | Owner modifies the employee account information|
+|6 | Owner saves the changes by clicking the confirm button |
+
+### Use case 3, UC3 - Disable Employee account
+| Actors Involved        | Owner |
+| ------------- |:-------------:|
+|  Precondition     | Owner is logged |
+| Post condition | An existing employee account has been disable from access the EZShop Application |
+|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information |
+
+##### Scenario 3.1 - Nominal
+|  Scenario 3.1  | |
+| ------------- |:-------------:|
+| Description | Owner wants disable an employee that is already in the system for the EZShop |
+| Precondition |  Owner is logged in |
+| Post condition | The existing employee account has been disable from access the EZShop Application |
+|  Step#     | Description |  
+|  1     | Owner click on the employees section |  
+|  2     | Owner search the user that wants to modify |  
+| 3 | Owner selects the modify command for that employee|
+|4 | System presents the employee details. The screen opens in edit mode|
+|5|Owner disable the employee account|
+|6 |Owner saves the changes|
+
+
+### Use case 4, UC4 - Create an offer
+| Actors Involved        | Manager |
+| ------------- |:-------------:|
+|  Precondition | Manager is logged in |  
+|  Post condition | The offer is successfully created a product and the EZShop inventory is updated |
+|  Nominal Scenario     | The manger search a product from the list, clicks over it and create an offer |
+|  Variants     | For that product another offer is still valid, a confirmation alert is promoted to the manager |
+
+##### Scenario 4.1 - Nominal
+|  Scenario 4.1  | |
+| ------------- |:-------------:|
+|  Description | Manager wants to create an offer on a products in the inventory   |
+| Precondition |  Manager is logged in |
+|  Post condition | The offer is successfully created a product and the EZShop inventory is updated |
+|  Step#     | Description |  
+| 1 | Manager searches the product from the list in the inventory section|
+| 2 | Select products |
+| 3 | Create an Offer |
+| 4 | Manager saves the changes |
+| 5 | The system re-calculate the product price |
+| 6 | The system updates the product inventory with the offer|
+
+##### Scenario 4.2
+|  Scenario 4.1  | |
+| ------------- |:-------------:|
+|  Description | Manager wants to create an offer on a products in the inventory, but the product has already a valid offer  |
+| Precondition |  Manager is logged in |
+|  Post condition | The old offer is replace with the new one |
+|  Step#     | Description |  
+| 1 | Manager searches the product from the list in the inventory section|
+| 2 | Select products |
+| 3 | Create an Offer |
+| 4 | System prompt an alert because there is a valid offer on the product and the manager confirmation  |
+| 4 | Manager click of the confirmation button |
+| 5 | The system re-calculate the product price |
+| 6 | The system updates the product inventory with the offer|
+
+
+### Use case 5, UC5 - Create a new fidelity card
+| Actors Involved        | Manager |
 | ------------- |:-------------:|
 |  Precondition     | The cashier wants to create a new fidelity card for a customer |  
 |  Post condition     | A new customer and the related fidelity card is added to the system |
 |  Nominal Scenario     | The cashier select with the appropriate button the custom section, then he click over a button that prompt a windows that must be filled with the new customer information |
 |  Variants     | Owner insert customer's information that already match with one customer in the system The application will notify this information in the same window |
 
-
-##### Scenario 8.1 - Nominal
-
-| Scenario 8.1 | |
+##### Scenario 5.1 - Nominal
+|  Scenario 5.1  | |
 | ------------- |:-------------:|
 | Description | The cashier wants to add a new customer and its fidelity card|
 |  Precondition     | The cashier wants to create a new fidelity card for a customer |  
 |  Post condition     | A new customer and the related fidelity card is added to the system |
+|  Step#     | Description |  
 |  1     | Cashier clicks on the customer section |  
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Cashier enters the new customer information |
 |  5     | Owner confirm the operation by clicking on the appropriate button |
 
-##### Scenario 8.2
-
-| Scenario 8.2 | |
+##### Scenario 5.2
+|  Scenario 5.2  | |
 | ------------- |:-------------:|
 | Description | Owner wants to add a new employee that is already in the system for the EZShop|
 |  Precondition     | The cashier wants to create a new fidelity card for a customer |  
 |  Post condition     | The customer is not added to the system because already present |
+|  Step#     | Description |  
 |  1     | Cashier clicks on the customer section |  
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
@@ -361,59 +422,131 @@ Owner -up-|> Employee
 |  5     | Owner confirm the operation by clicking on the appropriate button |
 
 
-### Use case 12, UC12 - Log in
-| Actors Involved        |  |
+
+
+### Use case 6, UC6 - Manage a sale transaction
+| Actors Involved        | Cashier |
+| ------------- |:-------------:|
+|  Precondition | Cashier is logged in the system |  
+|  Post condition | The sales record is stored in the system and the inventory is updated |
+|  Nominal Scenario     | The cashier starts a new transaction, cashier scans the product and the system computes the total. At the end the cashier get paid  |
+|  Variants 1    | The customer wants to pay with the credit card |
+|  Variants 2    | The scanner doesn't read correctly the product code |
+|  Variants 3    | The customer wants to use a discount code |
+
+##### Scenario 6.1 - Nominal
+|  Scenario 6.1  | |
+| ------------- |:-------------:|
+|  Description | The cashier want to perform a sale transaction for a customer that wants to buy some products with cash  |
+|  Precondition | Cashier is logged in the system |  
+|  Post condition | The sales record is stored in the system and the inventory is updated |
+|  Step#     | Description |  
+| 1 | Cashier scans all products with the bar code scanner |
+| 2 | Once all products have been scanned, the cashier ends the transaction |
+| 3 | The system computes the total and apply the VAT |
+| 4 | Cashier get paid and the transaction is recorded into the system|
+
+##### Scenario 6.2
+|  Scenario 6.2  | |
+| ------------- |:-------------:|
+|  Description | The cashier want to perform a sale transaction for a customer that wants to buy some products with credit card  |
+|  Precondition | Cashier is logged in the system |  
+|  Post condition | The sales record is stored in the system and the inventory is updated |
+|  Step#     | Description |  
+| 1 | Cashier scans all products with the bar code scanner |
+| 2 | Once all products have been scanned, the cashier ends the transaction |
+| 3 | The system computes the total and apply the VAT |
+| 4 | Cashier get paid via the credit card system
+|5|The transaction is recorded into the system|
+
+##### Scenario 6.3
+|  Scenario 6.3  | |
+| ------------- |:-------------:|
+| Description | The cashier isn't able to scan a product, the product code in inserted directly from the keyboard |
+|  Precondition | Cashier is logged in the system |  
+|  Post condition | The sales record is stored in the system and the inventory is updated |
+|  Step#     | Description |  
+| 1 | Cashier scans all products with the bar code scanner except one |
+| 2 | The cashier insert the product code directly in to the transaction via the keyboard |
+| 3 | Once all products have been scanned, the cashier ends the transaction |
+| 4 | The system computes the total and apply the VAT |
+| 5 | Cashier get paid via the credit card system
+| 6 | The transaction is recorded into the system|
+
+##### Scenario 6.4
+|  Scenario 6.4  | |
+| ------------- |:-------------:|
+|  Description | The cashier want to perform a sale transaction for a customer that wants to buy some products and has a coupon |
+|  Precondition | Cashier is logged in the system |  
+|  Post condition | The sales record is stored in the system and the inventory is updated |
+|  Step#     | Description |  
+| 1 | Cashier scans all products with the bar code scanner |
+| 2 | Once all products have been scanned, the cashier ends the transaction |
+| 3 | Cashiers insert the coupons given by the customer |
+| 4 | The system computes the total and apply the VAT |
+| 5 | Cashier get paid and the transaction is recorded into the system|
+
+
+### Use case 7, UC7 - Log in
+| Actors Involved        | Cashier |
 | ------------- |:-------------:|
 |  Precondition     | The employee is not logged in |  
 |  Post condition     | The employee is logged into the system, all functions based on the access rights are available  |
-|  Nominal Scenario     | The employee enters his user id and password in the login form and then clicks on the confirmation button |
-|  Variants     | The employee enters wrong a wrong user id or password, the system notifies a login error |
+|  Nominal Scenario     | The employee enters his id and password in the login form and then clicks on the confirmation button |
+|  Variants     | The employee enters wrong a wrong id or password, the system notifies a login error |
 
 
-##### Scenario 12.1 - Nominal
+##### Scenario 7.1 - Nominal
 
-| Scenario 12.1 | |
+| Scenario 11.1 | |
 | ------------- |:-------------:|
 | Description | The employee wants to log in to the system in order to use its functions  |
 | Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
 | Postcondition |  The employee is logged in |
-|  1     | The user click on the login button and a form is opened |  
-|  2     | The user enter his credential |
-|  3     | The user confirm with the appropriate button |
+|  Step#     | Description |  
+|  1    | The employee click on the login button and a form is opened |  
+|  2    | The employee enter his credential |
+|  3    | The employee confirm with the appropriate button |
 
-##### Scenario 12.2
+##### Scenario 7.2
 
-| Scenario 12.2 | |
+| Scenario 11.2 | |
 | ------------- |:-------------:|
 | Description | The employee wants to log in to the system in order to use its functions  |
 | Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
 | Postcondition |  The employee is not logged in |
-|  1     | The user click on the login button and a form is opened |  
-|  2     | The user enter wrong credential |
-|  3     | The user can enter again the credential |
+|  Step#     | Description |  
+|  1     | The employee click on the login button and a form is opened |  
+|  2     | The employee enter wrong credential |
+|  3     | The employee can enter again the credential |
 
-### Use case 2, UC2
-| Actors Involved        |  |
+
+
+
+### Use case 8, UC8 - Modify price of an item
+| Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
-|  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
-|  Nominal Scenario     | \<Textual description of actions executed by the UC> |
-|  Variants     | \<other executions, ex in case of errors> |
+|  Precondition | Owner is logged in |  
+|  Post condition | Successfully modify price of the product in the inventory|
+|  Nominal Scenario     | The owner select with the appropriate button the inventory section, then he select the product and insert the new price |
 
-### Use case x, UCx
-..
-
+##### Scenario 8.1 - Nominal
+|  Scenario 8.1  | |
+| ------------- |:-------------:|
+|  Description | The owner wants to modify the price of a product in the inventory  |
+| Precondition |  The owner is logged in the system and the application is already opened and running in the computer |
+| Postcondition |  The price of the product is updated with the new one |
+| 1 | Owner searches the product from the list in the inventory section|
+| 2 | Owner select the product |
+| 3 | Owner enter the new price |
+| 4 | Owner save the changes |
 
 
 # Glossary
 
-\<use UML class diagram to define important terms, or concepts in the domain of the system, and their relationships>
-
-\<concepts are used consistently all over the document, ex in use cases, requirements etc>
-
 ```plantuml
 @startuml
-class Employee {
+class Cashier {
 	+ name
 	+ surname
 	+ id
@@ -455,23 +588,27 @@ class Sale {
 	+ total
 }
 
-EZShop -- "*" Employee
-Cashier -up-|> Employee
-Manager -up-|> Employee
-Owner -up-|> Employee
+class Supplier {
+	+ name
+	+ email
+	+ telephone
+}
+
+EZShop -- "*" Cashier
+Manager -up-|> Cashier
+Owner -up-|> Manager
 Cashier "*"-- "*" Right
-Manager "*"-- "*" Right
-Owner "*" -- "*" Right
 Cashier -down- "*" Statistic
 EZShop -right- "*" "Gift card"
 
 EZShop -- Inventory
-Inventory -- "*" Notification
+Inventory -up- "*" Notification
 Inventory -right- "*" Product
 Product "*" -right- Offer
-
+Supplier "*" -up- "*" Product
 EZShop -left- "*" Customer
 Customer -left- "Fidelity card"
+Manager -- Inventory
 
 Cashier -- "*" Sale
 Sale "*" -- "1..*" Product
@@ -479,7 +616,7 @@ Sale "*" -- "1..*" Product
 
 note left of "Fidelity card" : A customer can have only\none fidelity card that contains\nall the points.
 note right of "Gift card" : The shop can sell gift cards\nwith different values.
-note bottom of Notification : An email notification contains information\nabout the products that are\ngoing to be out of stock
+note top of Notification : An email notification contains \ninformation about the products that\nare going to be out of stock
 note bottom of Right : Different rights are\nassociated depending\non the employee type.
 note bottom of Statistic : For each cashier a list\nof possible statistics\nis available in order to\nevaluate the performance.
 
@@ -496,7 +633,9 @@ note bottom of Statistic : For each cashier a list\nof possible statistics\nis a
 Computer o-- "Bar code scanner"
 Computer o-- "Keyboard"
 Computer o-- "Touchscreen"
+Computer o-- "Mouse"
 Computer o-- "Software"
+Computer o-- "Ticket machine"
 
 Server o-- "DBMS"
 
@@ -518,3 +657,6 @@ dbms .right.> server
 application ..> computer2
 @enduml
 ```
+
+### System configuration
+The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Ticket machine and the Bar code scanner.
