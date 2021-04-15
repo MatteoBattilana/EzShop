@@ -2,9 +2,9 @@
 
 Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date: 08/04/2021
+Date: 15/04/2021
 
-Version: 1.0
+Version: 1.1
 
 # Contents
 
