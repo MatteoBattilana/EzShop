@@ -265,8 +265,6 @@ Manager <|-up- Owner
 @enduml
 ```
 
-TODO: sale transaction
-
 ### Use case 1, UC1 - Create a new employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
@@ -540,6 +538,28 @@ TODO: sale transaction
 | 2 | Owner select the product |
 | 3 | Owner enter the new price |
 | 4 | Owner save the changes |
+
+
+### Use case 9, UC9 - Create a new employee
+| Actors Involved        | Owner |
+| ------------- |:-------------:|
+|  Precondition     | The owner is logged in |  
+|  Post condition     | The statistics of the employee are shown to the owner |
+|  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt the employee's statistics |
+
+
+##### Scenario 9.1 - Nominal
+
+| Scenario 9.1 | |
+| ------------- |:-------------:|
+| Description | Owner to get the number of sales in this week for a specific cashier|
+| Precondition |  Owner is logged in|
+|  Post condition     | The statistics of the employee are shown to the owner |
+|  Step#     | Description |  
+|  1     | Owner click on the statistics section |  
+|  2     | Owner search and select a cashier |
+|  3     | A window is opened and the owner can select the week he want to check|
+|  4     | The system generates the statistics for that cashier for the selected week |
 
 
 # Glossary
