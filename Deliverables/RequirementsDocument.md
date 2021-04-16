@@ -139,6 +139,8 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee, (for cashier daily earnings)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |Search Employee|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6 |Disable Employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.7 |Add a work-shift into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.8 |Modify a work-shift that is already into the work-shift timetable common to all employees|
 |FR3|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Order product to the suppliers|
@@ -186,6 +188,8 @@ PRODUCT -- S
 |FR2.2| &check;|  ||
 |FR2.3|&check;| &check;||  
 |FR2.4|&check;| &check;||
+|FR2.7|&check;| &check;||  
+|FR2.8|&check;| &check;||
 |FR3.1|&check;| &check;| &check;|
 |FR3.2|&check;| &check;||  
 |FR3.3| &check;| &check;||
@@ -586,34 +590,32 @@ Manager <|-up- Owner
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition  | The owner/manager is login in  |
-| Post condition | The owner/manager succesfully create new timetable or modified pre-existed timetable for work-shift |
-|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then create new timetable or modify pre-existed work-shift timetable |
+| Post condition | The owner/manager successfully create new timetable or modified pre-existed timetable for work-shift of all employee|
+|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable or modify the pre-existed work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
 | ------------- |:-------------:|
-| Description | The owner/manager wants to create new work-shift timetable for better managemnet of the Ezshop|
-| Precondition |  Owner/manager open work-shift page to create new timetable|
-| Post condition | Succesfully created new work-shift timetable|
-|  Step#     | Description |  
-| 1 | Owner/Manager log in |  
-| 2 | Owner/Manager open the work-shift section |  
-| 3 | Owner create new work-shift timetable|
-| 4 | Owner insert details in the work-shift timetable |
-| 5 | Owner saves the details by clicking the confirm button |
+| Description | The owner/manager wants to add a work-shift in the work-shift timetable for better management of the EZShop|
+| Precondition |  Owner/Manager log in |
+| Post condition | Successfully created add the work-shift in the  work-shift timetable|
+|  Step#     | Description |   
+| 1 | Owner/Manager open the work-shift section |  
+| 2 | Owner create new work-shift timetable|
+| 3 | Owner insert details in the work-shift timetable |
+| 4 | Owner saves the details by clicking the confirm button |
 
 
 |  Scenario 10.2  | |
 | ------------- |:-------------:|
 | Description | The owner/manager wants to modify work-shift timetable according to the needs|
-| Precondition |  Owner/manager open work-shift page to make some modifications in the pre-existed timetable|
-| Post condition | succesfully Modify the pre-existed work-shift timetable |
+| Precondition |  Owner/Manager log in, the work-shift timetable has at least one record |
+| Post condition | Successfully modify the pre-existed work-shift timetable |
 |  Step#     | Description |  
-| 1 | Owner/Manager log in | 
-| 2 | Owner/Manager open the work-shift section |  
-| 3 | Owner select and modified pre-existed work-shift timetable|
-| 4 | Owner insert new details in the work-shift timetable |
-| 5 | Owner saves the modifications by clicking the confirm button |
+| 1 | Owner/Manager open the work-shift section |  
+| 2 | Owner select and modified pre-existed work-shift timetable|
+| 3 | Owner insert new details in the work-shift timetable |
+| 4 | Owner saves the modifications by clicking the confirm button |
 
 # Glossary
 
@@ -669,6 +671,8 @@ class Supplier {
 	+ telephone
 }
 
+EZShop -- "Work-shift\ntimetable"
+"Work-shift\ntimetable" -up- "*" Cashier
 EZShop -- "*" Cashier
 Manager -up-|> Cashier
 Owner -up-|> Manager
