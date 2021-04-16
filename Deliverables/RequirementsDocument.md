@@ -8,7 +8,6 @@ Version: 1.1
 
 # TODO
 - Finish Use Case Diagram
-- Add UC9 for Employee time shift
 
 # Contents
 
