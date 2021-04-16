@@ -6,6 +6,10 @@ Date: 15/04/2021
 
 Version: 1.1
 
+# TODO
+- Finish Use Case Diagram
+- Add UC9 for Employee time shift
+
 # Contents
 
 - [Essential description](#essential-description)
@@ -578,6 +582,16 @@ Manager <|-up- Owner
 |  3     | A window is opened and the owner can select the week he want to check|
 |  4     | The system generates the statistics for that cashier for the selected week |
 
+
+### Use case 10, UC10 - Manage Employee Workshift
+\#TODO
+| Actors Involved        | Owner |
+| ------------- |:-------------:|
+|  Precondition     |  |  
+|  Post condition     |  |
+|  Nominal Scenario     |  |
+
+##### Scenario 10.1 - Nominal
 
 # Glossary
 
