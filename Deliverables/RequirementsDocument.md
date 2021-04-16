@@ -612,6 +612,8 @@ class Discount {
 }
 class "Product" {
 	+ id
+	+ availableStock
+	+ description
 }
 class Notification {
 	+ id
