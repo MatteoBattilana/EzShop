@@ -506,7 +506,7 @@ Manager <|-up- Owner
 ### Use case 7, UC7 - Log in
 | Actors Involved        | Cashier |
 | ------------- |:-------------:|
-|  Precondition     | The employee is not logged in |  
+|  Precondition     | The employee is not logged in and login form is displayed |  
 |  Post condition     | The employee is logged into the system, all functions based on the access rights are available  |
 |  Nominal Scenario     | The employee enters his id and password in the login form and then clicks on the confirmation button |
 |  Variants     | The employee enters wrong a wrong id or password, the system notifies a login error |
@@ -519,9 +519,8 @@ Manager <|-up- Owner
 | Description | The employee wants to log in to the system in order to use its functions  |
 | Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
 | Postcondition |  The employee is logged in |
-|  Step#     | Description |  
-|  1    | The employee click on the login button and a form is opened |  
-|  2    | The employee enter his credential |
+|  Step#     | Description |   
+|  2    | The employee enter his credential, user id and password |
 |  3    | The employee confirm with the appropriate button |
 
 ##### Scenario 7.2
