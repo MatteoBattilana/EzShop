@@ -454,6 +454,7 @@ Manager <|-up- Owner
 | 3 | The system computes the total and apply the VAT |
 | 4 | Cashier get paid via the credit card system
 |5|The transaction is recorded into the system|
+| 6 | The system prints the ticket|
 
 ##### Scenario 6.3
 |  Scenario 6.3  | |
@@ -468,6 +469,7 @@ Manager <|-up- Owner
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid via the credit card system
 | 6 | The transaction is recorded into the system|
+| 7 | The system prints the ticket|
 
 ##### Scenario 6.4
 |  Scenario 6.4  | |
@@ -481,6 +483,23 @@ Manager <|-up- Owner
 | 3 | Cashiers insert the coupons given by the customer |
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid and the transaction is recorded into the system|
+| 6 | The system prints the ticket|
+
+##### Scenario 6.5
+|  Scenario 6.5  | |
+| ------------- |:-------------:|
+|  Description | The cashier want to perform a sale transaction for a customer that wants to buy some products, using the fidelity card |
+|  Precondition | Cashier is logged in the system |  
+|  Post condition | The sales record is stored in the system and the inventory is updated |
+|  Step#     | Description |  
+| 1 | Cashier scans the fidelity card |
+| 2 | Cashier scans all products with the bar code scanner |
+| 3 | Once all products have been scanned, the cashier ends the transaction |
+| 3 | The system computes the points for the current sale transaction |
+| 3 | The points are added to the current points |
+| 4 | The system computes the total and apply the VAT |
+| 5 | Cashier get paid and the transaction is recorded into the system|
+| 6 | The system prints the ticket with the number of points|
 
 
 ### Use case 7, UC7 - Log in
@@ -538,7 +557,7 @@ Manager <|-up- Owner
 | 4 | Owner save the changes |
 
 
-### Use case 9, UC9 - Create a new employee
+### Use case 9, UC9 - Employee statistics
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | The owner is logged in |  
@@ -635,7 +654,7 @@ Sale "*" -- "1..*" Product
 note left of "Fidelity card" : A customer can have only\none fidelity card that contains\nall the points.
 note right of "Gift card" : The shop can sell gift cards\nwith different values.
 note top of Notification : An email notification contains \ninformation about the products that\nare going to be out of stock
-note bottom of Right : Different rights are\nassociated depending\non the employee type.
+note top of Right : Different rights are\nassociated depending\non the employee type.
 note bottom of Statistic : For each cashier a list\nof possible statistics\nis available in order to\nevaluate the performance.
 
 @enduml
