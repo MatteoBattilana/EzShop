@@ -586,15 +586,15 @@ Manager <|-up- Owner
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition  | The owner/manager is login in  |
-| Post condition | The owner/manager succesfully create new timetable or modified pre-existed timetable for work-shift |
-|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then create new timetable or modify pre-existed work-shift timetable |
+| Post condition | The owner/manager succesfully create new timetable of all employee or modified pre-existed timetable for work-shift |
+|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then create new timetable of all employee or modify pre-existed work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
 | ------------- |:-------------:|
-| Description | The owner/manager wants to create new work-shift timetable for better managemnet of the Ezshop|
+| Description | The owner/manager wants to create new work-shift timetable of all employee for better managemnet of the Ezshop|
 | Precondition |  Owner/manager open work-shift page to create new timetable|
-| Post condition | Succesfully created new work-shift timetable|
+| Post condition | Succesfully created new work-shift timetable |
 |  Step#     | Description |  
 | 1 | Owner/Manager log in |  
 | 2 | Owner/Manager open the work-shift section |  
