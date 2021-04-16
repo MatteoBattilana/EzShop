@@ -609,7 +609,7 @@ Manager <|-up- Owner
 |  Scenario 10.2  | |
 | ------------- |:-------------:|
 | Description | The owner/manager wants to modify work-shift timetable according to the needs|
-| Precondition |  Owner/Manager log in, the work-shift timetable has at least one record |
+| Precondition |  Owner/Manager is logged in, the work-shift timetable has at least one record |
 | Post condition | Successfully modify the pre-existed work-shift timetable |
 |  Step#     | Description |  
 | 1 | Owner/Manager open the work-shift section |  
