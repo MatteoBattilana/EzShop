@@ -529,7 +529,7 @@ Manager <|-up- Owner
 
 ##### Scenario 7.2
 
-| Scenario 11.2 | |
+| Scenario 7.2 | |
 | ------------- |:-------------:|
 | Description | The employee wants to log in to the system in order to use its functions  |
 | Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
