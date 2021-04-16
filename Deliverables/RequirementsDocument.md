@@ -377,7 +377,7 @@ Manager <|-up- Owner
 | 6 | The system updates the product inventory with the discount|
 
 ##### Scenario 4.2
-|  Scenario 4.1  | |
+|  Scenario 4.2  | |
 | ------------- |:-------------:|
 |  Description | Manager wants to create a discount on a products in the inventory, but the product has already a valid discount  |
 | Precondition |  Manager is logged in |
