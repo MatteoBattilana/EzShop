@@ -147,7 +147,7 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1 |Create a new fidelity card (with an ID)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Add new customer + unique id |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of all the customers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 20% discount)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4| Give a discount |
 |FR5|Manage sales|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.1| List of best selling products|
@@ -495,11 +495,12 @@ Manager <|-up- Owner
 | 1 | Cashier scans the fidelity card |
 | 2 | Cashier scans all products with the bar code scanner |
 | 3 | Once all products have been scanned, the cashier ends the transaction |
-| 3 | The system computes the points for the current sale transaction |
-| 3 | The points are added to the current points |
-| 4 | The system computes the total and apply the VAT |
-| 5 | Cashier get paid and the transaction is recorded into the system|
-| 6 | The system prints the ticket with the number of points|
+| 4 | The system computes the points for the current sale transaction |
+| 5 | The points are added to the current points |
+| 6 | The system applies 10% discount of the sale transaction if the number of points are >= 10 |
+| 7 | The system computes the total and apply the VAT |
+| 8 | Cashier get paid and the transaction is recorded into the system|
+| 9 | The system prints the ticket with the number of points|
 
 
 ### Use case 7, UC7 - Log in
