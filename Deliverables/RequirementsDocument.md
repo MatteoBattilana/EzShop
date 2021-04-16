@@ -590,22 +590,22 @@ Manager <|-up- Owner
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition  | The owner/manager is login in  |
-| Post condition | The owner/manager successfully create new timetable or modified pre-existed timetable for work-shift of all employee|
-|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable or modify the pre-existed work-shift timetable |
+| Post condition | The owner/manager successfully create new timetable or modify the pre-existing timetable for work-shift of all employee|
+|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all employees or modify the pre-existed work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
 | ------------- |:-------------:|
 | Description | The owner/manager wants to add a work-shift in the work-shift timetable for better management of the EZShop|
-| Precondition |  Owner/Manager log in |
-| Post condition | Successfully created add the work-shift in the  work-shift timetable|
+| Precondition |  Owner/Manager is logged in |
+| Post condition | Successfully created add the work-shift in the work-shift timetable|
 |  Step#     | Description |   
 | 1 | Owner/Manager open the work-shift section |  
-| 2 | Owner create new work-shift timetable|
+| 2 | Owner create a new work-shift in the work-shift timetable|
 | 3 | Owner insert details in the work-shift timetable |
 | 4 | Owner saves the details by clicking the confirm button |
 
-
+##### Scenario 10.2
 |  Scenario 10.2  | |
 | ------------- |:-------------:|
 | Description | The owner/manager wants to modify work-shift timetable according to the needs|
