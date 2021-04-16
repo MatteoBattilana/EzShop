@@ -583,15 +583,38 @@ Manager <|-up- Owner
 |  4     | The system generates the statistics for that cashier for the selected week |
 
 
-### Use case 10, UC10 - Manage Employee Workshift
-\#TODO
+### Use case 10, UC10 - Manage Employee Work-Shift
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     |  |  
-|  Post condition     |  |
-|  Nominal Scenario     |  |
+|  Precondition  | The owner/manager is login in  |
+| Post condition | The owner/manager succesfully create new timetable or modified pre-existed timetable for work-shift |
+|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then create new timetable or modify pre-existed work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
+|  Scenario 10.1  | |
+| ------------- |:-------------:|
+| Description | The owner/manager wants to create new work-shift timetable for better managemnet of the Ezshop|
+| Precondition |  Owner/manager open work-shift page to create new timetable|
+| Post condition | Succesfully created new work-shift timetable|
+|  Step#     | Description |  
+| 1 | Owner/Manager log in |  
+| 2 | Owner/Manager open the work-shift section |  
+| 3 | Owner create new work-shift timetable|
+| 4 | Owner insert details in the work-shift timetable |
+| 5 | Owner saves the details by clicking the confirm button |
+
+
+|  Scenario 10.2  | |
+| ------------- |:-------------:|
+| Description | The owner/manager wants to modify work-shift timetable according to the needs|
+| Precondition |  Owner/manager open work-shift page to make some modifications in the pre-existed timetable|
+| Post condition | succesfully Modify the pre-existed work-shift timetable |
+|  Step#     | Description |  
+| 1 | Owner/Manager log in | 
+| 2 | Owner/Manager open the work-shift section |  
+| 3 | Owner select and modified pre-existed work-shift timetable|
+| 4 | Owner insert new details in the work-shift timetable |
+| 5 | Owner saves the modifications by clicking the confirm button |
 
 # Glossary
 
