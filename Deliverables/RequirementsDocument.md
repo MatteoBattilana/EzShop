@@ -163,22 +163,25 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.4| Statistics of Employee, (for cashier daily earnings)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.5 |Search Employee|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.6 |Disable Employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.7 |Add a work-shift into the work-shift timetable common to all employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8 |Modify a work-shift that is already into the work-shift timetable common to all employees|
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.9  |Manage rights. Authorize access to functions to specific actors according to axcesss rights|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.7  |Manage rights. Authorize access to functions to specific actors according to access rights|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8 | Manage work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.1 |Add a work-shift into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Modify a work-shift that is already into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Delete a work-shift that is already into the work-shift timetable common to all employees|
 |FR2|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1 |Search product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Order product to the suppliers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |Add product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4 |Remove product (automatically + manually)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |List of products + prices + number of products orderd by some criterion (list of multiple choices)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |List of products + prices + number of products ordered by some criterion (list of multiple choices)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6| Email notification when product is out of stock|
 |FR3|Manage customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Create a new fidelity card (with an ID)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |Add new customer + unique id |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |List of all the customers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4| Give a discount |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Add new customer + unique id |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |List of all the customers|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Manage customer points|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.1 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.2| Give a discount |
 |FR4|Manage sales|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1| List of best selling products|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of daily sales|
@@ -195,7 +198,7 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.2 |Monthly income|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.3 |Year income|
 |FR7|Register a sale payment |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Scan product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Read product barcode|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Apply possible discount|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Use possible gift card|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.4 | Get the receipt|
@@ -213,7 +216,7 @@ PRODUCT -- S
 |FR1.2| &check;|  ||
 |FR1.3|&check;| &check;||  
 |FR1.4|&check;| &check;||
-|FR1.7|&check;| &check;||  
+|FR1.7|&check;| ||  
 |FR1.8|&check;| &check;||
 |FR2.1|&check;| &check;| &check;|
 |FR2.2|&check;| &check;||  
@@ -224,6 +227,8 @@ PRODUCT -- S
 |FR3.1| &check;| &check; |&check;|
 |FR3.4| &check;| &check; |&check;|
 |FR4 |&check;| &check; ||
+|FR4.7 |&check;| &check; |&check;|
+|FR4.8 |&check;| &check; |&check;|
 |FR5 |&check;| &check; |&check;|
 |FR6 |&check;| &check;||
 |FR7 |&check;| &check; |&check;|
@@ -253,50 +258,90 @@ PRODUCT -- S
 rectangle System {
 	left to right direction
 	usecase "Manage Employee" as UC2
-	usecase "Delete Employee" as UC2.1
-	usecase "Add Employee" as UC2.2
+	usecase "Modify/Delete Employee" as UC2.1
 	usecase "List Employees" as UC2.3
 	usecase "Statistics of Employee" as UC2.4
 	usecase "Search Employee" as UC2.5
-	usecase "Manage Rights" as UC2.5
+	usecase "Manage Rights" as UC2.6
+	usecase "Manage Work-shift timetable" as UC2.7
+	usecase "Manage rights" as UC2.8
 	UC2.1 <.up. UC2: <<include>>
-	UC2.2 <.up. UC2: <<include>>
 	UC2.3 <.up. UC2: <<include>>
 	UC2.4 <.up. UC2: <<include>>
+	UC2.7 <.up. UC2: <<include>>
+	UC2.8 <.up. UC2: <<include>>
 	UC2.5 <.up. UC2: <<include>>
+	UC2.6 <.up. UC2: <<include>>
 
 	usecase "Handle inventory" as UC3
 	usecase "Search product" as UC3.1
   usecase "Add product" as UC3.2
-  usecase "Remove product" as UC3.3
   usecase "Order by some criterion" as UC3.4
-  usecase "Modify product" as UC3.5
+  usecase "Modify/Delete product" as UC3.5
 	UC3.4 <.up. UC3: <<extend>>
-	UC3.3 <.up. UC3: <<include>>
 	UC3.2 <.up. UC3: <<include>>
 	UC3.1 <.up. UC3: <<include>>
 	UC3.5 <.up. UC3: <<include>>
 
 	usecase "Access to the system" as UC4
 	usecase "Log in" as UC4.1
-  usecase "Log out" as UC4.2
+	usecase "Log out" as UC4.2
 	UC4.1 <.up. UC4: <<include>>
 	UC4.2 <.up. UC4: <<include>>
 
-	usecase "Monitor incomes" as UC5
+	usecase "Manage customers" as UC5
+	usecase "Create fidelity card" as UC5.1
+	usecase "Create customer" as UC5.1.1
+	UC5.1 <.up. UC5: <<include>>
+	UC5.1.1 <.up. UC5.1: <<extend>>
+	usecase "List customers" as UC5.2
+	usecase "Manage customer points" as UC5.2
+	usecase "Add points" as UC5.2.1
+	usecase "Generate discount" as UC5.2.2
+	UC5.2.2 <.up. UC5.2: <<extend>>
+	UC5.2.1 <.up. UC5.2: <<include>>
+	UC5.2 <.up. UC5: <<include>>
 
-	usecase "Manage customers" as UC6
+	usecase "Monitor incomes" as UC6
+	usecase "Filter by day/month/year" as UC6.1
+	UC6.1 <.up. UC6: <<extend>>
 
 	usecase "Register a sale payment" as UC7
+	usecase "Read product barcode" as UC7.1
+	usecase "Apply discount" as UC7.2
+	usecase "Compute sum" as UC7.3
+	usecase "Store transaction" as UC7.4
+	usecase "Update inventory" as UC7.5
+	usecase "Print ticket" as UC7.6
+	usecase "Apply gift card" as UC7.7
+	usecase "Get paid" as UC7.8
+	usecase "Get paid via credit card" as UC7.8.1
+	UC7.8.1 <.up. UC7.8: <<extends>>
+	UC7.8 <.up. UC7: <<include>>
+	UC7.7 <.up. UC7: <<extends>>
+	UC7.6 <.up. UC7: <<include>>
+	UC7.5 <.up. UC7: <<include>>
+	UC7.4 <.up. UC7: <<include>>
+	UC7.3 <.up. UC7: <<include>>
+	UC7.2 <.up. UC7: <<include>>
+	UC7.1 <.up. UC7: <<include>>
 
 	usecase "Manage sales" as UC8
+  usecase "Add discount" as UC8.1
+  usecase "Modify/Delete discount" as UC8.2
+  usecase "List best selling" as UC8.3
+	UC8.1 <.up. UC8: <<include>>
+	UC8.2 <.up. UC8: <<include>>
+	UC8.3 <.up. UC8: <<include>>
 
 }
 actor Product
 actor :Credit Card System:
 Cashier <|-up- Manager
 Manager <|-up- Owner
-
+Product <-up- UC7.1
+:Credit Card System: <-up- UC7.8.1
+Cashier --> UC4
 @enduml
 ```
 
