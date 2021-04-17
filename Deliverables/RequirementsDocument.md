@@ -18,6 +18,7 @@ Version: 1.1
 	+ [Interfaces](#interfaces)
 
 - [Requirements Document](#requirements-document)
+- [TODO](#todo)
 - [Contents](#contents)
 - [Essential description](#essential-description)
 - [Stakeholders](#stakeholders)
@@ -27,19 +28,43 @@ Version: 1.1
 - [Stories and personas](#stories-and-personas)
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
 	- [Functional Requirements](#functional-requirements)
-- [Access rights, actor vs function](#access-right-actor-vs-function)
+	- [Access rights, actor vs function](#access-rights-actor-vs-function)
 	- [Non Functional Requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	- [Use case diagram](#use-case-diagram)
-		- [Use case 1, UC1](#use-case-1-uc1)
-				- [Scenario 1.1](#scenario-11)
+		- [Use case 1, UC1 - Create a new employee](#use-case-1-uc1---create-a-new-employee)
+				- [Scenario 1.1 - Nominal](#scenario-11---nominal)
 				- [Scenario 1.2](#scenario-12)
-				- [Scenario 1.x](#scenario-1x)
-		- [Use case 2, UC2](#use-case-2-uc2)
-		- [Use case x, UCx](#use-case-x-ucx)
+		- [Use case 2, UC2 - Modify Employee](#use-case-2-uc2---modify-employee)
+				- [Scenario 2.1 - Nominal](#scenario-21---nominal)
+		- [Use case 3, UC3 - Disable Employee](#use-case-3-uc3---disable-employee)
+				- [Scenario 3.1 - Nominal](#scenario-31---nominal)
+		- [Use case 4, UC4 - Create a discount](#use-case-4-uc4---create-a-discount)
+				- [Scenario 4.1 - Nominal](#scenario-41---nominal)
+				- [Scenario 4.2](#scenario-42)
+		- [Use case 5, UC5 - Create a new fidelity card](#use-case-5-uc5---create-a-new-fidelity-card)
+				- [Scenario 5.1 - Nominal](#scenario-51---nominal)
+				- [Scenario 5.2](#scenario-52)
+		- [Use case 6, UC6 - Manage a sale transaction](#use-case-6-uc6---manage-a-sale-transaction)
+				- [Scenario 6.1 - Nominal](#scenario-61---nominal)
+				- [Scenario 6.2](#scenario-62)
+				- [Scenario 6.3](#scenario-63)
+				- [Scenario 6.4](#scenario-64)
+				- [Scenario 6.5](#scenario-65)
+		- [Use case 7, UC7 - Log in](#use-case-7-uc7---log-in)
+				- [Scenario 7.1 - Nominal](#scenario-71---nominal)
+				- [Scenario 7.2](#scenario-72)
+		- [Use case 8, UC8 - Modify price of an item](#use-case-8-uc8---modify-price-of-an-item)
+				- [Scenario 8.1 - Nominal](#scenario-81---nominal)
+		- [Use case 9, UC9 - Employee statistics](#use-case-9-uc9---employee-statistics)
+				- [Scenario 9.1 - Nominal](#scenario-91---nominal)
+		- [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10---manage-employee-work-shift)
+				- [Scenario 10.1 - Nominal](#scenario-101---nominal)
+				- [Scenario 10.2](#scenario-102)
 - [Glossary](#glossary)
 - [System Design](#system-design)
 - [Deployment Diagram](#deployment-diagram)
+		- [System configuration](#system-configuration)
 
 # Essential description
 
@@ -326,8 +351,8 @@ Manager <|-up- Owner
 | Post condition | The existing account has been modified |
 |  Step#     | Description |  
 |  1     | Owner click on the employees section |  
-|  2     | Owner search the user that wants to modify |  
-| 3 | Owner selects the modify command for that employee|
+|  2     | Owner clicks the modify command|  
+| 3 | Owner searches the user that wants to modifyand selects it|
 |4 | System presents the employee details. The screen opens in edit mode|
 |5 | Owner modifies the employee account information|
 |6 | Owner saves the changes by clicking the confirm button |
@@ -347,8 +372,8 @@ Manager <|-up- Owner
 | Post condition | The existing employee account has been disable from access the EZShop Application |
 |  Step#     | Description |  
 |  1     | Owner click on the employees section |  
-|  2     | Owner search the user that wants to modify |  
-| 3 | Owner selects the modify command for that employee|
+|  2     |Owner clicks the modify command |  
+| 3 | Owner searches the user that wants to modify and selects it|
 |4 | System presents the employee details. The screen opens in edit mode|
 |5|Owner disable the employee account|
 |6 |Owner saves the changes|
@@ -579,11 +604,12 @@ Manager <|-up- Owner
 | Description | Owner to get the number of sales in this week for a specific cashier|
 | Precondition |  Owner is logged in|
 |  Post condition     | The statistics of the employee are shown to the owner |
-|  Step#     | Description |  
-|  1     | Owner click on the statistics section |  
-|  2     | Owner search and select a cashier |
-|  3     | A window is opened and the owner can select the week he want to check|
-|  4     | The system generates the statistics for that cashier for the selected week |
+|  Step#     | Description | 
+|  1     | Owner clicks on the accounting section|
+|  2     | Owner click on the statistics section |  
+|  3     | Owner search and select a cashier |
+|  4     | A window is opened and the owner can select the week he want to check|
+|  5     | The system generates the statistics for that cashier for the selected week |
 
 
 ### Use case 10, UC10 - Manage Employee Work-Shift
