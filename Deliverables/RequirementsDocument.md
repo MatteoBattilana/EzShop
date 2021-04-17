@@ -156,77 +156,77 @@ PRODUCT -- S
 
 | ID        | Description  |
 | ------------- |-------------|
-|  FR1 |Manage rights. Authorize access to functions to specific actors according to axcesss rights|
-|FR2|	Manage employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1| Modify or define a new employee (manager or cashier)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Delete employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |List of all the employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee, (for cashier daily earnings)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |Search Employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6 |Disable Employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.7 |Add a work-shift into the work-shift timetable common to all employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.8 |Modify a work-shift that is already into the work-shift timetable common to all employees|
-|FR3|Handle inventory|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Order product to the suppliers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |Add product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Remove product (automatically + manually)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |List of products + prices + number of products orderd by some criterion (list of multiple choices)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.6| Email notification when product is out of stock|
-|FR4|Manage customers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1 |Create a new fidelity card (with an ID)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Add new customer + unique id |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of all the customers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4| Give a discount |
-|FR5|Manage sales|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.1| List of best selling products|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.2 |List of daily sales|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.3 |List of discounts (ex with products in expiration)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.4 |Create a discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.5 |Delete discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.7 |Create a gift card|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.8 |Delete gift card|
-|FR6|Access to the system|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.1 |Log in|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.2 |Log out|
-|FR7|Monitor incomes|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Daily income|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Monthly income|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Year income|
-|FR8|Register a sale payment |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.1| Scan product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.2 |Apply possible discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.3 |Use possible gift card|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.4 | Get the receipt|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.5 | Compute the sum|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.6 |Get paid (credit card, cash)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.7 |Store the information about the transaction (sale, cashier and customer) |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.8 |Update inventory|
+|FR1|	Manage employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.1| Modify or define a new employee (manager or cashier)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.2 |Delete employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.3 |List of all the employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.4| Statistics of Employee, (for cashier daily earnings)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.5 |Search Employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.6 |Disable Employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.7 |Add a work-shift into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8 |Modify a work-shift that is already into the work-shift timetable common to all employees|
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.9  |Manage rights. Authorize access to functions to specific actors according to axcesss rights|
+|FR2|Handle inventory|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1 |Search product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Order product to the suppliers|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |Add product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4 |Remove product (automatically + manually)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |List of products + prices + number of products orderd by some criterion (list of multiple choices)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6| Email notification when product is out of stock|
+|FR3|Manage customers|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Create a new fidelity card (with an ID)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |Add new customer + unique id |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |List of all the customers|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4| Give a discount |
+|FR4|Manage sales|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1| List of best selling products|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of daily sales|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |List of discounts (ex with products in expiration)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4 |Create a discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Delete discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.7 |Create a gift card|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.8 |Delete gift card|
+|FR5|Access to the system|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.1 |Log in|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.2 |Log out|
+|FR6|Monitor incomes|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.1| Daily income|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.2 |Monthly income|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.3 |Year income|
+|FR7|Register a sale payment |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Scan product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Apply possible discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Use possible gift card|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.4 | Get the receipt|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.5 | Compute the sum|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.6 |Get paid (credit card, cash)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.7 |Store the information about the transaction (sale, cashier and customer) |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.8 |Update inventory|
 
 ## Access rights, actor vs function
 
 | Function        | Owner | Manager | Cashier|
 | ------------- |:-------------:| ------------- |:-------------:|
 |FR1| &check;|  ||
-|FR2.1| &check; | | |
-|FR2.2| &check;|  ||
-|FR2.3|&check;| &check;||  
-|FR2.4|&check;| &check;||
-|FR2.7|&check;| &check;||  
-|FR2.8|&check;| &check;||
-|FR3.1|&check;| &check;| &check;|
-|FR3.2|&check;| &check;||  
-|FR3.3| &check;| &check;||
-|FR3.4| &check;| &check;||
-|FR3.5| &check;| &check;||
-|FR4| &check;| &check; ||
-|FR4.1| &check;| &check; |&check;|
-|FR4.4| &check;| &check; |&check;|
-|FR5 |&check;| &check; ||
-|FR6 |&check;| &check; |&check;|
-|FR7 |&check;| &check;||
-|FR8 |&check;| &check; |&check;|
+|FR1.1| &check; | | |
+|FR1.2| &check;|  ||
+|FR1.3|&check;| &check;||  
+|FR1.4|&check;| &check;||
+|FR1.7|&check;| &check;||  
+|FR1.8|&check;| &check;||
+|FR2.1|&check;| &check;| &check;|
+|FR2.2|&check;| &check;||  
+|FR2.3| &check;| &check;||
+|FR2.4| &check;| &check;||
+|FR2.5| &check;| &check;||
+|FR3| &check;| &check; ||
+|FR3.1| &check;| &check; |&check;|
+|FR3.4| &check;| &check; |&check;|
+|FR4 |&check;| &check; ||
+|FR5 |&check;| &check; |&check;|
+|FR6 |&check;| &check;||
+|FR7 |&check;| &check; |&check;|
 
 
 ## Non Functional Requirements
@@ -234,16 +234,16 @@ PRODUCT -- S
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
 |NFR1| USABILITY | Every customer with at least 3+ years experience in using a PC must be able to use all functions with no training in less than 30 minutes| All FR |
-|NFR2| PERFORMANCE| All function should respond in <0.5 sec| All FR, excluded FR8.5, FR8.6, FR8.4 |
-|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure | FR2, FR3, FR4.5, FR7, FR8.7 |           
+|NFR2| PERFORMANCE| All function should respond in <0.5 sec| All FR, excluded FR7.5, FR7.6, FR7.4 |
+|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure | FR1, FR2, FR3.5, FR6, FR7.7 |           
 |NFR4| AVAILABILITY | The system must be available for least 99% of the time|All FR|
 |NFR5| PORTABILITY| The application should be working in a Windows 10 operating system, build version 1809|All FR|
-|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager. The data should be disclosed to other cashiers at the same or lower level. |FR2|
-|NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR6|    
-|NFR8| SECURITY | The credit card information should never be recorded into the system | FR8.6 |    
-|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR8.5 |
-|NFR10| LOCALISATION | VAT application on the final price depends on the local national law | FR8.5 |
-|NFR11| LOCALISATION | Data protection must be in accordance with the local law (GDPR for Europe)| FR2, FR3, FR4.5, FR7, FR8.7 |
+|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager. The data should be disclosed to other cashiers at the same or lower level. |FR1|
+|NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR5|    
+|NFR8| SECURITY | The credit card information should never be recorded into the system | FR7.6 |    
+|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR7.5 |
+|NFR10| LOCALISATION | VAT application on the final price depends on the local national law | FR7.5 |
+|NFR11| LOCALISATION | Data protection must be in accordance with the local law (GDPR for Europe)| FR1, FR2, FR3.5, FR6, FR7.7 |
 
 # Use case diagram and use cases
 ## Use case diagram
@@ -258,27 +258,30 @@ rectangle System {
 	usecase "List Employees" as UC2.3
 	usecase "Statistics of Employee" as UC2.4
 	usecase "Search Employee" as UC2.5
-	UC2.1 <-up- UC2: <<include>>
-	UC2.2 <-up- UC2: <<include>>
-	UC2.3 <-up- UC2: <<include>>
-	UC2.4 <-up- UC2: <<include>>
-	UC2.5 <-up- UC2: <<include>>
+	usecase "Manage Rights" as UC2.5
+	UC2.1 <.up. UC2: <<include>>
+	UC2.2 <.up. UC2: <<include>>
+	UC2.3 <.up. UC2: <<include>>
+	UC2.4 <.up. UC2: <<include>>
+	UC2.5 <.up. UC2: <<include>>
 
 	usecase "Handle inventory" as UC3
 	usecase "Search product" as UC3.1
   usecase "Add product" as UC3.2
   usecase "Remove product" as UC3.3
   usecase "Order by some criterion" as UC3.4
-	UC3.4 <-up- UC3: <<extend>>
-	UC3.3 <-up- UC3: <<include>>
-	UC3.2 <-up- UC3: <<include>>
-	UC3.1 <-up- UC3: <<include>>
+  usecase "Modify product" as UC3.5
+	UC3.4 <.up. UC3: <<extend>>
+	UC3.3 <.up. UC3: <<include>>
+	UC3.2 <.up. UC3: <<include>>
+	UC3.1 <.up. UC3: <<include>>
+	UC3.5 <.up. UC3: <<include>>
 
 	usecase "Access to the system" as UC4
 	usecase "Log in" as UC4.1
   usecase "Log out" as UC4.2
-	UC4.1 <-up- UC4: <<include>>
-	UC4.2 <-up- UC4: <<include>>
+	UC4.1 <.up. UC4: <<include>>
+	UC4.2 <.up. UC4: <<include>>
 
 	usecase "Monitor incomes" as UC5
 
@@ -604,7 +607,7 @@ Manager <|-up- Owner
 | Description | Owner to get the number of sales in this week for a specific cashier|
 | Precondition |  Owner is logged in|
 |  Post condition     | The statistics of the employee are shown to the owner |
-|  Step#     | Description | 
+|  Step#     | Description |
 |  1     | Owner clicks on the accounting section|
 |  2     | Owner click on the statistics section |  
 |  3     | Owner search and select a cashier |
