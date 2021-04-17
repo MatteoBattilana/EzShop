@@ -164,11 +164,10 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Delete a work-shift that is already into the work-shift timetable common to all employees|
 |FR2|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1 |Search product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Order product to the suppliers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |Add product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4 |Remove product (automatically + manually)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |List of products + prices + number of products ordered by some criterion (list of multiple choices)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6| Email notification when product is out of stock|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Add product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |Remove product (automatically + manually)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4 |List of products + prices + number of products ordered by some criterion (list of multiple choices)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5| Email notification when product is out of stock|
 |FR3|Manage customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Create a new fidelity card (with an ID)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Add new customer + unique id |
@@ -213,10 +212,9 @@ PRODUCT -- S
 |FR1.7|&check;| ||  
 |FR1.8|&check;| &check;||
 |FR2.1|&check;| &check;| &check;|
-|FR2.2|&check;| &check;||  
+|FR2.2| &check;| &check;||
 |FR2.3| &check;| &check;||
 |FR2.4| &check;| &check;||
-|FR2.5| &check;| &check;||
 |FR3| &check;| &check; ||
 |FR3.1| &check;| &check; |&check;|
 |FR3.4| &check;| &check; |&check;|
@@ -251,64 +249,64 @@ PRODUCT -- S
 @startuml
 rectangle System {
 	left to right direction
-	usecase "Manage Employee" as UC2
-	usecase "Modify/Delete Employee" as UC2.1
-	usecase "List Employees" as UC2.3
-	usecase "Statistics of Employee" as UC2.4
-	usecase "Search Employee" as UC2.5
-	usecase "Manage Rights" as UC2.6
-	usecase "Manage Work-shift timetable" as UC2.7
-	usecase "Manage rights" as UC2.8
+	usecase "FR1 Manage employees" as UC2
+	usecase "FR1.1 Modify/Delete/Disable Employee" as UC2.1
+	usecase "FR1.3 List Employees" as UC2.3
+	usecase "FR1.4 Statistics of Employee" as UC2.4
+	usecase "FR1.5 Search Employee" as UC2.5
+	usecase "FR1.7 Manage Rights" as UC2.6
+	usecase "FR1.8 Manage Work-shift timetable" as UC2.7
 	UC2.1 <.up. UC2: <<include>>
 	UC2.3 <.up. UC2: <<include>>
 	UC2.4 <.up. UC2: <<include>>
-	UC2.7 <.up. UC2: <<include>>
-	UC2.8 <.up. UC2: <<include>>
 	UC2.5 <.up. UC2: <<include>>
 	UC2.6 <.up. UC2: <<include>>
+	UC2.7 <.up. UC2: <<include>>
 
-	usecase "Handle inventory" as UC3
-	usecase "Search product" as UC3.1
-  usecase "Add product" as UC3.2
-  usecase "Order by some criterion" as UC3.4
-  usecase "Modify/Delete product" as UC3.5
-	UC3.4 <.up. UC3: <<extend>>
+	usecase "FR2 Handle inventory" as UC3
+	usecase "FR2.1 Search product" as UC3.1
+  usecase "FR2.2 Add product" as UC3.2
+  usecase "FR2.4 List by some criterion" as UC3.4
+  usecase "FR2.3 Modify/Delete product" as UC3.5
+  usecase "FR2.5 Email notification" as UC3.6
+	UC3.4 <.up. UC3.1: <<extend>>
 	UC3.2 <.up. UC3: <<include>>
 	UC3.1 <.up. UC3: <<include>>
 	UC3.5 <.up. UC3: <<include>>
+	UC3.6 <.up. UC3: <<include>>
 
-	usecase "Access to the system" as UC4
-	usecase "Log in" as UC4.1
-	usecase "Log out" as UC4.2
+	usecase "FR5 Access to the system" as UC4
+	usecase "FR5.1 Log in" as UC4.1
+	usecase "FR5.2 Log out" as UC4.2
 	UC4.1 <.up. UC4: <<include>>
 	UC4.2 <.up. UC4: <<include>>
 
-	usecase "Manage customers" as UC5
-	usecase "Create fidelity card" as UC5.1
-	usecase "Create customer" as UC5.1.1
+	usecase "FR3 Manage customers" as UC5
+	usecase "FR3.1 Create fidelity card" as UC5.1
+	usecase "FR3.2 Create customer" as UC5.1.1
 	UC5.1 <.up. UC5: <<include>>
 	UC5.1.1 <.up. UC5.1: <<extend>>
-	usecase "List customers" as UC5.2
-	usecase "Manage customer points" as UC5.2
-	usecase "Add points" as UC5.2.1
-	usecase "Generate discount" as UC5.2.2
+	usecase "FR3.3 List customers" as UC5.2
+	usecase "FR3.4 Manage customer points" as UC5.2
+	usecase "FR3.4.1 Add points" as UC5.2.1
+	usecase "FR3.4.2 Generate discount" as UC5.2.2
 	UC5.2.2 <.up. UC5.2: <<extend>>
 	UC5.2.1 <.up. UC5.2: <<include>>
 	UC5.2 <.up. UC5: <<include>>
 
-	usecase "Monitor incomes" as UC6
-	usecase "Filter by day/month/year" as UC6.1
+	usecase "FR6 Monitor incomes" as UC6
+	usecase "FR6.1 Filter by day/month/year" as UC6.1
 	UC6.1 <.up. UC6: <<extend>>
 
-	usecase "Register a sale payment" as UC7
-	usecase "Read product barcode" as UC7.1
-	usecase "Apply discount" as UC7.2
-	usecase "Compute sum" as UC7.3
-	usecase "Store transaction" as UC7.4
-	usecase "Update inventory" as UC7.5
-	usecase "Print ticket" as UC7.6
-	usecase "Apply gift card" as UC7.7
-	usecase "Get paid" as UC7.8
+	usecase "FR7 Register a sale payment" as UC7
+	usecase "FR7.1 Read product barcode" as UC7.1
+	usecase "FR7.2 Apply discount" as UC7.2
+	usecase "FR7.5 Compute sum" as UC7.3
+	usecase "FR7.7 Store transaction" as UC7.4
+	usecase "FR7.8 Update inventory" as UC7.5
+	usecase "FR7.4 Print the receipt" as UC7.6
+	usecase "FR7.3 Apply gift card" as UC7.7
+	usecase "FR7.6 Get paid" as UC7.8
 	usecase "Get paid via credit card" as UC7.8.1
 	UC7.8.1 <.up. UC7.8: <<extends>>
 	UC7.8 <.up. UC7: <<include>>
@@ -320,13 +318,15 @@ rectangle System {
 	UC7.2 <.up. UC7: <<include>>
 	UC7.1 <.up. UC7: <<include>>
 
-	usecase "Manage sales" as UC8
-  usecase "Add discount" as UC8.1
-  usecase "Modify/Delete discount" as UC8.2
-  usecase "List best selling" as UC8.3
+	usecase "FR4 Manage sales" as UC8
+  usecase "FR4.4 Add discount" as UC8.1
+  usecase "FR4.5 Modify/Delete discount" as UC8.2
+  usecase "FR4.1 List best selling" as UC8.3
+  usecase "FR4.7 Create gift card" as UC8.4
 	UC8.1 <.up. UC8: <<include>>
 	UC8.2 <.up. UC8: <<include>>
 	UC8.3 <.up. UC8: <<include>>
+	UC8.4 <.up. UC8: <<include>>
 
 }
 actor Product
@@ -528,7 +528,7 @@ Cashier --> UC4
 | 3 | The system computes the total and apply the VAT |
 | 4 | Cashier get paid via the credit card system
 |5|The transaction is recorded into the system|
-| 6 | The system prints the ticket|
+| 6 | The system prints the receipt|
 
 ##### Scenario 6.3
 |  Scenario 6.3  | |
@@ -543,7 +543,7 @@ Cashier --> UC4
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid via the credit card system
 | 6 | The transaction is recorded into the system|
-| 7 | The system prints the ticket|
+| 7 | The system prints the receipt|
 
 ##### Scenario 6.4
 |  Scenario 6.4  | |
@@ -557,7 +557,7 @@ Cashier --> UC4
 | 3 | Cashiers insert the coupons given by the customer |
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid and the transaction is recorded into the system|
-| 6 | The system prints the ticket|
+| 6 | The system prints the receipt|
 
 ##### Scenario 6.5
 |  Scenario 6.5  | |
@@ -574,7 +574,7 @@ Cashier --> UC4
 | 6 | The system applies 10% discount of the sale transaction if the number of points are >= 10 |
 | 7 | The system computes the total and apply the VAT |
 | 8 | Cashier get paid and the transaction is recorded into the system|
-| 9 | The system prints the ticket with the number of points|
+| 9 | The system prints the receipt with the number of points|
 
 
 ### Use case 7, UC7 - Log in
@@ -782,7 +782,7 @@ Computer o-- "Keyboard"
 Computer o-- "Touchscreen"
 Computer o-- "Mouse"
 Computer o-- "Software"
-Computer o-- "Ticket machine"
+Computer o-- "Receipt machine"
 
 Server o-- "DBMS"
 
@@ -806,4 +806,4 @@ application ..> computer2
 ```
 
 ### System configuration
-The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Ticket machine and the Bar code scanner.
+The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Receipt machine and the Bar code scanner.
