@@ -11,60 +11,54 @@ Version: 1.1
 
 # Contents
 
-- [Essential description](#essential-description)
-- [Stakeholders](#stakeholders)
-- [Context Diagram and interfaces](#context-diagram-and-interfaces)
-	+ [Context Diagram](#context-diagram)
-	+ [Interfaces](#interfaces)
-
 - [Requirements Document](#requirements-document)
 - [TODO](#todo)
 - [Contents](#contents)
 - [Essential description](#essential-description)
 - [Stakeholders](#stakeholders)
 - [Context Diagram and interfaces](#context-diagram-and-interfaces)
-	- [Context Diagram](#context-diagram)
-	- [Interfaces](#interfaces)
+  * [Context Diagram](#context-diagram)
+  * [Interfaces](#interfaces)
 - [Stories and personas](#stories-and-personas)
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
-	- [Functional Requirements](#functional-requirements)
-	- [Access rights, actor vs function](#access-rights-actor-vs-function)
-	- [Non Functional Requirements](#non-functional-requirements)
+  * [Functional Requirements](#functional-requirements)
+  * [Access rights, actor vs function](#access-rights--actor-vs-function)
+  * [Non Functional Requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
-	- [Use case diagram](#use-case-diagram)
-		- [Use case 1, UC1 - Create a new employee](#use-case-1-uc1---create-a-new-employee)
-				- [Scenario 1.1 - Nominal](#scenario-11---nominal)
-				- [Scenario 1.2](#scenario-12)
-		- [Use case 2, UC2 - Modify Employee](#use-case-2-uc2---modify-employee)
-				- [Scenario 2.1 - Nominal](#scenario-21---nominal)
-		- [Use case 3, UC3 - Disable Employee](#use-case-3-uc3---disable-employee)
-				- [Scenario 3.1 - Nominal](#scenario-31---nominal)
-		- [Use case 4, UC4 - Create a discount](#use-case-4-uc4---create-a-discount)
-				- [Scenario 4.1 - Nominal](#scenario-41---nominal)
-				- [Scenario 4.2](#scenario-42)
-		- [Use case 5, UC5 - Create a new fidelity card](#use-case-5-uc5---create-a-new-fidelity-card)
-				- [Scenario 5.1 - Nominal](#scenario-51---nominal)
-				- [Scenario 5.2](#scenario-52)
-		- [Use case 6, UC6 - Manage a sale transaction](#use-case-6-uc6---manage-a-sale-transaction)
-				- [Scenario 6.1 - Nominal](#scenario-61---nominal)
-				- [Scenario 6.2](#scenario-62)
-				- [Scenario 6.3](#scenario-63)
-				- [Scenario 6.4](#scenario-64)
-				- [Scenario 6.5](#scenario-65)
-		- [Use case 7, UC7 - Log in](#use-case-7-uc7---log-in)
-				- [Scenario 7.1 - Nominal](#scenario-71---nominal)
-				- [Scenario 7.2](#scenario-72)
-		- [Use case 8, UC8 - Modify price of an item](#use-case-8-uc8---modify-price-of-an-item)
-				- [Scenario 8.1 - Nominal](#scenario-81---nominal)
-		- [Use case 9, UC9 - Employee statistics](#use-case-9-uc9---employee-statistics)
-				- [Scenario 9.1 - Nominal](#scenario-91---nominal)
-		- [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10---manage-employee-work-shift)
-				- [Scenario 10.1 - Nominal](#scenario-101---nominal)
-				- [Scenario 10.2](#scenario-102)
+  * [Use case diagram](#use-case-diagram)
+    + [Use case 1, UC1 - Create a new employee](#use-case-1--uc1---create-a-new-employee)
+        * [Scenario 1.1 - Nominal](#scenario-11---nominal)
+        * [Scenario 1.2](#scenario-12)
+    + [Use case 2, UC2 - Modify Employee](#use-case-2--uc2---modify-employee)
+        * [Scenario 2.1 - Nominal](#scenario-21---nominal)
+    + [Use case 3, UC3 - Disable Employee](#use-case-3--uc3---disable-employee)
+        * [Scenario 3.1 - Nominal](#scenario-31---nominal)
+    + [Use case 4, UC4 - Create a discount](#use-case-4--uc4---create-a-discount)
+        * [Scenario 4.1 - Nominal](#scenario-41---nominal)
+        * [Scenario 4.2](#scenario-42)
+    + [Use case 5, UC5 - Create a new fidelity card](#use-case-5--uc5---create-a-new-fidelity-card)
+        * [Scenario 5.1 - Nominal](#scenario-51---nominal)
+        * [Scenario 5.2](#scenario-52)
+    + [Use case 6, UC6 - Manage a sale transaction](#use-case-6--uc6---manage-a-sale-transaction)
+        * [Scenario 6.1 - Nominal](#scenario-61---nominal)
+        * [Scenario 6.2](#scenario-62)
+        * [Scenario 6.3](#scenario-63)
+        * [Scenario 6.4](#scenario-64)
+        * [Scenario 6.5](#scenario-65)
+    + [Use case 7, UC7 - Log in](#use-case-7--uc7---log-in)
+        * [Scenario 7.1 - Nominal](#scenario-71---nominal)
+        * [Scenario 7.2](#scenario-72)
+    + [Use case 8, UC8 - Modify price of an item](#use-case-8--uc8---modify-price-of-an-item)
+        * [Scenario 8.1 - Nominal](#scenario-81---nominal)
+    + [Use case 9, UC9 - Employee statistics](#use-case-9--uc9---employee-statistics)
+        * [Scenario 9.1 - Nominal](#scenario-91---nominal)
+    + [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10--uc10---manage-employee-work-shift)
+        * [Scenario 10.1 - Nominal](#scenario-101---nominal)
+        * [Scenario 10.2](#scenario-102)
 - [Glossary](#glossary)
 - [System Design](#system-design)
 - [Deployment Diagram](#deployment-diagram)
-		- [System configuration](#system-configuration)
+    + [System configuration](#system-configuration)
 
 # Essential description
 
@@ -156,77 +150,80 @@ PRODUCT -- S
 
 | ID        | Description  |
 | ------------- |-------------|
-|  FR1 |Manage rights. Authorize access to functions to specific actors according to axcesss rights|
-|FR2|	Manage employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1| Modify or define a new employee (manager or cashier)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Delete employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |List of all the employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4| Statistics of Employee, (for cashier daily earnings)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5 |Search Employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.6 |Disable Employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.7 |Add a work-shift into the work-shift timetable common to all employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.8 |Modify a work-shift that is already into the work-shift timetable common to all employees|
-|FR3|Handle inventory|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Search product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Order product to the suppliers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |Add product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Remove product (automatically + manually)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.5 |List of products + prices + number of products orderd by some criterion (list of multiple choices)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.6| Email notification when product is out of stock|
-|FR4|Manage customers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1 |Create a new fidelity card (with an ID)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Add new customer + unique id |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of all the customers|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4| Give a discount |
-|FR5|Manage sales|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.1| List of best selling products|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.2 |List of daily sales|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.3 |List of discounts (ex with products in expiration)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.4 |Create a discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.5 |Delete discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.7 |Create a gift card|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.8 |Delete gift card|
-|FR6|Access to the system|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.1 |Log in|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.2 |Log out|
-|FR7|Monitor incomes|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Daily income|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Monthly income|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Year income|
-|FR8|Register a sale payment |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.1| Scan product|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.2 |Apply possible discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.3 |Use possible gift card|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.4 | Get the receipt|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.5 | Compute the sum|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.6 |Get paid (credit card, cash)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.7 |Store the information about the transaction (sale, cashier and customer) |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR8.8 |Update inventory|
+|FR1|	Manage employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.1| Modify or define a new employee (manager or cashier)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.2 |Delete employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.3 |List of all the employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.4| Statistics of Employee, (for cashier daily earnings)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.5 |Search Employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.6 |Disable Employee|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.7  |Manage rights. Authorize access to functions to specific actors according to access rights|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8 | Manage work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.1 |Add a work-shift into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Modify a work-shift that is already into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Delete a work-shift that is already into the work-shift timetable common to all employees|
+|FR2|Handle inventory|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1 |Search product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Add product|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |Remove product (automatically + manually)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4 |List of products + prices + number of products ordered by some criterion (list of multiple choices)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5| Email notification when product is out of stock|
+|FR3|Manage customers|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Create a new fidelity card (with an ID)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Add new customer + unique id |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |List of all the customers|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Manage customer points|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.1 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.2| Give a discount |
+|FR4|Manage sales|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1| List of best selling products|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of daily sales|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |List of discounts (ex with products in expiration)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4 |Create a discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Delete discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.7 |Create a gift card|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.8 |Delete gift card|
+|FR5|Access to the system|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.1 |Log in|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR5.2 |Log out|
+|FR6|Monitor incomes|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.1| Daily income|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.2 |Monthly income|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.3 |Year income|
+|FR7|Register a sale payment |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Read product barcode|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Apply possible discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Use possible gift card|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.4 | Get the receipt|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.5 | Compute the sum|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.6 |Get paid (credit card, cash)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.7 |Store the information about the transaction (sale, cashier and customer) |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.8 |Update inventory|
 
 ## Access rights, actor vs function
 
 | Function        | Owner | Manager | Cashier|
 | ------------- |:-------------:| ------------- |:-------------:|
 |FR1| &check;|  ||
-|FR2.1| &check; | | |
-|FR2.2| &check;|  ||
-|FR2.3|&check;| &check;||  
-|FR2.4|&check;| &check;||
-|FR2.7|&check;| &check;||  
-|FR2.8|&check;| &check;||
-|FR3.1|&check;| &check;| &check;|
-|FR3.2|&check;| &check;||  
-|FR3.3| &check;| &check;||
-|FR3.4| &check;| &check;||
-|FR3.5| &check;| &check;||
-|FR4| &check;| &check; ||
-|FR4.1| &check;| &check; |&check;|
-|FR4.4| &check;| &check; |&check;|
-|FR5 |&check;| &check; ||
-|FR6 |&check;| &check; |&check;|
-|FR7 |&check;| &check;||
-|FR8 |&check;| &check; |&check;|
+|FR1.1| &check; | | |
+|FR1.2| &check;|  ||
+|FR1.3|&check;| &check;||  
+|FR1.4|&check;| &check;||
+|FR1.7|&check;| ||  
+|FR1.8|&check;| &check;||
+|FR2.1|&check;| &check;| &check;|
+|FR2.2| &check;| &check;||
+|FR2.3| &check;| &check;||
+|FR2.4| &check;| &check;||
+|FR3| &check;| &check; ||
+|FR3.1| &check;| &check; |&check;|
+|FR3.4| &check;| &check; |&check;|
+|FR4 |&check;| &check; ||
+|FR4.7 |&check;| &check; |&check;|
+|FR4.8 |&check;| &check; |&check;|
+|FR5 |&check;| &check; |&check;|
+|FR6 |&check;| &check;||
+|FR7 |&check;| &check; |&check;|
 
 
 ## Non Functional Requirements
@@ -234,16 +231,16 @@ PRODUCT -- S
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
 |NFR1| USABILITY | Every customer with at least 3+ years experience in using a PC must be able to use all functions with no training in less than 30 minutes| All FR |
-|NFR2| PERFORMANCE| All function should respond in <0.5 sec| All FR, excluded FR8.5, FR8.6, FR8.4 |
-|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure | FR2, FR3, FR4.5, FR7, FR8.7 |           
+|NFR2| PERFORMANCE| All function should respond in <0.5 sec| All FR, excluded FR7.5, FR7.6, FR7.4 |
+|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure | FR1, FR2, FR3.5, FR6, FR7.7 |           
 |NFR4| AVAILABILITY | The system must be available for least 99% of the time|All FR|
 |NFR5| PORTABILITY| The application should be working in a Windows 10 operating system, build version 1809|All FR|
-|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager. The data should be disclosed to other cashiers at the same or lower level. |FR2|
-|NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR6|    
-|NFR8| SECURITY | The credit card information should never be recorded into the system | FR8.6 |    
-|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR8.5 |
-|NFR10| LOCALISATION | VAT application on the final price depends on the local national law | FR8.5 |
-|NFR11| LOCALISATION | Data protection must be in accordance with the local law (GDPR for Europe)| FR2, FR3, FR4.5, FR7, FR8.7 |
+|NFR6| SECURITY| The data of one cashier can be visible and modifiable only by the owner and the manager. The data should be disclosed to other cashiers at the same or lower level. |FR1|
+|NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR5|    
+|NFR8| SECURITY | The credit card information should never be recorded into the system | FR7.6 |    
+|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR7.5 |
+|NFR10| LOCALISATION | VAT application on the final price depends on the local national law | FR7.5 |
+|NFR11| LOCALISATION | Data protection must be in accordance with the local law (GDPR for Europe)| FR1, FR2, FR3.5, FR6, FR7.7 |
 
 # Use case diagram and use cases
 ## Use case diagram
@@ -252,48 +249,115 @@ PRODUCT -- S
 @startuml
 rectangle System {
 	left to right direction
-	usecase "Manage Employee" as UC2
-	usecase "Delete Employee" as UC2.1
-	usecase "Add Employee" as UC2.2
-	usecase "List Employees" as UC2.3
-	usecase "Statistics of Employee" as UC2.4
-	usecase "Search Employee" as UC2.5
-	UC2.1 <-up- UC2: <<include>>
-	UC2.2 <-up- UC2: <<include>>
-	UC2.3 <-up- UC2: <<include>>
-	UC2.4 <-up- UC2: <<include>>
-	UC2.5 <-up- UC2: <<include>>
 
-	usecase "Handle inventory" as UC3
-	usecase "Search product" as UC3.1
-  usecase "Add product" as UC3.2
-  usecase "Remove product" as UC3.3
-  usecase "Order by some criterion" as UC3.4
-	UC3.4 <-up- UC3: <<extend>>
-	UC3.3 <-up- UC3: <<include>>
-	UC3.2 <-up- UC3: <<include>>
-	UC3.1 <-up- UC3: <<include>>
+	usecase "FR1 Manage employees" as UC2
+	usecase "FR1.1 Modify/Delete/Disable Employee" as UC2.1
+	usecase "FR1.3 List Employees" as UC2.3
+	usecase "FR1.4 Statistics of Employee" as UC2.4
+	usecase "FR1.5 Search Employee" as UC2.5
+	usecase "FR1.7 Manage Rights" as UC2.6
+	usecase "FR1.8 Manage Work-shift timetable" as UC2.7
+	UC2.1 <.up. UC2: <<include>>
+	UC2.3 <.up. UC2: <<include>>
+	UC2.4 <.up. UC2: <<include>>
+	UC2.5 <.up. UC2: <<include>>
+	UC2.6 <.up. UC2: <<include>>
+	UC2.7 <.up. UC2: <<include>>
 
-	usecase "Access to the system" as UC4
-	usecase "Log in" as UC4.1
-  usecase "Log out" as UC4.2
-	UC4.1 <-up- UC4: <<include>>
-	UC4.2 <-up- UC4: <<include>>
+	usecase "FR2 Handle inventory" as UC3
+	usecase "FR2.1 Search product" as UC3.1
+  usecase "FR2.2 Add product" as UC3.2
+  usecase "FR2.4 List by some criterion" as UC3.4
+  usecase "FR2.3 Modify/Delete product" as UC3.5
+  usecase "FR2.5 Email notification" as UC3.6
+	UC3.4 <.up. UC3.1: <<extend>>
+	UC3.2 <.up. UC3: <<include>>
+	UC3.1 <.up. UC3: <<include>>
+	UC3.5 <.up. UC3: <<include>>
+	UC3.6 <.up. UC3: <<include>>
 
-	usecase "Monitor incomes" as UC5
+	usecase "FR5 Access to the system" as UC4
+	usecase "FR5.1 Log in" as UC4.1
+	usecase "FR5.2 Log out" as UC4.2
+	UC4.1 <.up. UC4: <<include>>
+	UC4.2 <.up. UC4: <<include>>
 
-	usecase "Manage customers" as UC6
+	usecase "FR3 Manage customers" as UC5
+	usecase "FR3.1 Create fidelity card" as UC5.1
+	usecase "FR3.2 Create customer" as UC5.1.1
+	UC5.1 <.up. UC5: <<include>>
+	UC5.1.1 <.up. UC5.1: <<extend>>
+	usecase "FR3.3 List customers" as UC5.2
+	usecase "FR3.4 Manage customer points" as UC5.2
+	usecase "FR3.4.1 Add points" as UC5.2.1
+	usecase "FR3.4.2 Generate discount" as UC5.2.2
+	UC5.2.2 <.up. UC5.2: <<extend>>
+	UC5.2.1 <.up. UC5.2: <<include>>
+	UC5.2 <.up. UC5: <<include>>
 
-	usecase "Register a sale payment" as UC7
+	usecase "FR6 Monitor incomes" as UC6
+	usecase "FR6.1 Filter by day/month/year" as UC6.1
+	UC6.1 <.up. UC6: <<extend>>
 
-	usecase "Manage sales" as UC8
+
+
+	usecase "FR4 Manage sales" as UC8
+  usecase "FR4.4 Add discount" as UC8.1
+  usecase "FR4.5 Modify/Delete discount" as UC8.2
+  usecase "FR4.1 List best selling" as UC8.3
+  usecase "FR4.7 Create gift card" as UC8.4
+  usecase "FR4.8 Delete gift card" as UC8.5
+	UC8.1 <.up. UC8: <<include>>
+	UC8.2 <.up. UC8: <<include>>
+	UC8.3 <.up. UC8: <<include>>
+	UC8.4 <.up. UC8: <<include>>
+	UC8.5 <.up. UC8: <<include>>
+
+  usecase "FR7 Register a sale payment" as UC7
+  usecase "FR7.2 Apply discount" as UC7.2
+  usecase "FR7.5 Compute sum" as UC7.3
+  usecase "FR7.7 Store transaction" as UC7.4
+  usecase "FR7.8 Update inventory" as UC7.5
+  usecase "FR7.4 Print the receipt" as UC7.6
+  usecase "FR7.3 Apply gift card" as UC7.7
+  usecase "FR7.6 Get paid" as UC7.8
+  usecase "Get paid via credit card" as UC7.8.1
+  usecase "FR7.1 Read product barcode" as UC7.1
+  UC7.8.1 <.up. UC7.8: <<extends>>
+  UC7.8 <.up. UC7: <<include>>
+  UC7.7 <.up. UC7: <<extends>>
+  UC7.6 <.up. UC7: <<include>>
+  UC7.5 <.up. UC7: <<include>>
+  UC7.4 <.up. UC7: <<include>>
+  UC7.3 <.up. UC7: <<include>>
+  UC7.2 <.up. UC7: <<include>>
+  UC7.1 <.up. UC7: <<include>>
 
 }
 actor Product
 actor :Credit Card System:
-Cashier <|-up- Manager
-Manager <|-up- Owner
+Cashier <|-- Manager
+Manager <|-left- Owner
+Product <-left- UC7.1
+:Credit Card System: <-up- UC7.8.1
 
+Owner -down-> UC2
+
+Manager --> UC2.3
+Manager --> UC2.4
+Manager --> UC2.7
+Manager --> UC3
+Manager --> UC4
+Manager --> UC6
+Manager --> UC8
+
+Cashier --> UC3.1
+Cashier --> UC5.1
+Cashier --> UC5.2
+Cashier --> UC4
+Cashier --> UC8.4
+Cashier --> UC8.5
+Cashier --> UC7
 @enduml
 ```
 
@@ -486,7 +550,7 @@ Manager <|-up- Owner
 | 3 | The system computes the total and apply the VAT |
 | 4 | Cashier get paid via the credit card system
 |5|The transaction is recorded into the system|
-| 6 | The system prints the ticket|
+| 6 | The system prints the receipt|
 
 ##### Scenario 6.3
 |  Scenario 6.3  | |
@@ -501,7 +565,7 @@ Manager <|-up- Owner
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid via the credit card system
 | 6 | The transaction is recorded into the system|
-| 7 | The system prints the ticket|
+| 7 | The system prints the receipt|
 
 ##### Scenario 6.4
 |  Scenario 6.4  | |
@@ -515,7 +579,7 @@ Manager <|-up- Owner
 | 3 | Cashiers insert the coupons given by the customer |
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid and the transaction is recorded into the system|
-| 6 | The system prints the ticket|
+| 6 | The system prints the receipt|
 
 ##### Scenario 6.5
 |  Scenario 6.5  | |
@@ -532,7 +596,7 @@ Manager <|-up- Owner
 | 6 | The system applies 10% discount of the sale transaction if the number of points are >= 10 |
 | 7 | The system computes the total and apply the VAT |
 | 8 | Cashier get paid and the transaction is recorded into the system|
-| 9 | The system prints the ticket with the number of points|
+| 9 | The system prints the receipt with the number of points|
 
 
 ### Use case 7, UC7 - Log in
@@ -604,7 +668,7 @@ Manager <|-up- Owner
 | Description | Owner to get the number of sales in this week for a specific cashier|
 | Precondition |  Owner is logged in|
 |  Post condition     | The statistics of the employee are shown to the owner |
-|  Step#     | Description | 
+|  Step#     | Description |
 |  1     | Owner clicks on the accounting section|
 |  2     | Owner click on the statistics section |  
 |  3     | Owner search and select a cashier |
@@ -740,7 +804,7 @@ Computer o-- "Keyboard"
 Computer o-- "Touchscreen"
 Computer o-- "Mouse"
 Computer o-- "Software"
-Computer o-- "Ticket machine"
+Computer o-- "Receipt machine"
 
 Server o-- "DBMS"
 
@@ -764,4 +828,4 @@ application ..> computer2
 ```
 
 ### System configuration
-The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Ticket machine and the Bar code scanner.
+The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Receipt machine and the Bar code scanner.
