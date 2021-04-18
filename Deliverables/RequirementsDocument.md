@@ -221,11 +221,105 @@ PRODUCT -- S
 
 # Use case diagram and use cases
 ## Use case diagram
+```plantuml
+@startuml
+	usecase "FR1 Manage employees" as UC2
+	usecase "FR1.3 List Employees" as UC2.3
+	usecase "FR1.4 Statistics of Employee" as UC2.4
+	usecase "FR1.8 Manage Work-shift timetable" as UC2.7
+	UC2.3 <.. UC2: <<include>>
+	UC2.4 <.. UC2: <<include>>
+	UC2.7 <.. UC2: <<include>>
+
+	usecase "FR2 Handle inventory" as UC3
+	usecase "FR2.1 Search product" as UC3.1
+	UC3.1 <.. UC3: <<include>>
+
+	usecase "FR5 Access to the system" as UC4
+
+	usecase "FR3 Manage customers" as UC5
+	usecase "FR6 Monitor incomes" as UC6
+
+	usecase "FR4 Manage sales" as UC8
+  usecase "FR4.7 Create gift card" as UC8.4
+  usecase "FR4.8 Delete gift card" as UC8.5
+	UC8.4 <.. UC8: <<include>>
+	UC8.5 <.. UC8: <<include>>
+
+  usecase "FR7 Register a sale payment" as UC7
+  usecase "FR7.6 Get paid" as UC7.8
+  usecase "Get paid via\ncredit card" as UC7.8.1
+  usecase "FR7.1 Read product\nbarcode" as UC7.1
+  UC7.8.1 <.up. UC7.8: <<extends>>
+  UC7.8 <.up. UC7: <<include>>
+  UC7.1 <.up. UC7: <<include>>
+
+
+Cashier <|-down- Manager
+Manager <|-down- Owner
+Product <-up- UC7.1
+:Credit Card System: <-up- UC7.8.1
+
+Owner -right-> UC2
+
+Manager --> UC2.3
+Manager --> UC2.4
+Manager -up-> UC2.7
+Manager -up-> UC3
+Manager --> UC6
+Manager --> UC8
+
+Cashier --> UC3.1
+Cashier -up-> UC4
+Cashier -up-> UC8.4
+Cashier --> UC8.5
+Cashier -right-> UC7
+Cashier -up-> UC5
+@enduml
+```
+
+### Use case complete decomposition
 
 ```plantuml
 @startuml
-rectangle System {
-	left to right direction
+
+	usecase "FR4 Manage sales" as UC8
+  usecase "FR4.4 Add discount" as UC8.1
+  usecase "FR4.5 Modify/Delete discount" as UC8.2
+  usecase "FR4.1 List best selling" as UC8.3
+  usecase "FR4.7 Create gift card" as UC8.4
+  usecase "FR4.8 Delete gift card" as UC8.5
+	UC8.1 <.up. UC8: <<include>>
+	UC8.2 <.up. UC8: <<include>>
+	UC8.3 <.up. UC8: <<include>>
+	UC8.4 <.up. UC8: <<include>>
+	UC8.5 <.up. UC8: <<include>>
+
+  usecase "FR7 Register a sale payment" as UC7
+  usecase "FR7.2 Apply discount" as UC7.2
+  usecase "FR7.5 Compute sum" as UC7.3
+  usecase "FR7.7 Store transaction" as UC7.4
+  usecase "FR7.8 Update inventory" as UC7.5
+  usecase "FR7.4 Print the receipt" as UC7.6
+  usecase "FR7.3 Apply gift card" as UC7.7
+  usecase "FR7.6 Get paid" as UC7.8
+  usecase "Get paid via credit card" as UC7.8.1
+  usecase "FR7.1 Read product barcode" as UC7.1
+  UC7.8.1 <.up. UC7.8: <<extends>>
+  UC7.8 <.up. UC7: <<include>>
+  UC7.7 <.up. UC7: <<extends>>
+  UC7.6 <.up. UC7: <<include>>
+  UC7.5 <.up. UC7: <<include>>
+  UC7.4 <.up. UC7: <<include>>
+  UC7.3 <.up. UC7: <<include>>
+  UC7.2 <.up. UC7: <<include>>
+  UC7.1 <.up. UC7: <<include>>
+@enduml
+```
+
+
+```plantuml
+@startuml
 
 	usecase "FR1 Manage employees" as UC2
 	usecase "FR1.1 Modify/Delete/Disable Employee" as UC2.1
@@ -277,64 +371,6 @@ rectangle System {
 	UC6.1 <.up. UC6: <<extend>>
 
 
-
-	usecase "FR4 Manage sales" as UC8
-  usecase "FR4.4 Add discount" as UC8.1
-  usecase "FR4.5 Modify/Delete discount" as UC8.2
-  usecase "FR4.1 List best selling" as UC8.3
-  usecase "FR4.7 Create gift card" as UC8.4
-  usecase "FR4.8 Delete gift card" as UC8.5
-	UC8.1 <.up. UC8: <<include>>
-	UC8.2 <.up. UC8: <<include>>
-	UC8.3 <.up. UC8: <<include>>
-	UC8.4 <.up. UC8: <<include>>
-	UC8.5 <.up. UC8: <<include>>
-
-  usecase "FR7 Register a sale payment" as UC7
-  usecase "FR7.2 Apply discount" as UC7.2
-  usecase "FR7.5 Compute sum" as UC7.3
-  usecase "FR7.7 Store transaction" as UC7.4
-  usecase "FR7.8 Update inventory" as UC7.5
-  usecase "FR7.4 Print the receipt" as UC7.6
-  usecase "FR7.3 Apply gift card" as UC7.7
-  usecase "FR7.6 Get paid" as UC7.8
-  usecase "Get paid via credit card" as UC7.8.1
-  usecase "FR7.1 Read product barcode" as UC7.1
-  UC7.8.1 <.up. UC7.8: <<extends>>
-  UC7.8 <.up. UC7: <<include>>
-  UC7.7 <.up. UC7: <<extends>>
-  UC7.6 <.up. UC7: <<include>>
-  UC7.5 <.up. UC7: <<include>>
-  UC7.4 <.up. UC7: <<include>>
-  UC7.3 <.up. UC7: <<include>>
-  UC7.2 <.up. UC7: <<include>>
-  UC7.1 <.up. UC7: <<include>>
-
-}
-actor Product
-actor :Credit Card System:
-Cashier <|-- Manager
-Manager <|-left- Owner
-Product <-left- UC7.1
-:Credit Card System: <-up- UC7.8.1
-
-Owner -down-> UC2
-
-Manager --> UC2.3
-Manager --> UC2.4
-Manager --> UC2.7
-Manager --> UC3
-Manager --> UC4
-Manager --> UC6
-Manager --> UC8
-
-Cashier --> UC3.1
-Cashier --> UC5.1
-Cashier --> UC5.2
-Cashier --> UC4
-Cashier --> UC8.4
-Cashier --> UC8.5
-Cashier --> UC7
 @enduml
 ```
 
