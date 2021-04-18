@@ -92,7 +92,7 @@ PRODUCT -- S
 |OWNER |GUI| Screen Keyboard on PC, mouse|
 |CASHIER |GUI| Touchscreen, Keyboard on PC, mouse|
 | CREDIT CARD SYSTEM | Web services (data exchange, soap + XML) | Internet connection |
-| PRODUCT | Bar code reader laser | Bar code |
+| PRODUCT | Barcode reader laser | Barcode |
 | EMAIL GATEWAY | IMAP (Internet Message Access Protocol) | Internet connection |
 
 # Stories and personas
@@ -144,10 +144,10 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Add product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.3 |Remove product (automatically + manually)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.4 |List of products + prices + number of products ordered by some criterion (list of multiple choices)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5| Email notification when product is out of stock|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.5| Email notification if a product is out of stock|
 |FR3|Manage customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.1 |Create a new fidelity card (with an ID)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Add new customer + unique id |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Add new customer with unique id |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |List of all the customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Manage customer points|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.1 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
@@ -233,6 +233,8 @@ PRODUCT -- S
 
 	usecase "FR2 Handle inventory" as UC3
 	usecase "FR2.1 Search product" as UC3.1
+	usecase "FR2.2 Send email if product\nout of stock" as UC3.2
+	UC3.2 <.. UC3: <<include>>
 	UC3.1 <.. UC3: <<include>>
 
 	usecase "FR5 Access to the system" as UC4
@@ -275,6 +277,9 @@ Cashier -up-> UC8.4
 Cashier --> UC8.5
 Cashier -right-> UC7
 Cashier -up-> UC5
+
+
+:Email Gateway: <-up- UC3.2
 @enduml
 ```
 
@@ -341,6 +346,8 @@ Cashier -up-> UC5
   usecase "FR2.4 List by some criterion" as UC3.4
   usecase "FR2.3 Modify/Delete product" as UC3.5
   usecase "FR2.5 Email notification" as UC3.6
+	usecase "FR2.2 Send email if product\nout of stock" as UC3.2
+	UC3.2 <.. UC3: <<include>>
 	UC3.4 <.up. UC3.1: <<extend>>
 	UC3.2 <.up. UC3: <<include>>
 	UC3.1 <.up. UC3: <<include>>
@@ -547,7 +554,7 @@ Cashier -up-> UC5
 |  Precondition | Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
-| 1 | Cashier scans all products with the bar code scanner |
+| 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the cashier ends the transaction |
 | 3 | The system computes the total and apply the VAT |
 | 4 | Cashier get paid and the transaction is recorded into the system|
@@ -559,7 +566,7 @@ Cashier -up-> UC5
 |  Precondition | Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
-| 1 | Cashier scans all products with the bar code scanner |
+| 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the cashier ends the transaction |
 | 3 | The system computes the total and apply the VAT |
 | 4 | Cashier get paid via the credit card system
@@ -573,7 +580,7 @@ Cashier -up-> UC5
 |  Precondition | Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
-| 1 | Cashier scans all products with the bar code scanner except one |
+| 1 | Cashier scans all products with the barcode scanner except one |
 | 2 | The cashier insert the product code directly in to the transaction via the keyboard |
 | 3 | Once all products have been scanned, the cashier ends the transaction |
 | 4 | The system computes the total and apply the VAT |
@@ -588,7 +595,7 @@ Cashier -up-> UC5
 |  Precondition | Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
-| 1 | Cashier scans all products with the bar code scanner |
+| 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the cashier ends the transaction |
 | 3 | Cashiers insert the coupons given by the customer |
 | 4 | The system computes the total and apply the VAT |
@@ -603,7 +610,7 @@ Cashier -up-> UC5
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans the fidelity card |
-| 2 | Cashier scans all products with the bar code scanner |
+| 2 | Cashier scans all products with the barcode scanner |
 | 3 | Once all products have been scanned, the cashier ends the transaction |
 | 4 | The system computes the points for the current sale transaction |
 | 5 | The points are added to the current points |
@@ -756,10 +763,11 @@ class "Gift card" {
 class Customer {
 	+ name
 	+ surname
+	+ user id
+	+ password
 }
 
 class "Fidelity card" {
-	+ id
 	+ points
 }
 
@@ -800,7 +808,7 @@ Sale "*" -- "1..*" Product
 note left of "Fidelity card" : A customer can have only\none fidelity card that contains\nall the points.
 note right of "Gift card" : The shop can sell gift cards\nwith different values.
 note top of Notification : An email notification contains \ninformation about the products that\nare going to be out of stock
-note top of Right : Different rights are\nassociated depending\non the employee type.
+note bottom of Right : Different rights are\nassociated depending\non the employee type.
 note bottom of Statistic : For each cashier a list\nof possible statistics\nis available in order to\nevaluate the performance.
 
 @enduml
@@ -813,7 +821,7 @@ note bottom of Statistic : For each cashier a list\nof possible statistics\nis a
 "EZShop System" o-- Computer: is composed
 "EZShop System" o-- Server: is composed
 
-Computer o-- "Bar code scanner"
+Computer o-- "Barcode scanner"
 Computer o-- "Keyboard"
 Computer o-- "Touchscreen"
 Computer o-- "Mouse"
@@ -842,4 +850,4 @@ application ..> computer2
 ```
 
 ### System configuration
-The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Receipt machine and the Bar code scanner.
+The system is based on a client-server pattern. Since the software can be used both for generating statistics about the employee and mages the inventory, it can work without the Receipt machine and the Barcode scanner.
