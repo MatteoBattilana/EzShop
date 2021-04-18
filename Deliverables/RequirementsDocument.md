@@ -6,9 +6,6 @@ Date: 18/04/2021
 
 Version: 1.2
 
-# TODO
-- Finish Use Case Diagram
-
 # Contents
 - [Essential description](#essential-description)
 - [Stakeholders](#stakeholders)
