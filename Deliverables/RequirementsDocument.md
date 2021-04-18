@@ -2,63 +2,40 @@
 
 Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date: 15/04/2021
+Date: 18/04/2021
 
-Version: 1.1
+Version: 1.2
 
 # TODO
 - Finish Use Case Diagram
 
 # Contents
-
-- [Requirements Document](#requirements-document)
-- [TODO](#todo)
-- [Contents](#contents)
 - [Essential description](#essential-description)
 - [Stakeholders](#stakeholders)
 - [Context Diagram and interfaces](#context-diagram-and-interfaces)
-  * [Context Diagram](#context-diagram)
-  * [Interfaces](#interfaces)
+  - [Context Diagram](#context-diagram)
+  - [Interfaces](#interfaces)
 - [Stories and personas](#stories-and-personas)
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
-  * [Functional Requirements](#functional-requirements)
-  * [Access rights, actor vs function](#access-rights--actor-vs-function)
-  * [Non Functional Requirements](#non-functional-requirements)
+  - [Functional Requirements](#functional-requirements)
+  - [Access rights, actor vs function](#access-rights-actor-vs-function)
+  - [Non Functional Requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
-  * [Use case diagram](#use-case-diagram)
-    + [Use case 1, UC1 - Create a new employee](#use-case-1--uc1---create-a-new-employee)
-        * [Scenario 1.1 - Nominal](#scenario-11---nominal)
-        * [Scenario 1.2](#scenario-12)
-    + [Use case 2, UC2 - Modify Employee](#use-case-2--uc2---modify-employee)
-        * [Scenario 2.1 - Nominal](#scenario-21---nominal)
-    + [Use case 3, UC3 - Disable Employee](#use-case-3--uc3---disable-employee)
-        * [Scenario 3.1 - Nominal](#scenario-31---nominal)
-    + [Use case 4, UC4 - Create a discount](#use-case-4--uc4---create-a-discount)
-        * [Scenario 4.1 - Nominal](#scenario-41---nominal)
-        * [Scenario 4.2](#scenario-42)
-    + [Use case 5, UC5 - Create a new fidelity card](#use-case-5--uc5---create-a-new-fidelity-card)
-        * [Scenario 5.1 - Nominal](#scenario-51---nominal)
-        * [Scenario 5.2](#scenario-52)
-    + [Use case 6, UC6 - Manage a sale transaction](#use-case-6--uc6---manage-a-sale-transaction)
-        * [Scenario 6.1 - Nominal](#scenario-61---nominal)
-        * [Scenario 6.2](#scenario-62)
-        * [Scenario 6.3](#scenario-63)
-        * [Scenario 6.4](#scenario-64)
-        * [Scenario 6.5](#scenario-65)
-    + [Use case 7, UC7 - Log in](#use-case-7--uc7---log-in)
-        * [Scenario 7.1 - Nominal](#scenario-71---nominal)
-        * [Scenario 7.2](#scenario-72)
-    + [Use case 8, UC8 - Modify price of an item](#use-case-8--uc8---modify-price-of-an-item)
-        * [Scenario 8.1 - Nominal](#scenario-81---nominal)
-    + [Use case 9, UC9 - Employee statistics](#use-case-9--uc9---employee-statistics)
-        * [Scenario 9.1 - Nominal](#scenario-91---nominal)
-    + [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10--uc10---manage-employee-work-shift)
-        * [Scenario 10.1 - Nominal](#scenario-101---nominal)
-        * [Scenario 10.2](#scenario-102)
+  - [Use case diagram](#use-case-diagram)
+    - [Use case 1, UC1 - Create a new employee](#use-case-1-uc1-create-a-new-employee)
+    - [Use case 2, UC2 - Modify Employee](#use-case-2-uc2-modify-employee)
+    - [Use case 3, UC3 - Disable Employee](#use-case-3-uc3-disable-employee)
+    - [Use case 4, UC4 - Create a discount](#use-case-4-uc4-create-a-discount)
+    - [Use case 5, UC5 - Create a new fidelity card](#use-case-5-uc5-create-a-new-fidelity-card)
+    - [Use case 6, UC6 - Manage a sale transaction](#use-case-6-uc6-manage-a-sale-transaction)
+    - [Use case 7, UC7 - Log in](#use-case-7-uc7-log-in)
+    - [Use case 8, UC8 - Modify price of an item](#use-case-8-uc8-modify-price-of-an-item)
+    - [Use case 9, UC9 - Employee statistics](#use-case-9-uc9-employee-statistics)
+    - [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10-manage-employee-work-shift)
 - [Glossary](#glossary)
 - [System Design](#system-design)
 - [Deployment Diagram](#deployment-diagram)
-    + [System configuration](#system-configuration)
+    - [System configuration](#system-configuration)
 
 # Essential description
 
@@ -364,7 +341,7 @@ Cashier --> UC7
 ### Use case 1, UC1 - Create a new employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | The owner is logged in |  
+|  Precondition     | The EZShop application is running, the owner is logged in |  
 |  Post condition     | A new employee is added into the system |
 |  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information |
 |  Variants     | Owner provide person's information that already match with one employee in the system The application will notify this information in the same window |
@@ -402,7 +379,7 @@ Cashier --> UC7
 ### Use case 2, UC2 - Modify Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | The owner must be logger to the EZShop Application and the account that requires modifications must exists |
+|  Precondition     | The EZShop application is running, the owner must be logger to the EZShop Application and the account that requires modifications must exists |
 | Post condition | The existing account has been modified |
 |  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that allows to change the employee information |
 
@@ -424,7 +401,7 @@ Cashier --> UC7
 ### Use case 3, UC3 - Disable Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | Owner is logged |
+|  Precondition     | The EZShop application is running and the owner is logged |
 | Post condition | An existing employee account has been disable from access the EZShop Application |
 |  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt a windows that must be filled with the new employee's information |
 
@@ -446,7 +423,7 @@ Cashier --> UC7
 ### Use case 4, UC4 - Create a discount
 | Actors Involved        | Manager |
 | ------------- |:-------------:|
-|  Precondition | Manager is logged in |  
+|  Precondition | The EZShop application is running and the Manager is logged in |  
 |  Post condition | The discount is successfully created a product and the EZShop inventory is updated |
 |  Nominal Scenario     | The manger search a product from the list, clicks over it and create a discount |
 |  Variants     | For that product another discount is still valid, a confirmation alert is promoted to the manager |
@@ -482,12 +459,12 @@ Cashier --> UC7
 
 
 ### Use case 5, UC5 - Create a new fidelity card
-| Actors Involved        | Manager |
+| Actors Involved        | Cashier |
 | ------------- |:-------------:|
-|  Precondition     | The cashier wants to create a new fidelity card for a customer |  
+|  Precondition     | The EZShop application is running and the cashier cashier is logged in |  
 |  Post condition     | A new customer and the related fidelity card is added to the system |
-|  Nominal Scenario     | The cashier select with the appropriate button the custom section, then he click over a button that prompt a windows that must be filled with the new customer information |
-|  Variants     | Owner insert customer's information that already match with one customer in the system The application will notify this information in the same window |
+|  Nominal Scenario     | The cashier wants to create a new fidelity card for a customer. The cashier select with the appropriate button the custom section, then he click over a button that prompt a windows that must be filled with the new customer information |
+|  Variants     | The cashier insert customer's information that already match with one customer in the system. The application will notify this information in the same window and will create a new fidelity card replacing the previous one |
 
 ##### Scenario 5.1 - Nominal
 |  Scenario 5.1  | |
@@ -500,26 +477,27 @@ Cashier --> UC7
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Cashier enters the new customer information |
-|  5     | Owner confirm the operation by clicking on the appropriate button |
+|  5     | Cashier confirm the operation by clicking on the appropriate button |
 
 ##### Scenario 5.2
 |  Scenario 5.2  | |
 | ------------- |:-------------:|
-| Description | Owner wants to add a new employee that is already in the system for the EZShop|
+| Description | The cashier wants to add a new customer and its fidelity card. The customer and the fidelity card is already in the system |
 |  Precondition     | The cashier wants to create a new fidelity card for a customer |  
-|  Post condition     | The customer is not added to the system because already present |
+|  Post condition     | The customer is not added to the system because already present, but a new fidelity card is created and stored in the system |
 |  Step#     | Description |  
 |  1     | Cashier clicks on the customer section |  
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Cashier enters the new customer information |
-|  5     | Owner confirm the operation by clicking on the appropriate button |
+|  6     | The system will prompt an information message, since the customer is already in the system |
+|  7     | The cashier confirm the creation of a new fidelity card, associated to the customer, invalidating the previous one |
 
 
 ### Use case 6, UC6 - Manage a sale transaction
 | Actors Involved        | Cashier |
 | ------------- |:-------------:|
-|  Precondition | Cashier is logged in the system |  
+|  Precondition | The EZShop application is running and the cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Nominal Scenario     | The cashier starts a new transaction, cashier scans the product and the system computes the total. At the end the cashier get paid  |
 |  Variants 1    | The customer wants to pay with the credit card |
@@ -602,7 +580,7 @@ Cashier --> UC7
 ### Use case 7, UC7 - Log in
 | Actors Involved        | Cashier |
 | ------------- |:-------------:|
-|  Precondition     | The employee is not logged in and login form is displayed |  
+|  Precondition     | The EZShop application is running and the employee is not logged in and login form is displayed |  
 |  Post condition     | The employee is logged into the system, all functions based on the access rights are available  |
 |  Nominal Scenario     | The employee enters his id and password in the login form and then clicks on the confirmation button |
 |  Variants     | The employee enters wrong a wrong id or password, the system notifies a login error |
@@ -637,7 +615,7 @@ Cashier --> UC7
 ### Use case 8, UC8 - Modify price of an item
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition | Owner is logged in |  
+|  Precondition | The EZShop application is running and the owner is logged in |  
 |  Post condition | Successfully modify price of the product in the inventory|
 |  Nominal Scenario     | The owner select with the appropriate button the inventory section, then he select the product and insert the new price |
 
@@ -656,7 +634,7 @@ Cashier --> UC7
 ### Use case 9, UC9 - Employee statistics
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | The owner is logged in |  
+|  Precondition     | The EZShop application is running and the owner is logged in |  
 |  Post condition     | The statistics of the employee are shown to the owner |
 |  Nominal Scenario     | The owner select with the appropriate button the employee section, then he click over a button that prompt the employee's statistics |
 
@@ -679,7 +657,7 @@ Cashier --> UC7
 ### Use case 10, UC10 - Manage Employee Work-Shift
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition  | The owner/manager is login in  |
+|  Precondition  | The EZShop application is running and the owner/manager is login in  |
 | Post condition | The owner/manager successfully create new timetable or modify the pre-existing timetable for work-shift of all employee|
 |  Nominal Scenario |The owner/manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all employees or modify the pre-existed work-shift timetable |
 
