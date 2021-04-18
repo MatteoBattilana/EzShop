@@ -285,18 +285,6 @@ Cashier -up-> UC5
 ```plantuml
 @startuml
 
-	usecase "FR4 Manage sales" as UC8
-  usecase "FR4.4 Add discount" as UC8.1
-  usecase "FR4.5 Modify/Delete discount" as UC8.2
-  usecase "FR4.1 List best selling" as UC8.3
-  usecase "FR4.7 Create gift card" as UC8.4
-  usecase "FR4.8 Delete gift card" as UC8.5
-	UC8.1 <.up. UC8: <<include>>
-	UC8.2 <.up. UC8: <<include>>
-	UC8.3 <.up. UC8: <<include>>
-	UC8.4 <.up. UC8: <<include>>
-	UC8.5 <.up. UC8: <<include>>
-
   usecase "FR7 Register a sale payment" as UC7
   usecase "FR7.2 Apply discount" as UC7.2
   usecase "FR7.5 Compute sum" as UC7.3
@@ -323,19 +311,55 @@ Cashier -up-> UC5
 ```plantuml
 @startuml
 
-	usecase "FR1 Manage employees" as UC2
-	usecase "FR1.1 Modify/Delete/Disable Employee" as UC2.1
-	usecase "FR1.3 List Employees" as UC2.3
-	usecase "FR1.4 Statistics of Employee" as UC2.4
-	usecase "FR1.5 Search Employee" as UC2.5
-	usecase "FR1.7 Manage Rights" as UC2.6
-	usecase "FR1.8 Manage Work-shift timetable" as UC2.7
-	UC2.1 <.up. UC2: <<include>>
-	UC2.3 <.up. UC2: <<include>>
-	UC2.4 <.up. UC2: <<include>>
-	UC2.5 <.up. UC2: <<include>>
-	UC2.6 <.up. UC2: <<include>>
-	UC2.7 <.up. UC2: <<include>>
+	usecase "FR4 Manage sales" as UC8
+  usecase "FR4.4 Add discount" as UC8.1
+  usecase "FR4.5 Modify/Delete discount" as UC8.2
+  usecase "FR4.1 List best selling" as UC8.3
+  usecase "FR4.7 Create gift card" as UC8.4
+  usecase "FR4.8 Delete gift card" as UC8.5
+	UC8.1 <.up. UC8: <<include>>
+	UC8.2 <.up. UC8: <<include>>
+	UC8.3 <.up. UC8: <<include>>
+	UC8.4 <.up. UC8: <<include>>
+	UC8.5 <.up. UC8: <<include>>
+
+
+		usecase "FR6 Monitor incomes" as UC6
+		usecase "FR6.1 Filter by day/month/year" as UC6.1
+		UC6.1 <.up. UC6: <<extend>>
+
+		usecase "FR5 Access to the system" as UC4
+		usecase "FR5.1 Log in" as UC4.1
+		usecase "FR5.2 Log out" as UC4.2
+		UC4.1 <.up. UC4: <<include>>
+		UC4.2 <.up. UC4: <<include>>
+
+@enduml
+```
+
+```plantuml
+@startuml
+
+usecase "FR1 Manage employees" as UC2
+usecase "FR1.1 Modify/Delete/Disable Employee" as UC2.1
+usecase "FR1.3 List Employees" as UC2.3
+usecase "FR1.4 Statistics of Employee" as UC2.4
+usecase "FR1.5 Search Employee" as UC2.5
+usecase "FR1.7 Manage Rights" as UC2.6
+usecase "FR1.8 Manage Work-shift timetable" as UC2.7
+UC2.1 <.up. UC2: <<include>>
+UC2.3 <.up. UC2: <<include>>
+UC2.4 <.up. UC2: <<include>>
+UC2.5 <.up. UC2: <<include>>
+UC2.6 <.up. UC2: <<include>>
+UC2.7 <.up. UC2: <<include>>
+
+@enduml
+```
+
+```plantuml
+@startuml
+
 
 	usecase "FR2 Handle inventory" as UC3
 	usecase "FR2.1 Search product" as UC3.1
@@ -351,11 +375,6 @@ Cashier -up-> UC5
 	UC3.5 <.up. UC3: <<include>>
 	UC3.6 <.up. UC3: <<include>>
 
-	usecase "FR5 Access to the system" as UC4
-	usecase "FR5.1 Log in" as UC4.1
-	usecase "FR5.2 Log out" as UC4.2
-	UC4.1 <.up. UC4: <<include>>
-	UC4.2 <.up. UC4: <<include>>
 
 	usecase "FR3 Manage customers" as UC5
 	usecase "FR3.1 Create fidelity card" as UC5.1
@@ -370,9 +389,6 @@ Cashier -up-> UC5
 	UC5.2.1 <.up. UC5.2: <<include>>
 	UC5.2 <.up. UC5: <<include>>
 
-	usecase "FR6 Monitor incomes" as UC6
-	usecase "FR6.1 Filter by day/month/year" as UC6.1
-	UC6.1 <.up. UC6: <<extend>>
 
 
 @enduml
