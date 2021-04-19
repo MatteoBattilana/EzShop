@@ -604,13 +604,13 @@ UC2.7 <.up. UC2: <<include>>
 ##### Scenario 6.4
 |  Scenario 6.4  | |
 | ------------- |:-------------:|
-|  Description | The cashier want to perform a sale transaction for a customer that wants to buy some products and has a coupon |
+|  Description | The cashier want to perform a sale transaction for a customer that wants to buy some products and has a gift card |
 |  Precondition | Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the cashier ends the transaction |
-| 3 | Cashiers insert the coupons given by the customer |
+| 3 | Cashiers insert the gift card given by the customer |
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier get paid and the transaction is recorded into the system|
 | 6 | The system prints the receipt|
