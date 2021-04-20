@@ -397,6 +397,8 @@ UC2.7 <.up. UC2: <<include>>
 @enduml
 ```
 
+[Go GUI Prototype](./GUIPrototype.md)
+
 ### Use case 1, UC1 - Create a new Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
