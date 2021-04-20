@@ -654,6 +654,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  The employee is not logged in the system and the application is already opened and running in the computer |
 | Postcondition |  The employee is logged in |
 |  Step#     | Description |   
+|  1     | The employee click on the login button and a form is opened |  
 |  2    | The employee enter his credential, user id and password |
 |  3    | The employee confirm with the appropriate button |
 
