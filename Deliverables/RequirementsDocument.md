@@ -2,7 +2,7 @@
 
 Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date: 18/04/2021
+Date: 20/04/2021
 
 Version: 1.2
 
@@ -19,7 +19,7 @@ Version: 1.2
   - [Non Functional Requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
   - [Use case diagram](#use-case-diagram)
-    - [Use case 1, UC1 - Create a new employee](#use-case-1-uc1-create-a-new-employee)
+    - [Use case 1, UC1 - Create a new Employee](#use-case-1-uc1-create-a-new-employee)
     - [Use case 2, UC2 - Modify Employee](#use-case-2-uc2-modify-employee)
     - [Use case 3, UC3 - Disable Employee](#use-case-3-uc3-disable-employee)
     - [Use case 4, UC4 - Create a discount](#use-case-4-uc4-create-a-discount)
@@ -147,13 +147,13 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.2 |Add new customer with unique id |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.3 |List of all the customers|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4 |Manage customer points|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.1 |Mark points every tot of shop (ex every 50 spent give them 1 point after 10 point 10% discount for the entire sale transaction)|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.1 |Mark points every tot of shop (e.g. every 15 spent give to the customer 1 point; after 50 point 10% discount for the entire sale transaction)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR3.4.2| Give a discount |
 |FR4|Manage sales|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.1| List of best selling products|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.2 |List of daily sales|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.3 |List of discounts (ex with products in expiration)|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4 |Create a discount|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.4 |Create a discount, the name of the products that are *on discount* are written in a green color, the products *out of stock* in red |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.5 |Delete discount|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.7 |Create a gift card|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR4.8 |Delete gift card|
@@ -165,14 +165,15 @@ PRODUCT -- S
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.2 |Monthly income|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR6.3 |Year income|
 |FR7|Register a sale payment |
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Read product barcode|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.1| Scan product barcode and play a feedback sound|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.2 |Apply possible discount|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Use possible gift card|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.3 |Apply possible gift card|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.4 | Get the receipt|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.5 | Compute the sum|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.6 |Get paid (credit card, cash)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.7 |Store the information about the transaction (sale, cashier and customer) |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.8 |Update inventory|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR7.9 |Remove product from the transaction list|
 
 ## Access rights, actor vs function
 
@@ -248,7 +249,7 @@ PRODUCT -- S
   usecase "FR7 Register a sale payment" as UC7
   usecase "FR7.6 Get paid" as UC7.8
   usecase "Get paid via\ncredit card" as UC7.8.1
-  usecase "FR7.1 Read product\nbarcode" as UC7.1
+  usecase "FR7.1 Scan product\nbarcode" as UC7.1
   UC7.8.1 <.up. UC7.8: <<extends>>
   UC7.8 <.up. UC7: <<include>>
   UC7.1 <.up. UC7: <<include>>
@@ -290,20 +291,22 @@ Cashier -up-> UC5
   usecase "FR7.5 Compute sum" as UC7.3
   usecase "FR7.7 Store transaction" as UC7.4
   usecase "FR7.8 Update inventory" as UC7.5
+  usecase "FR7.9 Remove product" as UC7.9
   usecase "FR7.4 Print the receipt" as UC7.6
   usecase "FR7.3 Apply gift card" as UC7.7
   usecase "FR7.6 Get paid" as UC7.8
   usecase "Get paid via credit card" as UC7.8.1
-  usecase "FR7.1 Read product barcode" as UC7.1
+  usecase "FR7.1 Scan product barcode" as UC7.1
   UC7.8.1 <.up. UC7.8: <<extends>>
   UC7.8 <.up. UC7: <<include>>
   UC7.7 <.up. UC7: <<extends>>
   UC7.6 <.up. UC7: <<include>>
   UC7.5 <.up. UC7: <<include>>
   UC7.4 <.up. UC7: <<include>>
-  UC7.3 <.up. UC7: <<include>>
-  UC7.2 <.up. UC7: <<include>>
+  UC7.3 <.up. UC7: <<extend>>
+  UC7.2 <.up. UC7: <<extend>>
   UC7.1 <.up. UC7: <<include>>
+  UC7.9 <.up. UC7: <<extend>>
 @enduml
 ```
 
@@ -394,7 +397,7 @@ UC2.7 <.up. UC2: <<include>>
 @enduml
 ```
 
-### Use case 1, UC1 - Create a new employee
+### Use case 1, UC1 - Create a new Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running, the owner is logged in |  
@@ -491,7 +494,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Manager is logged in |
 |  Post condition | The discount is successfully created a product and the EZShop inventory is updated |
 |  Step#     | Description |  
-| 1 | Manager searches the product from the list in the inventory section|
+| 1 | Manager searches the product from the list in the inventory section  |
 | 2 | Select products |
 | 3 | Create a discount |
 | 4 | Manager saves the changes |
@@ -556,9 +559,10 @@ UC2.7 <.up. UC2: <<include>>
 |  Precondition | The EZShop application is running and the cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Nominal Scenario     | The cashier starts a new transaction, cashier scans the product and the system computes the total. At the end the cashier get paid  |
-|  Variants 1    | The customer wants to pay with the credit card |
-|  Variants 2    | The scanner doesn't read correctly the product code |
-|  Variants 3    | The customer wants to use a discount code |
+|  Variant 1    | The customer wants to pay with the credit card |
+|  Variant 2    | The scanner doesn't read correctly the product code |
+|  Variant 3    | The customer wants to use a gift card |
+|  Variant 5    | The customer wants to insert the fidelity card, in order have points |
 
 ##### Scenario 6.1 - Nominal
 |  Scenario 6.1  | |
@@ -627,7 +631,7 @@ UC2.7 <.up. UC2: <<include>>
 | 3 | Once all products have been scanned, the cashier ends the transaction |
 | 4 | The system computes the points for the current sale transaction |
 | 5 | The points are added to the current points |
-| 6 | The system applies 10% discount of the sale transaction if the number of points are >= 10 |
+| 6 | The system applies 10% discount of the sale transaction if the number of points are >= 50 |
 | 7 | The system computes the total and apply the VAT |
 | 8 | Cashier get paid and the transaction is recorded into the system|
 | 9 | The system prints the receipt with the number of points|
@@ -711,35 +715,37 @@ UC2.7 <.up. UC2: <<include>>
 
 
 ### Use case 10, UC10 - Manage Employee Work-Shift
-| Actors Involved        | Owner |
+| Actors Involved        | Manager |
 | ------------- |:-------------:|
-|  Precondition  | The EZShop application is running and the owner/manager is login in  |
-| Post condition | The owner/manager successfully create new timetable or modify the pre-existing timetable for work-shift of all employee|
-|  Nominal Scenario |The owner/manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all employees or modify the pre-existed work-shift timetable |
+|  Precondition  | The EZShop application is running and the Manager is login in  |
+| Post condition | The Manager successfully create new timetable or modify the pre-existing timetable for work-shift of all employee|
+|  Nominal Scenario |The Manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all employees or modify the pre-existing work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
 | ------------- |:-------------:|
-| Description | The owner/manager wants to add a work-shift in the work-shift timetable for better management of the EZShop|
-| Precondition |  Owner/Manager is logged in |
-| Post condition | Successfully created add the work-shift in the work-shift timetable|
+| Description | The Manager wants to add a work-shift in the work-shift timetable for better management of the EZShop|
+| Precondition |  The system is running and the Manager is logged in |
+| Post condition | Successfully added the work-shift in the work-shift timetable|
 |  Step#     | Description |   
-| 1 | Owner/Manager open the work-shift section |  
-| 2 | Owner create a new work-shift in the work-shift timetable|
-| 3 | Owner insert details in the work-shift timetable |
-| 4 | Owner saves the details by clicking the confirm button |
+| 1 | Manager open the work-shift section |  
+| 2| Manager click on the appropriate add button|
+| 3| The system will highlight the free slots|
+| 4| Manager create a new work-shift in the work-shift timetable|
+| 5 | Manager insert details in the work-shift timetable |
+| 6 | Manager saves the details by clicking the confirm button |
 
 ##### Scenario 10.2
 |  Scenario 10.2  | |
 | ------------- |:-------------:|
-| Description | The owner/manager wants to modify work-shift timetable according to the needs|
-| Precondition |  Owner/Manager is logged in, the work-shift timetable has at least one record |
-| Post condition | Successfully modify the pre-existed work-shift timetable |
+| Description | The Manager wants to modify work-shift timetable according to the needs|
+| Precondition |  Manager is logged in, the work-shift timetable has at least one record |
+| Post condition | Successfully modified the pre-existing work-shift timetable |
 |  Step#     | Description |  
-| 1 | Owner/Manager open the work-shift section |  
-| 2 | Owner select and modified pre-existed work-shift timetable|
-| 3 | Owner insert new details in the work-shift timetable |
-| 4 | Owner saves the modifications by clicking the confirm button |
+| 1 | Manager open the work-shift section |  
+| 2 | Manager select a slot in the pre-existing work-shift timetable|
+| 3 | Manager modifies the slot |
+| 4 | Manager saves the modifications by clicking the confirm button |
 
 # Glossary
 
@@ -839,7 +845,8 @@ Computer o-- "Keyboard"
 Computer o-- "Touchscreen"
 Computer o-- "Mouse"
 Computer o-- "Software"
-Computer o-- "Receipt machine"
+Computer o-right- "Receipt machine"
+Computer o-left- "Speaker"
 
 Server o-- "DBMS"
 
