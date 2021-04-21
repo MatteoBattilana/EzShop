@@ -20,7 +20,7 @@ Version: 1.2
 - [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10-manage-employee-work-shift)
 
 ## Basic considerations
-The GUI has been made with bright colors and big buttons in all the sections used by the Cashier in order to increase the usability with the Touchscreen and exploit the color association with the function.
+The GUI has been made with bright colors and big buttons in all the sections used by the Cashier in order to increase the usability with the Touchscreen and exploit the color association with the function. Different Home view are generated accordingly to the Employee permission.
 
 ### Use case 1, UC1 - Create a new Employee
  | Scenario 1.1 - Nominal  |
