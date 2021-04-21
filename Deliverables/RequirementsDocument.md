@@ -2,37 +2,59 @@
 
 Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date: 20/04/2021
+Date: 21/04/2021
 
 Version: 1.2
 
 # Contents
+- [Requirements Document](#requirements-document)
+- [Contents](#contents)
 - [Essential description](#essential-description)
 - [Stakeholders](#stakeholders)
 - [Context Diagram and interfaces](#context-diagram-and-interfaces)
-  - [Context Diagram](#context-diagram)
-  - [Interfaces](#interfaces)
+	- [Context Diagram](#context-diagram)
+	- [Interfaces](#interfaces)
 - [Stories and personas](#stories-and-personas)
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
-  - [Functional Requirements](#functional-requirements)
-  - [Access rights, actor vs function](#access-rights-actor-vs-function)
-  - [Non Functional Requirements](#non-functional-requirements)
+	- [Functional Requirements](#functional-requirements)
+	- [Access rights, actor vs function](#access-rights-actor-vs-function)
+	- [Non Functional Requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
-  - [Use case diagram](#use-case-diagram)
-    - [Use case 1, UC1 - Create a new Employee](#use-case-1-uc1-create-a-new-employee)
-    - [Use case 2, UC2 - Modify Employee](#use-case-2-uc2-modify-employee)
-    - [Use case 3, UC3 - Disable Employee](#use-case-3-uc3-disable-employee)
-    - [Use case 4, UC4 - Create a discount](#use-case-4-uc4-create-a-discount)
-    - [Use case 5, UC5 - Create a new fidelity card](#use-case-5-uc5-create-a-new-fidelity-card)
-    - [Use case 6, UC6 - Manage a sale transaction](#use-case-6-uc6-manage-a-sale-transaction)
-    - [Use case 7, UC7 - Log in](#use-case-7-uc7-log-in)
-    - [Use case 8, UC8 - Modify price of an item](#use-case-8-uc8-modify-price-of-an-item)
-    - [Use case 9, UC9 - Employee statistics](#use-case-9-uc9-employee-statistics)
-    - [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10-manage-employee-work-shift)
+	- [Use case diagram](#use-case-diagram)
+		- [Use case complete decomposition](#use-case-complete-decomposition)
+		- [Use case 1, UC1 - Create a new Employee](#use-case-1-uc1---create-a-new-employee)
+				- [Scenario 1.1 - Nominal](#scenario-11---nominal)
+				- [Scenario 1.2](#scenario-12)
+		- [Use case 2, UC2 - Modify Employee](#use-case-2-uc2---modify-employee)
+				- [Scenario 2.1 - Nominal](#scenario-21---nominal)
+		- [Use case 3, UC3 - Disable Employee](#use-case-3-uc3---disable-employee)
+				- [Scenario 3.1 - Nominal](#scenario-31---nominal)
+		- [Use case 4, UC4 - Create a discount](#use-case-4-uc4---create-a-discount)
+				- [Scenario 4.1 - Nominal](#scenario-41---nominal)
+				- [Scenario 4.2](#scenario-42)
+		- [Use case 5, UC5 - Create a new fidelity card](#use-case-5-uc5---create-a-new-fidelity-card)
+				- [Scenario 5.1 - Nominal](#scenario-51---nominal)
+				- [Scenario 5.2](#scenario-52)
+		- [Use case 6, UC6 - Manage a sale transaction](#use-case-6-uc6---manage-a-sale-transaction)
+				- [Scenario 6.1 - Nominal](#scenario-61---nominal)
+				- [Scenario 6.2](#scenario-62)
+				- [Scenario 6.3](#scenario-63)
+				- [Scenario 6.4](#scenario-64)
+				- [Scenario 6.5](#scenario-65)
+		- [Use case 7, UC7 - Log in](#use-case-7-uc7---log-in)
+				- [Scenario 7.1 - Nominal](#scenario-71---nominal)
+				- [Scenario 7.2](#scenario-72)
+		- [Use case 8, UC8 - Modify price of an item](#use-case-8-uc8---modify-price-of-an-item)
+				- [Scenario 8.1 - Nominal](#scenario-81---nominal)
+		- [Use case 9, UC9 - Employee statistics](#use-case-9-uc9---employee-statistics)
+				- [Scenario 9.1 - Nominal](#scenario-91---nominal)
+		- [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10---manage-employee-work-shift)
+				- [Scenario 10.1 - Nominal](#scenario-101---nominal)
+				- [Scenario 10.2](#scenario-102)
 - [Glossary](#glossary)
 - [System Design](#system-design)
 - [Deployment Diagram](#deployment-diagram)
-    - [System configuration](#system-configuration)
+		- [System configuration](#system-configuration)
 
 # Essential description
 
@@ -50,12 +72,12 @@ EZShop is a software application to:
 | Stakeholder name  | Description |
 | ----------------- |:-----------:|
 | OWNER | Owns the shop and wants to use the application in order to make more efficient the shop's administration and to check the performance of the shop and the Employees |
-| MANAGER| Manages the application, can insert or delete products from the inventory,  supervise the shop and the others Employee (Cashier)|
-| CASHIER | Handle the sale transactions and handle the costumers |
-| CUSTOMERS | Person that wants to buy products in the shop |
+| MANAGER| Manages the application, can insert or delete products from the inventory,  supervise the shop and the others Employee (Cashiers)|
+| CASHIER | Handles the sale transactions and handles the costumers |
+| CUSTOMER | Person that wants to buy products in the shop |
 | DB ADMINISTRATOR | The database administrator configures the database of the system that will be running for the EZShop application |
 | SOFTWARE DEVELOPER | Writes the code for the EZShop application and installs also the application |
-| SYSTEM DEVELOPER | Define the hardware that must be include in the final system in order to handle the payment and the product scan |
+| SYSTEM DEVELOPER | Defines the hardware that must be include in the final system in order to handle the payment and the product scan |
 | CREDIT CARD SYSTEM | Service provided by merchant services and used by the application to perform payment with credit/debit card |
 | PRODUCT |  Product that has to be sold to the customers, that is scanned by the barcode reader |
 | SUPPLIER | Who supplies or delivers goods to the shop |
@@ -94,20 +116,19 @@ Product -- S
 
 # Stories and personas
 
-1. **Sharon**, 37, single mother of two girls aged 3 and 6 years, Owner of a small
- grocery store is committed to providing hers customers seasonal and quality fruit and vegetables but admits that often reconcile management an activity and life as a mother is not so easy.
- This affects the organization of products in the warehouse that ends up rotting and must be thrown. For this reason,she would like to know, week by week which are the  goods that have been sold less than the other, so that the next week she will order a bit less, according to the numbers.<hr>
+1. **Sharon**, 37, single mother of two girls aged 3 and 6 years, owner of a small
+ grocery store is committed to providing her customers seasonal and quality fruit and vegetables but admits that often combine management an activity and life as a mother is not so easy.
+ This affects the organization of products in the warehouse that may rot and shoukd be thrown. For this reason she would like to have a weekly report showing which goods have been less sold, in order to reduce their amount on the next order.<hr>
 
-2. **Fabio**, 30, sporty, busy and dynamic man,is a Owner of a several small sports supplement stores.
-  He has made fitness and wellness his purpose of life and given the great demand
-  of the market for these products his revenue is increasing considerably. For this reason he
-  is thinking of hiring a Manager to help him manage one of his shops.
-  His main interest is to continue to manage every aspect of the shop at his best even if will not be always present.<hr>
+2. **Fabio**, 30, sporty, busy and dynamic man,is the owner of  several small sport supplement stores.
+  He has made fitness and wellness his purpose of life and given the great market demand for these products his revenue is considerably increasing.
+  For this reason he is thinking of hiring a manager to help him manage one of his shops.
+  His main goal is to keep on managing every aspect of his shop even if he won't be always present.<hr>
 
 
-3. **Alicia**, 44, a small businesswoman from Turin, owns a lovely shoes boutique.
+3. **Alicia**, 44, a small businesswoman from Turin,   owns a lovely shoes boutique.
   With the pandemic and with the economic crisis she is facing hard times but she does not give up to close permanently.
-  Every day she searches in the list of sold product, written in the receipts, which one have been sold in order to compute manually the remaining inventory. She would    like to  have a software that helps her to keep track of all products, so that her shop will be never out of stock and never excess.<hr>
+  Every day she searches in the list of sold product, written in the receipts, which one have been sold in order to compute manually the remaining inventory. She would like to  have a software that helps her to keep track of all products, so that her shop will be never out of stock and never excess.<hr>
 
 4. **Tom**, 22, an economics student to pay for his studies, works in a small hardware store,
  thanks to his skills with numbers and bureaucracy, he was recently promoted to Manager of the activity.
@@ -115,7 +136,7 @@ Product -- S
  He is very happy with his new role but he is aware of the responsibilities it entails
  and he would like to be able to combine work and studies well. So he is looking for an application that  allow him to satisfy the same tasks in less time and in a more efficient way.<hr>
 
-5. **Jonathan**, 32, is the Owner of a small book shop in an town; he has a tight budget and in order to cut the costs he has one stable Cashier and some students that work on call, when they are free. He would like to have a software that is simply able to record his Employees work shifts.
+5. **Jonathan**, 32, is the Owner of a small book shop in a town; he has a tight budget and in order to cut the costs he has one stable cashier and some students that work on call, when they are free. He would like to have a software that is simply able to record his Employees work shifts.
 
 
 # Functional and non functional requirements
@@ -206,7 +227,7 @@ Product -- S
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
 |NFR1| USABILITY | Every person with at least 3+ years experience in using a PC must be able to use the core functions with no training in less than 30 minutes| All FR |
-|NFR2| PERFORMANCE| All function should respond in < 0.5 sec| All FR, excluded FR7.5, FR7.6, FR7.4 |
+|NFR2| PERFORMANCE| All functions should respond in < 0.5 sec| All FR, excluded FR7.5, FR7.6, FR7.4 |
 |NFR3| PRIVACY| The system must store data in a safe way, in order to avoid information disclosure | FR1, FR2, FR3.5, FR6, FR7.7 |           
 |NFR4| AVAILABILITY | The system must be available for least 99% of the time|All FR|
 |NFR5| PORTABILITY| The application works on a Windows 10 operating system, build version 1809|All FR|
@@ -419,8 +440,8 @@ UC2.7 <.up. UC2: <<include>>
 |  1     | Owner clicks on the Employees section |  
 |  2     | Owner clicks on the create new Employee button |
 |  3     | A window is opened with all necessary fields to be filled |
-|  4     | Owner enters the new Employee information and select if it is a Manager or a Cashier |
-|  5     | Owner confirm the operation by clicking on the appropriate button |
+|  4     | Owner enters the new Employee information and selects if it is a Manager or a Cashier |
+|  5     | Owner confirms the operation by clicking on the appropriate button |
 |  6     | The system will give a positive feedback about the creation |
 
 ##### Scenario 1.2
@@ -433,17 +454,17 @@ UC2.7 <.up. UC2: <<include>>
 |  1     | Owner clicks on the Employees section |  
 |  2     | Owner clicks on the create new Employee button |
 |  3     | A window is opened with all necessary fields to be filled |
-|  4     | Owner enters the new Employee information and select if it is a Manager or a Cashier |
-|  5     | Owner confirm the operation by clicking on the appropriate button |
-|  6     | An alert notify that the Employee is already in the system |
-|  5     | Owner cancel the operation by clicking on the appropriate button |
+|  4     | Owner enters the new Employee information and selects if it is a Manager or a Cashier |
+|  5     | Owner confirms the operation by clicking on the appropriate button |
+|  6     | An alert notifies that the Employee is already in the system |
+|  5     | Owner cancels the operation by clicking on the appropriate button |
 
 ### Use case 2, UC2 - Modify Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | The EZShop application is running, the Owner must be logger into the EZShop Application and the account that requires modifications must exists |
+|  Precondition     | The EZShop application is running, the Owner must be logged into the EZShop Application and the account that requires modifications must exists |
 | Post condition | The existing account is modified |
-|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click the name of the Employee that shows a windows that allows to change the Employee information |
+|  Nominal Scenario     | The Owner selects with the appropriate button the Employee section, then he clicks the name of the Employee that shows  windows that allow to change the Employee information |
 
 
 ##### Scenario 2.1 - Nominal
@@ -453,33 +474,31 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition | The EZShop application is running and the Owner is logged in|
 | Post condition | The existing account is modified |
 |  Step#     | Description |  
-|  1     | Owner clicks on the Employees section |  
-|  2     | Owner clicks the modify button|  
-| 3 | Owner searches the user that wants to modify and selects it|
-|4 | System shows the Employee details. The Employee information are opened in edit mode|
-|5 | Owner modifies the Employee account information|
-|6 | Owner saves the changes by clicking the confirm button |
+|  1     | Owner clicks on the Employees section |    
+| 2 | Owner searches the user that wants to modify and selects it|
+|3 | System shows the Employee details. The Employee information are opened in edit mode|
+|4 | Owner modifies the Employee account information|
+|5 | Owner saves the changes by clicking the confirm button |
 
 ### Use case 3, UC3 - Disable Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running and the Owner is logged |
 | Post condition | An existing Employee account is disabled from access the EZShop Application, but not deleted |
-|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click the name of the Employee that shows a windows that allows to change the Employee information |
+|  Nominal Scenario     | The Owner selects with the appropriate button the Employee section, then he clicks the name of the Employee that shows windows that allow to change the Employee information |
 
 ##### Scenario 3.1 - Nominal
 |  Scenario 3.1  | |
 | ------------- |:-------------:|
-| Description | Owner wants disable an Employee that is already in the system for the EZShop |
+| Description | Owner wants to disable an Employee that is already in the system for the EZShop |
 | Precondition |  The EZShop application is running and the Owner is logged in |
 | Post condition | The existing Employee account is disabled from access the EZShop Application |
 |  Step#     | Description |  
 |  1     | Owner clicks on the Employees section |  
-|  2     |Owner clicks the modify button |  
-| 3 | Owner searches the user that wants to modify and selects it|
-|4 | System presents the Employee details. The screen opens in edit mode|
-|5|Owner disable the Employee account|
-|6 |Owner saves the changes|
+| 2 | Owner searches the user that wants to modify and selects it|
+|3 | System presents the Employee details. The screen opens in edit mode|
+|4|Owner disables the Employee account|
+|5 |Owner saves the changes|
 
 
 ### Use case 4, UC4 - Create a discount
@@ -487,21 +506,21 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition | The EZShop application is running and the Manager is logged in |  
 |  Post condition | The discount is successfully created for a product and the EZShop inventory is updated |
-|  Nominal Scenario     | The Manager searches a product from the list, clicks over it and create a discount |
+|  Nominal Scenario     | The Manager searches a product from the list, clicks over it and creates a discount |
 |  Variants     | For that product another discount is still valid, a confirmation alert is promoted to the Manager in order to replace it with the new one |
 
 ##### Scenario 4.1 - Nominal
 |  Scenario 4.1  | |
 | ------------- |:-------------:|
-|  Description | Manager wants to create a discount on a products in the inventory   |
+|  Description | Manager wants to create a discount on a product in the inventory   |
 | Precondition | The EZShop application is running and the Manager is logged in |
 |  Post condition | The discount is successfully created for a product and the EZShop inventory is updated |
 |  Step#     | Description |  
 | 1 | The Manager searches the product from the list in the inventory section  |
 | 2 | The Manager selects the product |
-| 3 | The Manager insert the discount amount in percentage |
+| 3 | The Manager inserts the discount amount in percentage |
 | 4 | The Manager saves the changes |
-| 5 | The system re-calculate the product price |
+| 5 | The system re-calculates the product price |
 | 6 | The system updates the product inventory with the discount|
 
 ##### Scenario 4.2
@@ -513,10 +532,10 @@ UC2.7 <.up. UC2: <<include>>
 |  Step#     | Description |  
 | 1 | The Manager searches the product from the list in the inventory section  |
 | 2 | The Manager selects the product |
-| 3 | The Manager insert the discount amount in percentage |
-| 4 | System prompt an alert because there is a valid discount on the product and ask if the system needs to replace it |
-| 4 | Manager click of the confirmation button |
-| 5 | The system re-calculate the product price |
+| 3 | The Manager inserts the discount amount in percentage |
+| 4 | System prompts an alert because there is a valid discount on the product and ask if the system needs to replace it |
+| 4 | Manager clicks of the confirmation button |
+| 5 | The system re-calculates the product price |
 | 6 | The system updates the product inventory with the discount|
 
 
@@ -525,8 +544,8 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running and the Cashier is logged in |  
 |  Post condition     | A new customer and the related fidelity card is added to the system |
-|  Nominal Scenario     | The Cashier wants to create a new fidelity card for a customer. The Cashier selects with the appropriate button the custom section, then she click over a button that prompt a windows that must be filled with the new customer information |
-|  Variants     | The Cashier insert customer's information that already match with one customer in the system. The application will notify this information in the same window and will create a new fidelity card replacing the previous one |
+|  Nominal Scenario     | The Cashier wants to create a new fidelity card for a customer. The Cashier selects with the appropriate button for the customer section, then he clicks over a button that prompts  windows that must be filled with the new customer information |
+|  Variants     | The Cashier inserts customer's information that already match with another customer in the system. The application will notify this information in the same window and will create a new fidelity card replacing the previous one |
 
 ##### Scenario 5.1 - Nominal
 |  Scenario 5.1  | |
@@ -539,7 +558,7 @@ UC2.7 <.up. UC2: <<include>>
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Cashier enters the new customer's information |
-|  5     | Cashier confirm the operation by clicking on the appropriate button |
+|  5     | Cashier confirms the operation by clicking on the appropriate button |
 
 ##### Scenario 5.2
 |  Scenario 5.2  | |
@@ -576,8 +595,8 @@ UC2.7 <.up. UC2: <<include>>
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the Cashier ends the transaction |
-| 3 | The system computes the total and apply the VAT |
-| 4 | Cashier get paid and the transaction is recorded into the system|
+| 3 | The system computes the total and applies the VAT |
+| 4 | Cashier gets paid and the transaction is recorded into the system|
 
 ##### Scenario 6.2
 |  Scenario 6.2  | |
@@ -589,7 +608,7 @@ UC2.7 <.up. UC2: <<include>>
 | 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the Cashier ends the transaction |
 | 3 | The system computes the total and apply the VAT |
-| 4 | Cashier get paid via the credit card system
+| 4 | Cashier gets paid via the credit card system
 |5|The transaction is recorded into the system|
 | 6 | The system prints the receipt|
 
@@ -601,10 +620,10 @@ UC2.7 <.up. UC2: <<include>>
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner except one |
-| 2 | The Cashier insert the product code directly in to the transaction via the keyboard |
+| 2 | The Cashier inserts the product code directly in to the transaction via the keyboard |
 | 3 | Once all products have been scanned, the Cashier ends the transaction |
 | 4 | The system computes the total and apply the VAT |
-| 5 | Cashier get paid via the credit card system
+| 5 | Cashier gets paid via the credit card system
 | 6 | The transaction is recorded into the system|
 | 7 | The system prints the receipt|
 
@@ -617,10 +636,9 @@ UC2.7 <.up. UC2: <<include>>
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner |
 | 2 | Once all products have been scanned, the Cashier ends the transaction |
-| 3 | Cashiers insert the gift card given by the customer |
+| 3 | Cashiers inserts the gift card given by the customer |
 | 4 | The system computes the total and apply the VAT |
-| 5 | Cashier get paid and the transaction is recorded into the system|
-| 6 | The system prints the receipt|
+| 5 | Cashier gets paid and the transaction is recorded into the system|
 
 ##### Scenario 6.5
 |  Scenario 6.5  | |
@@ -636,7 +654,7 @@ UC2.7 <.up. UC2: <<include>>
 | 5 | The points are added to the current points |
 | 6 | The system applies 10% discount of the sale transaction if the number of points are >= 50 |
 | 7 | The system computes the total and apply the VAT |
-| 8 | Cashier get paid and the transaction is recorded into the system|
+| 8 | Cashier gets paid and the transaction is recorded into the system|
 | 9 | The system prints the receipt with the number of points|
 
 
@@ -646,7 +664,7 @@ UC2.7 <.up. UC2: <<include>>
 |  Precondition     | The EZShop application is running, the Employee is not logged in and the login form is displayed |  
 |  Post condition     | The Employee is logged into the system, all functions based on the access rights are available  |
 |  Nominal Scenario     | The Employee enters his user id and password in the login form and then clicks on the confirmation button |
-|  Variants     | The Employee enters wrong a wrong user id or password, the system notifies a login error |
+|  Variants     | The Employee enters a wrong user id or password, the system notifies a login error |
 
 
 ##### Scenario 7.1 - Nominal
@@ -668,7 +686,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  The Employee is not logged in the system and the application is already opened and running in the computer |
 | Post condition |  The Employee is not logged in |
 |  Step#     | Description |  
-| 1     | The Employee enter wrong credential |
+| 1     | The Employee enters wrong credential |
 |  2     | The Employee can enter again the credential |
 
 
@@ -679,7 +697,7 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition | The EZShop application is running and the Owner is logged in |  
 |  Post condition |  The price is successfully updated for the product in the inventory|
-|  Nominal Scenario     | The Owner selects with the appropriate button the inventory section, then he select the product and insert the new price |
+|  Nominal Scenario     | The Owner selects with the appropriate button the inventory section, then he selects the product and inserts the new price |
 
 ##### Scenario 8.1 - Nominal
 |  Scenario 8.1  | |
@@ -688,9 +706,9 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  The Owner is logged in the system and the application is already opened and running in the computer |
 | Post condition |  The price of the product is updated with the new one |
 | 1 | Owner searches the product from the list in the inventory section|
-| 2 | Owner select the product |
-| 3 | Owner enter the new price |
-| 4 | Owner save the changes |
+| 2 | Owner selects the product |
+| 3 | Owner enters the new price |
+| 4 | Owner saves the changes |
 
 
 ### Use case 9, UC9 - Employee statistics
@@ -698,14 +716,14 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running and the Owner is logged in |  
 |  Post condition     | The statistics of the Employee are shown to the Owner |
-|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click over a button that prompt the Employee's statistics |
+|  Nominal Scenario     | The Owner selects with the appropriate button the Employee section, then he clicks over a button that prompts the Employee's statistics |
 
 
 ##### Scenario 9.1 - Nominal
 
 | Scenario 9.1 | |
 | ------------- |:-------------:|
-| Description | Owner to get the number of sales in this week for a specific Cashier|
+| Description | Owner wants to get the number of sales in a week for a specific Cashier|
 |  Precondition     | The EZShop application is running and the Owner is logged in |  
 |  Post condition     | The statistics of the Employee are shown to the Owner |
 |  Step#     | Description |
@@ -720,8 +738,8 @@ UC2.7 <.up. UC2: <<include>>
 | Actors Involved        | Manager |
 | ------------- |:-------------:|
 |  Precondition  | The EZShop application is running and the Manager is logged in  |
-| Post condition | The Manager successfully create new timetable or modify the pre-existing timetable for work-shift of all Employee|
-|  Nominal Scenario |The Manager selects with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all Employees or modify the pre-existing work-shift timetable |
+| Post condition | The Manager successfully creates new timetable or modifies the pre-existing timetable for work-shift of all Employee|
+|  Nominal Scenario |The Manager selects with the appropriate button on the system, then he adds a new work-shift into the work-shift timetable of all Employees or modifies the pre-existing work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
