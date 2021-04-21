@@ -19,6 +19,8 @@ Version: 1.2
 - [Use case 9, UC9 - Employee statistics](#use-case-9-uc9-employee-statistics)
 - [Use case 10, UC10 - Manage Employee Work-Shift](#use-case-10-uc10-manage-employee-work-shift)
 
+## Basic considerations
+The GUI has been made with bright colors and big buttons in all the sections used by the Cashier in order to increase the usability with the Touchscreen and exploit the color association with the function.
 
 ### Use case 1, UC1 - Create a new Employee
  | Scenario 1.1 - Nominal  |
