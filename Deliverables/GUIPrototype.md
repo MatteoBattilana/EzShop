@@ -60,12 +60,12 @@ Version: 1.2
  | Scenario 5.1 - Nominal |
  | :----------- |
  |[Go to Scenario 5.1](./RequirementsDocument.md#scenario-51-nominal)|
- | ![](image/placeholder.png)|
+ | ![](image/s5.1.png)|
 
 | Scenario 5.2 |
  | :----------- |
  |[Go to Scenario 5.2](./RequirementsDocument.md#scenario-52)|
- | ![](image/placeholder.png)|
+ | ![](image/s5.2.png)|
 
 
 ### Use case 6, UC6 - Manage a sale transaction
@@ -119,7 +119,7 @@ Version: 1.2
  | Scenario 9.1 - Nominal |
  | :----------- |
  |[Go to Scenario 9.1](./RequirementsDocument.md#scenario-91)|
- | ![](image/placeholder.png)|
+ | ![](image/s9.1.png)|
 
 ### Use case 10, UC10 - Manage Employee Work-Shift
  | Scenario 10.1 - Nominal |
