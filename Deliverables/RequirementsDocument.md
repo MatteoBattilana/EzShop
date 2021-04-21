@@ -404,8 +404,8 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running, the Owner is logged in |  
 |  Post condition     | A new Employee is added into the system |
-|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click over a button that prompt a windows that must be filled with the new Employee's information |
-|  Variants     | Owner provide Employee's information that already match with one Employee in the system The application will notify this information in the same window |
+|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click over a button that shows a windows that must be filled with the new Employee's information |
+|  Variants     | Owner provide Employee's information that already match with one Employee in the system The application will notify this information in the same window with an alert |
 
 
 ##### Scenario 1.1 - Nominal
@@ -416,11 +416,12 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Owner is logged in|
 | Post condition |  A new Employee is added to into the system |
 |  Step#     | Description |  
-|  1     | Owner click on the Employees section |  
-|  2     | Owner click on the create new Employee button |
+|  1     | Owner clicks on the Employees section |  
+|  2     | Owner clicks on the create new Employee button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Owner enters the new Employee information and select if it is a Manager or a Cashier |
 |  5     | Owner confirm the operation by clicking on the appropriate button |
+|  6     | The system will give a positive feedback about the creation |
 
 ##### Scenario 1.2
 | Scenario 1.2 | |
@@ -429,8 +430,8 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Owner is logged in|
 | Post condition |  The entered Employee is already in the system, the new Employee is not added |
 |  Step#     | Description |  
-|  1     | Owner click on the Employees section |  
-|  2     | Owner click on the create new Employee button |
+|  1     | Owner clicks on the Employees section |  
+|  2     | Owner clicks on the create new Employee button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Owner enters the new Employee information and select if it is a Manager or a Cashier |
 |  5     | Owner confirm the operation by clicking on the appropriate button |
@@ -440,22 +441,22 @@ UC2.7 <.up. UC2: <<include>>
 ### Use case 2, UC2 - Modify Employee
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
-|  Precondition     | The EZShop application is running, the Owner must be logger to the EZShop Application and the account that requires modifications must exists |
-| Post condition | The existing account has been modified |
-|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click over a button that prompt a windows that allows to change the Employee information |
+|  Precondition     | The EZShop application is running, the Owner must be logger into the EZShop Application and the account that requires modifications must exists |
+| Post condition | The existing account is modified |
+|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click the name of the Employee that shows a windows that allows to change the Employee information |
 
 
 ##### Scenario 2.1 - Nominal
 |  Scenario 2.1  | |
 | ------------- |:-------------:|
-| Description | The Owner wants modify the Employee's information due to a typo error. The Employee is already in the system for the EZShop (e.g. password, Access Level, etc.)|
-| Precondition |  Owner is logged in|
-| Post condition | The existing account has been modified |
+| Description | The Owner wants to modify the Employee's information due to a typo error. The Employee is already in the system for the EZShop|
+| Precondition | The EZShop application is running and the Owner is logged in|
+| Post condition | The existing account is modified |
 |  Step#     | Description |  
-|  1     | Owner click on the Employees section |  
-|  2     | Owner clicks the modify command|  
-| 3 | Owner searches the user that wants to modifyand selects it|
-|4 | System presents the Employee details. The screen opens in edit mode|
+|  1     | Owner clicks on the Employees section |  
+|  2     | Owner clicks the modify button|  
+| 3 | Owner searches the user that wants to modify and selects it|
+|4 | System shows the Employee details. The Employee information are opened in edit mode|
 |5 | Owner modifies the Employee account information|
 |6 | Owner saves the changes by clicking the confirm button |
 
@@ -463,18 +464,18 @@ UC2.7 <.up. UC2: <<include>>
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running and the Owner is logged |
-| Post condition | An existing Employee account has been disable from access the EZShop Application |
-|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click over a button that prompt a windows that must be filled with the new Employee's information |
+| Post condition | An existing Employee account is disabled from access the EZShop Application, but not deleted |
+|  Nominal Scenario     | The Owner select with the appropriate button the Employee section, then he click the name of the Employee that shows a windows that allows to change the Employee information |
 
 ##### Scenario 3.1 - Nominal
 |  Scenario 3.1  | |
 | ------------- |:-------------:|
 | Description | Owner wants disable an Employee that is already in the system for the EZShop |
-| Precondition |  Owner is logged in |
-| Post condition | The existing Employee account has been disable from access the EZShop Application |
+| Precondition |  The EZShop application is running and the Owner is logged in |
+| Post condition | The existing Employee account is disabled from access the EZShop Application |
 |  Step#     | Description |  
-|  1     | Owner click on the Employees section |  
-|  2     |Owner clicks the modify command |  
+|  1     | Owner clicks on the Employees section |  
+|  2     |Owner clicks the modify button |  
 | 3 | Owner searches the user that wants to modify and selects it|
 |4 | System presents the Employee details. The screen opens in edit mode|
 |5|Owner disable the Employee account|
@@ -485,21 +486,21 @@ UC2.7 <.up. UC2: <<include>>
 | Actors Involved        | Manager |
 | ------------- |:-------------:|
 |  Precondition | The EZShop application is running and the Manager is logged in |  
-|  Post condition | The discount is successfully created a product and the EZShop inventory is updated |
-|  Nominal Scenario     | The manger search a product from the list, clicks over it and create a discount |
-|  Variants     | For that product another discount is still valid, a confirmation alert is promoted to the Manager |
+|  Post condition | The discount is successfully created for a product and the EZShop inventory is updated |
+|  Nominal Scenario     | The Manager searches a product from the list, clicks over it and create a discount |
+|  Variants     | For that product another discount is still valid, a confirmation alert is promoted to the Manager in order to replace it with the new one |
 
 ##### Scenario 4.1 - Nominal
 |  Scenario 4.1  | |
 | ------------- |:-------------:|
 |  Description | Manager wants to create a discount on a products in the inventory   |
-| Precondition |  Manager is logged in |
-|  Post condition | The discount is successfully created a product and the EZShop inventory is updated |
+| Precondition | The EZShop application is running and the Manager is logged in |
+|  Post condition | The discount is successfully created for a product and the EZShop inventory is updated |
 |  Step#     | Description |  
-| 1 | Manager searches the product from the list in the inventory section  |
-| 2 | Select products |
-| 3 | Create a discount |
-| 4 | Manager saves the changes |
+| 1 | The Manager searches the product from the list in the inventory section  |
+| 2 | The Manager selects the product |
+| 3 | The Manager insert the discount amount in percentage |
+| 4 | The Manager saves the changes |
 | 5 | The system re-calculate the product price |
 | 6 | The system updates the product inventory with the discount|
 
@@ -507,13 +508,13 @@ UC2.7 <.up. UC2: <<include>>
 |  Scenario 4.2  | |
 | ------------- |:-------------:|
 |  Description | Manager wants to create a discount on a products in the inventory, but the product has already a valid discount  |
-| Precondition |  Manager is logged in |
-|  Post condition | The old discount is replace with the new one |
+| Precondition | The EZShop application is running and the Manager is logged in |
+|  Post condition | The old discount is replaced with the new one |
 |  Step#     | Description |  
-| 1 | Manager searches the product from the list in the inventory section|
-| 2 | Select products |
-| 3 | Create a discount |
-| 4 | System prompt an alert because there is a valid discount on the product and the Manager confirmation  |
+| 1 | The Manager searches the product from the list in the inventory section  |
+| 2 | The Manager selects the product |
+| 3 | The Manager insert the discount amount in percentage |
+| 4 | System prompt an alert because there is a valid discount on the product and ask if the system needs to replace it |
 | 4 | Manager click of the confirmation button |
 | 5 | The system re-calculate the product price |
 | 6 | The system updates the product inventory with the discount|
@@ -524,33 +525,33 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition     | The EZShop application is running and the Cashier is logged in |  
 |  Post condition     | A new customer and the related fidelity card is added to the system |
-|  Nominal Scenario     | The Cashier wants to create a new fidelity card for a customer. The Cashier select with the appropriate button the custom section, then he click over a button that prompt a windows that must be filled with the new customer information |
+|  Nominal Scenario     | The Cashier wants to create a new fidelity card for a customer. The Cashier selects with the appropriate button the custom section, then she click over a button that prompt a windows that must be filled with the new customer information |
 |  Variants     | The Cashier insert customer's information that already match with one customer in the system. The application will notify this information in the same window and will create a new fidelity card replacing the previous one |
 
 ##### Scenario 5.1 - Nominal
 |  Scenario 5.1  | |
 | ------------- |:-------------:|
 | Description | The Cashier wants to add a new customer and its fidelity card|
-|  Precondition     | The Cashier wants to create a new fidelity card for a customer |  
+|  Precondition     | The EZShop application is running and the Cashier is logged in |  
 |  Post condition     | A new customer and the related fidelity card is added to the system |
 |  Step#     | Description |  
 |  1     | Cashier clicks on the customer section |  
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
-|  4     | Cashier enters the new customer information |
+|  4     | Cashier enters the new customer's information |
 |  5     | Cashier confirm the operation by clicking on the appropriate button |
 
 ##### Scenario 5.2
 |  Scenario 5.2  | |
 | ------------- |:-------------:|
 | Description | The Cashier wants to add a new customer and its fidelity card. The customer and the fidelity card is already in the system |
-|  Precondition     | The Cashier wants to create a new fidelity card for a customer |  
+|  Precondition     | The EZShop application is running and the Cashier is logged in |  
 |  Post condition     | The customer is not added to the system because already present, but a new fidelity card is created and stored in the system |
 |  Step#     | Description |  
 |  1     | Cashier clicks on the customer section |  
 |  2     | Cashier clicks on the create new customer button |
 |  3     | A window is opened with all necessary fields to be filled |
-|  4     | Cashier enters the new customer information |
+|  4     | Cashier enters the new customer's information |
 |  6     | The system will prompt an information message, since the customer is already in the system |
 |  7     | The Cashier confirm the creation of a new fidelity card, associated to the customer, invalidating the previous one |
 
@@ -569,8 +570,8 @@ UC2.7 <.up. UC2: <<include>>
 ##### Scenario 6.1 - Nominal
 |  Scenario 6.1  | |
 | ------------- |:-------------:|
-|  Description | The Cashier wants to perform a sale transaction for a customer that wants to buy some products with cash  |
-|  Precondition | Cashier is logged in the system |  
+|  Description | The Cashier wants to manage a sale transaction for a customer that wants to buy some products with cash  |
+|  Precondition | The EZShop application is running and the Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner |
@@ -581,8 +582,8 @@ UC2.7 <.up. UC2: <<include>>
 ##### Scenario 6.2
 |  Scenario 6.2  | |
 | ------------- |:-------------:|
-|  Description | The Cashier wants to perform a sale transaction for a customer that wants to buy some products with credit card  |
-|  Precondition | Cashier is logged in the system |  
+|  Description | The Cashier wants to manage a sale transaction for a customer that wants to buy some products with credit card  |
+|  Precondition | The EZShop application is running and the Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner |
@@ -596,7 +597,7 @@ UC2.7 <.up. UC2: <<include>>
 |  Scenario 6.3  | |
 | ------------- |:-------------:|
 | Description | The Cashier isn't able to scan a product, the product code in inserted directly from the keyboard |
-|  Precondition | Cashier is logged in the system |  
+|  Precondition | The EZShop application is running and the Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner except one |
@@ -610,8 +611,8 @@ UC2.7 <.up. UC2: <<include>>
 ##### Scenario 6.4
 |  Scenario 6.4  | |
 | ------------- |:-------------:|
-|  Description | The Cashier wants to perform a sale transaction for a customer that wants to buy some products and has a gift card |
-|  Precondition | Cashier is logged in the system |  
+|  Description | The Cashier wants to manage a sale transaction for a customer that wants to buy some products and has a gift card |
+|  Precondition | The EZShop application is running and the Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans all products with the barcode scanner |
@@ -624,8 +625,8 @@ UC2.7 <.up. UC2: <<include>>
 ##### Scenario 6.5
 |  Scenario 6.5  | |
 | ------------- |:-------------:|
-|  Description | The Cashier wants to perform a sale transaction for a customer that wants to buy some products, using the fidelity card |
-|  Precondition | Cashier is logged in the system |  
+|  Description | The Cashier wants to manage a sale transaction for a customer that wants to buy some products, using the fidelity card |
+|  Precondition | The EZShop application is running and the Cashier is logged in the system |  
 |  Post condition | The sales record is stored in the system and the inventory is updated |
 |  Step#     | Description |  
 | 1 | Cashier scans the fidelity card |
@@ -642,10 +643,10 @@ UC2.7 <.up. UC2: <<include>>
 ### Use case 7, UC7 - Log in
 | Actors Involved        | Cashier |
 | ------------- |:-------------:|
-|  Precondition     | The EZShop application is running and the Employee is not logged in and login form is displayed |  
+|  Precondition     | The EZShop application is running, the Employee is not logged in and the login form is displayed |  
 |  Post condition     | The Employee is logged into the system, all functions based on the access rights are available  |
-|  Nominal Scenario     | The Employee enters his id and password in the login form and then clicks on the confirmation button |
-|  Variants     | The Employee enters wrong a wrong id or password, the system notifies a login error |
+|  Nominal Scenario     | The Employee enters his user id and password in the login form and then clicks on the confirmation button |
+|  Variants     | The Employee enters wrong a wrong user id or password, the system notifies a login error |
 
 
 ##### Scenario 7.1 - Nominal
@@ -653,12 +654,11 @@ UC2.7 <.up. UC2: <<include>>
 | Scenario 7.1 | |
 | ------------- |:-------------:|
 | Description | The Employee wants to log in to the system in order to use its functions  |
-| Precondition |  The Employee is not logged in the system and the application is already opened and running in the computer |
-| Postcondition |  The Employee is logged in |
+| Precondition |   The EZShop application is running, the Employee is not logged in the system and the application is already opened and running in the computer |
+| Post condition |  The Employee is logged in |
 |  Step#     | Description |   
-|  1     | The Employee click on the login button and a form is opened |  
-|  2    | The Employee enter his credential, user id and password |
-|  3    | The Employee confirm with the appropriate button |
+|  1    | The Employee enters his credential, user id and password |
+|  2    | The Employee confirms with the appropriate button |
 
 ##### Scenario 7.2
 
@@ -666,11 +666,10 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 | Description | The Employee wants to log in to the system in order to use its functions  |
 | Precondition |  The Employee is not logged in the system and the application is already opened and running in the computer |
-| Postcondition |  The Employee is not logged in |
+| Post condition |  The Employee is not logged in |
 |  Step#     | Description |  
-|  1     | The Employee click on the login button and a form is opened |  
-|  2     | The Employee enter wrong credential |
-|  3     | The Employee can enter again the credential |
+| 1     | The Employee enter wrong credential |
+|  2     | The Employee can enter again the credential |
 
 
 
@@ -679,15 +678,15 @@ UC2.7 <.up. UC2: <<include>>
 | Actors Involved        | Owner |
 | ------------- |:-------------:|
 |  Precondition | The EZShop application is running and the Owner is logged in |  
-|  Post condition | Successfully modify price of the product in the inventory|
-|  Nominal Scenario     | The Owner select with the appropriate button the inventory section, then he select the product and insert the new price |
+|  Post condition |  The price is successfully updated for the product in the inventory|
+|  Nominal Scenario     | The Owner selects with the appropriate button the inventory section, then he select the product and insert the new price |
 
 ##### Scenario 8.1 - Nominal
 |  Scenario 8.1  | |
 | ------------- |:-------------:|
 |  Description | The Owner wants to modify the price of a product in the inventory  |
 | Precondition |  The Owner is logged in the system and the application is already opened and running in the computer |
-| Postcondition |  The price of the product is updated with the new one |
+| Post condition |  The price of the product is updated with the new one |
 | 1 | Owner searches the product from the list in the inventory section|
 | 2 | Owner select the product |
 | 3 | Owner enter the new price |
@@ -707,12 +706,12 @@ UC2.7 <.up. UC2: <<include>>
 | Scenario 9.1 | |
 | ------------- |:-------------:|
 | Description | Owner to get the number of sales in this week for a specific Cashier|
-| Precondition |  Owner is logged in|
+|  Precondition     | The EZShop application is running and the Owner is logged in |  
 |  Post condition     | The statistics of the Employee are shown to the Owner |
 |  Step#     | Description |
 |  1     | Owner clicks on the accounting section|
-|  2     | Owner click on the statistics section |  
-|  3     | Owner search and select a Cashier |
+|  2     | Owner clicks on the statistics section |  
+|  3     | Owner searches and selects a Cashier |
 |  4     | A window is opened and the Owner can select the week he wants to check|
 |  5     | The system generates the statistics for that Cashier for the selected week |
 
@@ -720,22 +719,22 @@ UC2.7 <.up. UC2: <<include>>
 ### Use case 10, UC10 - Manage Employee Work-Shift
 | Actors Involved        | Manager |
 | ------------- |:-------------:|
-|  Precondition  | The EZShop application is running and the Manager is login in  |
+|  Precondition  | The EZShop application is running and the Manager is logged in  |
 | Post condition | The Manager successfully create new timetable or modify the pre-existing timetable for work-shift of all Employee|
-|  Nominal Scenario |The Manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all Employees or modify the pre-existing work-shift timetable |
+|  Nominal Scenario |The Manager selects with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all Employees or modify the pre-existing work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
 | ------------- |:-------------:|
-| Description | The Manager wants to add a work-shift in the work-shift timetable for better management of the EZShop|
+| Description | The Manager wants to add a work-shift in the work-shift timetable for a better management of the EZShop|
 | Precondition |  The system is running and the Manager is logged in |
 | Post condition | Successfully added the work-shift in the work-shift timetable|
 |  Step#     | Description |   
-| 1 | Manager open the work-shift section |  
-| 2| Manager click on the appropriate add button|
+| 1 | Manager opens the work-shift section |  
+| 2| Manager clicks on the appropriate add button|
 | 3| The system will highlight the free slots|
-| 4| Manager create a new work-shift in the work-shift timetable|
-| 5 | Manager insert details in the work-shift timetable |
+| 4| Manager creates a new work-shift in the work-shift timetable|
+| 5 | Manager inserts details in the work-shift timetable |
 | 6 | Manager saves the details by clicking the confirm button |
 
 ##### Scenario 10.2
@@ -745,8 +744,8 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Manager is logged in, the work-shift timetable has at least one record |
 | Post condition | Successfully modified the pre-existing work-shift timetable |
 |  Step#     | Description |  
-| 1 | Manager open the work-shift section |  
-| 2 | Manager select a slot in the pre-existing work-shift timetable|
+| 1 | Manager opens the work-shift section |  
+| 2 | Manager selects a slot in the pre-existing work-shift timetable|
 | 3 | Manager modifies the slot |
 | 4 | Manager saves the modifications by clicking the confirm button |
 
@@ -873,4 +872,4 @@ application ..> computer2
 ```
 
 ### System configuration
-The system is based on a client-server pattern. Since the software can be used both for generating statistics about the Employee and mages the inventory, it can work without the Receipt machine and the Barcode scanner.
+The system is based on the client-server pattern. Since the software can be used both for generating statistics about the Employee and manage the inventory, it can work with or without the Receipt machine and the Barcode scanner.
