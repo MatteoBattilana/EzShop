@@ -49,17 +49,17 @@ EZShop is a software application to:
 
 | Stakeholder name  | Description |
 | ----------------- |:-----------:|
-| OWNER | Own the shop and wants to use the application in order to make more efficient the shop's administration and to check  the performance of the shop and the employees   |
-| MANAGER| Manages the application, can insert or delete products from the inventory, order products to the suppliers, supervise the shop and the others employees (Cashier)|
-| CASHIER | Handle the sales and handle the costumers|
+| OWNER | Owns the shop and wants to use the application in order to make more efficient the shop's administration and to check the performance of the shop and the Employees |
+| MANAGER| Manages the application, can insert or delete products from the inventory,  supervise the shop and the others Employee (Cashier)|
+| CASHIER | Handle the sale transactions and handle the costumers |
 | CUSTOMERS | Person that wants to buy products in the shop |
-| DB ADMINISTRATOR | The database administrator configure the database of the system |
-| SOFTWARE DEVELOPER | Writes the code by which the system is built, that installs also the application |
+| DB ADMINISTRATOR | The database administrator configures the database of the system that will be running for the EZShop application |
+| SOFTWARE DEVELOPER | Writes the code for the EZShop application and installs also the application |
 | SYSTEM DEVELOPER | Define the hardware that must be include in the final system in order to handle the payment and the product scan |
-| CREDIT CARD SYSTEM | Service provided by merchant services and used by the application perform payment with credit/debit card |
-| PRODUCT |  Product that has to be sold to the customers |
+| CREDIT CARD SYSTEM | Service provided by merchant services and used by the application to perform payment with credit/debit card |
+| PRODUCT |  Product that has to be sold to the customers, that is scanned by the barcode reader |
 | SUPPLIER | Who supplies or delivers goods to the shop |
-| EMAIL GATEWAY | This is the service used to send the email notifications |
+| EMAIL GATEWAY | TService used to send the email notifications |
 
 
 # Context Diagram and interfaces
@@ -73,24 +73,24 @@ rectangle System {
   usecase "EZShop" AS S
 }
 
-CASHIER -up- S
-OWNER -up- S
-MANAGER -- S
-PRODUCT -- S
-:CREDIT CARD SYSTEM: -down- S
-:EMAIL GATEWAY: -up- S
+Cashier -up- S
+Owner -up- S
+Manager -- S
+Product -- S
+:Credit Card System: -down- S
+:Email Gateway: -up- S
 @enduml
 ```
 ## Interfaces
 
 | Actor | Logical Interface | Physical Interface  |
 | ------------- |:-------------:| -----:|
-|MANAGER| GUI | Screen Keyboard on PC, mouse|
-|OWNER |GUI| Screen Keyboard on PC, mouse|
-|CASHIER |GUI| Touchscreen, Keyboard on PC, mouse|
-| CREDIT CARD SYSTEM | Web services (data exchange, soap + XML) | Internet connection |
-| PRODUCT | Barcode reader laser | Barcode |
-| EMAIL GATEWAY | IMAP (Internet Message Access Protocol) | Internet connection |
+|Manager| GUI | Screen Keyboard on PC, mouse|
+|Owner |GUI| Screen Keyboard on PC, mouse|
+|Cashier |GUI| Touchscreen, Keyboard on PC, mouse|
+| Credit Card System | Web services (data exchange, soap + XML) | Internet connection |
+| Product | Barcode reader laser | Barcode |
+| Email Gateway | IMAP (Internet Message Access Protocol) | Internet connection |
 
 # Stories and personas
 
@@ -115,7 +115,7 @@ PRODUCT -- S
  He is very happy with his new role but he is aware of the responsibilities it entails
  and he would like to be able to combine work and studies well. So he is looking for an application that  allow him to satisfy the same tasks in less time and in a more efficient way.<hr>
 
-5. **Jonathan**, 32, is the Owner of a small book shop in an town; he has a tight budget and in order to cut the costs he has one stable Cashier and some students that work on call, when they are free. He would like to have a software that is simply able to record his employees work shifts.
+5. **Jonathan**, 32, is the Owner of a small book shop in an town; he has a tight budget and in order to cut the costs he has one stable Cashier and some students that work on call, when they are free. He would like to have a software that is simply able to record his Employees work shifts.
 
 
 # Functional and non functional requirements
@@ -124,18 +124,18 @@ PRODUCT -- S
 
 | ID        | Description  |
 | ------------- |-------------|
-|FR1|	Manage employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.1| Modify or define a new Employee (Manager or Cashier)|
+|FR1|	Manage Employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.1| Modify or create a new Employee (Manager or Cashier)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.2 |Delete Employee|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.3 |List of all the employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.3 |List of all the Employees|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.4| Statistics of Employee, (for Cashier daily earnings)|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.5 |Search Employee|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.6 |Disable Employee|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.7  |Manage rights. Authorize access to functions to specific actors according to access rights|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8 | Manage work-shift timetable common to all employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.1 |Add a work-shift into the work-shift timetable common to all employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Modify a work-shift that is already into the work-shift timetable common to all employees|
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Delete a work-shift that is already into the work-shift timetable common to all employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8 | Manage work-shift timetable common to all Employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.1 |Add a work-shift into the work-shift timetable common to all Employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Modify a work-shift that is already into the work-shift timetable common to all Employees|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR1.8.2 |Delete a work-shift that is already into the work-shift timetable common to all Employees|
 |FR2|Handle inventory|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.1 |Search product|
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FR2.2 |Add product|
@@ -205,15 +205,15 @@ PRODUCT -- S
 
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
-|NFR1| USABILITY | Every customer with at least 3+ years experience in using a PC must be able to use all functions with no training in less than 30 minutes| All FR |
-|NFR2| PERFORMANCE| All function should respond in <0.5 sec| All FR, excluded FR7.5, FR7.6, FR7.4 |
-|NFR3| PRIVACY| The system must must store data in a safe way, in order to avoid information disclosure | FR1, FR2, FR3.5, FR6, FR7.7 |           
+|NFR1| USABILITY | Every person with at least 3+ years experience in using a PC must be able to use the core functions with no training in less than 30 minutes| All FR |
+|NFR2| PERFORMANCE| All function should respond in < 0.5 sec| All FR, excluded FR7.5, FR7.6, FR7.4 |
+|NFR3| PRIVACY| The system must store data in a safe way, in order to avoid information disclosure | FR1, FR2, FR3.5, FR6, FR7.7 |           
 |NFR4| AVAILABILITY | The system must be available for least 99% of the time|All FR|
-|NFR5| PORTABILITY| The application should be working in a Windows 10 operating system, build version 1809|All FR|
-|NFR6| SECURITY| The data of one Cashier can be visible and modifiable only by the Owner and the Manager. The data should be disclosed to other Cashiers at the same or lower level. |FR1|
+|NFR5| PORTABILITY| The application works on a Windows 10 operating system, build version 1809|All FR|
+|NFR6| SECURITY| The data of one Cashier can be visible and modifiable only by the Owner and the Manager. The data should be disclosed to other Cashiers. |FR1|
 |NFR7| SECURITY| The system must be protected from an unauthorized access by using id and password|FR5|    
-|NFR8| SECURITY | The credit card information should never be recorded into the system | FR7.6 |    
-|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This includes also the | FR7.5 |
+|NFR8| SECURITY | The credit card information should never be recorded into the system but only used during the payment process | FR7.6 |    
+|NFR9| LOCALISATION | The prices are managed and displayed with the local currency with two decimals. This also applies to the date format | FR7.5 |
 |NFR10| LOCALISATION | VAT application on the final price depends on the local national law | FR7.5 |
 |NFR11| LOCALISATION | Data protection must be in accordance with the local law (GDPR for Europe)| FR1, FR2, FR3.5, FR6, FR7.7 |
 
@@ -221,7 +221,7 @@ PRODUCT -- S
 ## Use case diagram
 ```plantuml
 @startuml
-	usecase "FR1 Manage employees" as UC2
+	usecase "FR1 Manage Employees" as UC2
 	usecase "FR1.3 List Employees" as UC2.3
 	usecase "FR1.4 Statistics of Employee" as UC2.4
 	usecase "FR1.8 Manage Work-shift timetable" as UC2.7
@@ -343,7 +343,7 @@ Cashier -up-> UC5
 ```plantuml
 @startuml
 
-usecase "FR1 Manage employees" as UC2
+usecase "FR1 Manage Employees" as UC2
 usecase "FR1.1 Modify/Delete/Disable Employee" as UC2.1
 usecase "FR1.3 List Employees" as UC2.3
 usecase "FR1.4 Statistics of Employee" as UC2.4
@@ -416,7 +416,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Owner is logged in|
 | Post condition |  A new Employee is added to into the system |
 |  Step#     | Description |  
-|  1     | Owner click on the employees section |  
+|  1     | Owner click on the Employees section |  
 |  2     | Owner click on the create new Employee button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Owner enters the new Employee information and select if it is a Manager or a Cashier |
@@ -429,7 +429,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Owner is logged in|
 | Post condition |  The entered Employee is already in the system, the new Employee is not added |
 |  Step#     | Description |  
-|  1     | Owner click on the employees section |  
+|  1     | Owner click on the Employees section |  
 |  2     | Owner click on the create new Employee button |
 |  3     | A window is opened with all necessary fields to be filled |
 |  4     | Owner enters the new Employee information and select if it is a Manager or a Cashier |
@@ -452,7 +452,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Owner is logged in|
 | Post condition | The existing account has been modified |
 |  Step#     | Description |  
-|  1     | Owner click on the employees section |  
+|  1     | Owner click on the Employees section |  
 |  2     | Owner clicks the modify command|  
 | 3 | Owner searches the user that wants to modifyand selects it|
 |4 | System presents the Employee details. The screen opens in edit mode|
@@ -473,7 +473,7 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  Owner is logged in |
 | Post condition | The existing Employee account has been disable from access the EZShop Application |
 |  Step#     | Description |  
-|  1     | Owner click on the employees section |  
+|  1     | Owner click on the Employees section |  
 |  2     |Owner clicks the modify command |  
 | 3 | Owner searches the user that wants to modify and selects it|
 |4 | System presents the Employee details. The screen opens in edit mode|
@@ -656,9 +656,9 @@ UC2.7 <.up. UC2: <<include>>
 | Precondition |  The Employee is not logged in the system and the application is already opened and running in the computer |
 | Postcondition |  The Employee is logged in |
 |  Step#     | Description |   
-|  1     | The employee click on the login button and a form is opened |  
-|  2    | The employee enter his credential, user id and password |
-|  3    | The employee confirm with the appropriate button |
+|  1     | The Employee click on the login button and a form is opened |  
+|  2    | The Employee enter his credential, user id and password |
+|  3    | The Employee confirm with the appropriate button |
 
 ##### Scenario 7.2
 
@@ -722,7 +722,7 @@ UC2.7 <.up. UC2: <<include>>
 | ------------- |:-------------:|
 |  Precondition  | The EZShop application is running and the Manager is login in  |
 | Post condition | The Manager successfully create new timetable or modify the pre-existing timetable for work-shift of all Employee|
-|  Nominal Scenario |The Manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all employees or modify the pre-existing work-shift timetable |
+|  Nominal Scenario |The Manager select with the appropriate button on the system, then add a new work-shift into the work-shift timetable of all Employees or modify the pre-existing work-shift timetable |
 
 ##### Scenario 10.1 - Nominal
 |  Scenario 10.1  | |
