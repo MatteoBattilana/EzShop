@@ -115,7 +115,7 @@ Product -- S
  He is very happy with his new role but he is aware of the responsibilities it entails
  and he would like to be able to combine work and studies well. Therefore he is looking for an application that allows him to accomplish the same tasks in less time and in a more efficient way.<hr>
 
-5. **Jonathan**, 32, is the Owner of a small book shop in a town; he has a tight budget and in order to cut the costs he has one stable cashier and some on call students that work. He would like to have a software that is simply able to record his Employees work shifts.
+5. **Jonathan**, 32, is the Owner of a small book shop in a town; he has a tight budget and in order to cut the costs he has one stable cashier and some on call students. He would like to have a software that is simply able to record his Employees work shifts.
 
 
 # Functional and non functional requirements
