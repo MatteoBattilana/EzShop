@@ -126,17 +126,17 @@ Product -- S
   His main goal is to keep on managing every aspect of his shop even if he won't be always present.<hr>
 
 
-3. **Alicia**, 44, a small businesswoman from Turin,   owns a lovely shoes boutique.
-  With the pandemic and with the economic crisis she is facing hard times but she does not give up to close permanently.
-  Every day she searches in the list of sold product, written in the receipts, which one have been sold in order to compute manually the remaining inventory. She would like to  have a software that helps her to keep track of all products, so that her shop will be never out of stock and never excess.<hr>
+3. **Alicia**, 44, a businesswoman from Turin, owns a lovely shoes boutique.
+  With the pandemic and with the economic crisis she is facing hard times but she doesn't want to give up and to close permanently.
+  Every day she checks on the list of sold product, which one have been sold in order to compute manually the remaining inventory. She would like to  have a software that helps her to keep track of all products, so that her shop will be never go out of stock and never become redundant.<hr>
 
-4. **Tom**, 22, an economics student to pay for his studies, works in a small hardware store,
- thanks to his skills with numbers and bureaucracy, he was recently promoted to Manager of the activity.
- So now he has to take care of monitoring all aspects of the store, from inventory, to sales, to relationships with suppliers.
+4. **Tom**, 22, an economics student works in a small hardware store,to pay for his studies.
+ Thanks to his skills with numbers and bureaucracy, he was recently promoted to Manager of the activity.
+ So now he has to deal of monitoring all aspects of the store, from the inventory, to the sales, to relationships with suppliers.
  He is very happy with his new role but he is aware of the responsibilities it entails
- and he would like to be able to combine work and studies well. So he is looking for an application that  allow him to satisfy the same tasks in less time and in a more efficient way.<hr>
+ and he would like to be able to combine work and studies well. Therefore he is looking for an application that allows him to accomplish the same tasks in less time and in a more efficient way.<hr>
 
-5. **Jonathan**, 32, is the Owner of a small book shop in a town; he has a tight budget and in order to cut the costs he has one stable cashier and some students that work on call, when they are free. He would like to have a software that is simply able to record his Employees work shifts.
+5. **Jonathan**, 32, is the Owner of a small book shop in a town; he has a tight budget and in order to cut the costs he has one stable cashier and some on call students that work. He would like to have a software that is simply able to record his Employees work shifts.
 
 
 # Functional and non functional requirements
@@ -597,6 +597,7 @@ UC2.7 <.up. UC2: <<include>>
 | 2 | Once all products have been scanned, the Cashier ends the transaction |
 | 3 | The system computes the total and applies the VAT |
 | 4 | Cashier gets paid and the transaction is recorded into the system|
+| 5 | The system prints the receipt|
 
 ##### Scenario 6.2
 |  Scenario 6.2  | |
@@ -639,6 +640,7 @@ UC2.7 <.up. UC2: <<include>>
 | 3 | Cashiers inserts the gift card given by the customer |
 | 4 | The system computes the total and apply the VAT |
 | 5 | Cashier gets paid and the transaction is recorded into the system|
+| 6 | The system prints the receipt|
 
 ##### Scenario 6.5
 |  Scenario 6.5  | |
