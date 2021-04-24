@@ -1,7 +1,7 @@
-# Design Document 
+# Design Document
 
 
-Authors: 
+Authors:
 
 Date:
 
@@ -25,7 +25,7 @@ Version:
 
 The design must satisfy the Official Requirements document, notably functional and non functional requirements
 
-# High level design 
+# High level design
 
 <discuss architectural styles used, if any>
 <report package diagram>
@@ -36,153 +36,166 @@ The design must satisfy the Official Requirements document, notably functional a
 
 
 # Low level design
+## Package
+#### Exception
+InvalidRoleException
+InvalidPasswordException
+InvalidProductDescriptionException
+InvalidPricePerUnitException
+InvalidLocationException
+InvalidCustomerIdException
+InvalidCustomerCardException
+InvalidDiscountRateException
+InvalidProductCodeException
+InvalidQuantityException
+InvalidPaymentException
+InvalidCreditCardException
+UnauthorizedException
+
+#### Model
+
+- User(username, password, id)
+  - Administrator, Cashier, ShopManager
+- ProductType(id, description, barcode, pricePerUnit, note, Position position(optional))
+- Product(id, quantity, temporaryQuantity, ProductType)
+- Position(aisleNumber, rackAlphabeticIdentifier, levelNumber)
+- Order(id, String productCode, int quantity, double pricePerUnit, supplier(?), status, arrival)
+- Customer(id, name, CustomerCard cc)
+- CustomerCard(id, points)
+- SaleTransaction(id, list<TransactionProduct>, CustomerCard, points, Ticket)
+- TransactionProduct(id, quantity, discount)
+- Ticket(id, ReturnTransaction, Payment)
+- AccountBook(List<FinancialTransaction>)
+- FinancialTransaction
+- Credit
+- Debit
+- ReturnTransaction(Ticket, list<Product, amount>, committed: true;false, Payment)
+- Payment(id, )
+  - CashPayment(cash, return)
+  - CreditCardPayment(Credit card)
+- Credit card ?
+- BalanceOperation (Credit, Debit, Order, Sale, Return)
+- EZShop(User logged, )
+
+#### Data
+????
+
+#### Database
+????
 
 <for each package, report class diagram>
 
-@startuml
 ```plantuml
+@startuml
 left to right direction
-class Employee {
+class Shop {
+  User logged
+}
+
+class User {
  id
-name
-surname
-AccessRight
-getPersonalAccount()
+ name
+ surname
+ username
+ password
 }
-
-class Shop{
-getEmployeeName?()
-getEmployeeSurname?()
-SearchEmployee()
-UpdateEmployee()
-CreateEmployee()
-getEmployeeId?()
-getEmployeeAccessRight()
-getEmployees()
-deleteEmployee?()
-getProducts()
-UpdateProducts()
-SearchProduct()
-createProductType()
-getOrders()
-manageOrder()
-createCustomer()
-SearchCustomer()
-modifyCustomer()
-createFidelityCard()
-deleteFidelityCrad?()
-addPointFidelityCard()
-searchTransaction()
-ProduceReportTransaction()
-showTranscationList()
-getBalance()
-updateBalance()
+User <|-- Administrator
+User <|-- Cashier
+User <|-- ShopManager
 
 
-}
-Shop -"*" Employee
+Shop -up"*" User
 class AccountBook {
     balance
+    List<FinancialTransaction>
 }
-AccountBook - Shop
+AccountBook <-left- Shop
 class FinancialTransaction {
  description
  amount
  date
-getAmount()
-setDate()
-getDescription()
-setDescription()
 }
-AccountBook -- "*" FinancialTransaction
+AccountBook --> FinancialTransaction
 
-class Credit 
+class Credit
 class Debit
 
 Credit --|> FinancialTransaction
 Debit --|> FinancialTransaction
 
 class Order
-class Sale
-class Return
 
 Order --|> Debit
-Sale --|> Credit
-Return --|> Debit
+SaleTransaction --|> Credit
+ReturnTransaction --|> Debit
 
 
 class ProductType{
-    barCode
+    id
+    barcode
     description
-    sellPrice
+    pricePerUnit
     quantity
     discountRate
-    notes
-getBarcode()
-setBarcode()
-getQuantity()
-setQuantity()
-getDescription()
-setDescription()
-setSellPrice()
-getSellPrice()
+    note
 }
 
 Shop - "*" ProductType
 
+class Ticket {
+  id
+  Optional<ReturnTransaction>
+  Payment
+}
+Ticket --> ReturnTransaction
+Ticket --> Payment
+ReturnTransaction --> Payment
+class CashPayment {
+  cash
+  return
+}
+class CreditCardPayment {
+  CreditCard
+}
+CreditCardPayment --> CreditCard
+CreditCardPayment --|> Payment
+CashPayment --|> Payment
+
 class SaleTransaction {
-    ID 
-    date
-    time
-    cost
-    paymentType
-    discount rate
-getId()
-setId()
-getdate()
-setDate()
-getTime()
-setTime()
-getcost()
-setCost()
-getPaymentType()
-setPaymentType()
-getDiscountRate()
-setDiscountRate()
-getProducts()
-addProducts()
+    discount
+    pints
+    Optional<SaleTransaction>
+    Optional<Ticket>
+    List<TransactionProduct>
 }
-SaleTransaction - "*" ProductType
-
-class Quantity {
-    quantity
-getQuantity()
-setQuantity()
+SaleTransaction --> TransactionProduct
+TransactionProduct --> Product
+class TransactionProduct {
+  id
+  quantity
+  discount
+  Product
 }
-(SaleTransaction, ProductType)  .. Quantity
 
-class LoyaltyCard {
-    ID
+class CustomerCard {
+    id
     points
-getId()
-setId()
-getPoint()
-setPoint()
+    Customer
 }
-
 class Customer {
+    id
     name
     surname
-getPersonalAccount()
-setPersonalAccount()
 }
-
-LoyaltyCard "0..1" - Customer
-
-SaleTransaction "*" -- "0..1" LoyaltyCard
+CustomerCard --> Customer
+SaleTransaction --> CustomerCard
 
 class Product {
-    
+  id
+  quantity
+  temporaryQuantity
+  Optional<Position>
+  ProductType
 }
 
 class Position {
@@ -193,42 +206,42 @@ getPosition()
 setPosition()
 }
 
-ProductType - "0..1" Position
+ProductType --> Position
 
-ProductType -- "*" Product : describes
+ProductType <-- Product
 
 class Order {
+  id
+  ProductType
   supplier
   pricePerUnit
   quantity
   status
-getQuantity()
-setStatus()
-getStatus()
-getPriceUnit()
+  arrival
 }
 
-Order "*" - ProductType
+Order --> ProductType
 
 class ReturnTransaction {
-  quantity
-  returnedValue
-getQuantity()
-setQuantity()
-getreturnedValue()
+  Ticket
+  List<ReturnProduct>
+  committed
+  Payment
 }
-
+ReturnTransaction --> Payment
+class ReturnProduct {
+  Product
+  amount
+}
+ReturnProduct --> Product
+ReturnTransaction --> Ticket
+ReturnTransaction --> ReturnProduct
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
 
-note "ID is a number on 10 digits " as N1  
-N1 .. LoyaltyCard
-note "bar code is a number on 12 to 14  digits, compliant to GTIN specifications, see  https://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
-N2 .. ProductType
-note "ID is a unique identifier of a transaction,  printed on the receipt (ticket number) " as N3
-N3 .. SaleTransaction
-```
 @enduml
+```
+
 
 
 
@@ -239,7 +252,7 @@ N3 .. SaleTransaction
 # Verification traceability matrix
 
 \<for each functional requirement from the requirement document, list which classes concur to implement it>
-|  | Position | Product Type| Quantity | Sale Transaction | Customer | Loyalty card| Return Transaction | Order        | Shop | Employee | Financial Transaction | Credit        | Debit   | Sale| Account Book |Product|
+|  | Position | Product Type| Quantity | Sale Transaction | Customer | Loyalty card| Return Transaction | Order        | Shop | User | Financial Transaction | Credit        | Debit   | Sale| Account Book |Product|
 | :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:| :-------------: |:------------------:|:---:|:---:|:----:|
 | FR1   || | || || ||X |X| || || | |
 | FR3|X| X| ||X |X| || X|X| || || | |
@@ -267,7 +280,7 @@ N3 .. SaleTransaction
 
 
 
-# Verification sequence diagrams 
+# Verification sequence diagrams
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 ## Sequence diagram for scenario "RECORD ORDER PRODUCT"
 ```plantuml
@@ -292,7 +305,7 @@ activate ProductType
 return
 Shop-> SaleTransaction:3 : addProducts()
 SaleTransaction->Quantity: 4: setquantity()
-Shop -> Shop:5: searchLoyaltyCard()
+Shop -> Shop:5: searchCustomerCard()
 Shop -> LotaltyCard:6:addPoint()
 Shop -> SaleTransaction:7: setPaymentType()
 Shop -> FinancialTransaction:8: setAmount()
