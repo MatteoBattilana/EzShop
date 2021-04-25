@@ -445,7 +445,7 @@ activate ControllerFactory
 return
 Shop -> ProductController:3 : createProductType()
 activate ProductController
-return id
+return productId
 
 Shop -> ProductController:4 : updatePosition()
 activate ProductController
