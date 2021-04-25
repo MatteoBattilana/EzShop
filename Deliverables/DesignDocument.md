@@ -235,7 +235,7 @@ AccountBook --> FinancialTransaction
 
 Ticket --> Payment
 ReturnTransaction --> Payment
-CreditCardPayment --> CreditCard
+CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> Product
 CustomerCard --> Customer
@@ -342,7 +342,8 @@ it.polito.ezshop.controller --> it.polito.ezshop.model
 Shop -left-> User
 Shop --> ControllerFactory
 
-
+```
+```plantuml
 package it.polito.ezshop.exception {
   class InvalidRoleException
   class InvalidPasswordException
@@ -358,9 +359,7 @@ package it.polito.ezshop.exception {
   class InvalidCreditCardException
   class UnauthorizedException
 }
-
 ```
-
 
 In order to make the Class Diagram more clear, the get and set methods have been committed from the diagram. For the same reason, the links from each class of the controller package to each classes of the model package have been omitted. The relation is 1:1 since the each calls of the controller internally works with the data representation given by the model.
 
