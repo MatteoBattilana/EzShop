@@ -77,13 +77,210 @@ UnauthorizedException
 - BalanceOperation (Credit, Debit, Order, Sale, Return)
 - EZShop(User logged, )
 
-#### Data
-????
 
-#### Database
-????
 
-<for each package, report class diagram>
+```plantuml
+package Controller
+package Model
+package Data
+package Exception
+package GUI
+
+Controller --> Model
+Controller --> Data
+Controller --> Exception
+```
+
+```plantuml
+class Shop {
+  loggedUser
+}
+
+package it.polito.ezshop.model {
+  interface FinancialTransaction
+  interface Credit
+  interface Debit
+  interface Payment
+  class User {
+    id
+    name
+    surname
+    username
+    password
+    type
+  }
+  class Product {
+    id
+    quantity
+    temporaryQuantity
+    position
+    ProductType
+  }
+  class ProductType{
+      id
+      barcode
+      description
+      pricePerUnit
+      discountRate
+      note
+      List<Product>
+  }
+  class Order {
+    id
+    ProductType
+    supplier
+    pricePerUnit
+    quantity
+    status
+    arrival
+  }
+  class CustomerCard {
+      id
+      points
+      Customer
+  }
+  class Customer {
+      id
+      name
+      surname
+  }
+  class SaleTransaction {
+      discount
+      pints
+      Optional<Ticket>
+      List<TransactionProduct>
+  }
+  class ReturnTransaction {
+    Ticket
+    List<TransactionProduct>
+    committed
+    Payment
+  }
+  class TransactionProduct {
+    Product
+    amount
+  }
+  class CashPayment {
+    cash
+    return
+  }
+  class CreditCardPayment {
+    CreditCard
+  }
+  class AccountBook{
+    balance
+    List<FinancialTransaction>
+  }
+  class Ticket{
+    id
+    Optional<ReturnTransaction>
+    Payment
+  }
+
+  Credit -up-|> FinancialTransaction
+  Debit -up-|> FinancialTransaction
+  SaleTransaction -up-|> Credit
+  ReturnTransaction -up-|> Debit
+  Order -up-|> Debit
+
+  Payment <|-- CreditCardPayment
+  Payment <|-- CashPayment
+
+AccountBook -left-> FinancialTransaction
+
+Ticket --> Payment
+ReturnTransaction --> Payment
+CreditCardPayment --> CreditCard
+SaleTransaction --> TransactionProduct
+TransactionProduct --> Product
+CustomerCard --> Customer
+SaleTransaction --> CustomerCard
+
+ProductType --> Product
+Order --> ProductType
+SaleTransaction --> Ticket
+ReturnTransaction --> TransactionProduct
+}
+
+package it.polito.ezshop.controller {
+  class UserController
+  class ProductController
+  class OrderController
+  class CustomerController
+  class SaleTransactionController
+  class ReturnTransactionController
+  class PaymentController
+}
+
+UserController --> User
+ProductController --> Product
+ProductController --> ProductType
+OrderController --> Order
+CustomerController --> Customer
+CustomerController --> CustomerCard
+SaleTransactionController ---> Ticket
+SaleTransactionController ---> TransactionProduct
+SaleTransactionController ---> SaleTransaction
+ReturnTransactionController --> ReturnTransaction
+ReturnTransactionController --> TransactionProduct
+PaymentController --> CreditCardPayment
+PaymentController --> CashPayment
+
+
+package it.polito.ezshop.exception {
+  class InvalidRoleException
+  class InvalidPasswordException
+  class InvalidProductDescriptionException
+  class InvalidPricePerUnitException
+  class InvalidLocationException
+  class InvalidCustomerIdException
+  class InvalidCustomerCardException
+  class InvalidDiscountRateException
+  class InvalidProductCodeException
+  class InvalidQuantityException
+  class InvalidPaymentException
+  class InvalidCreditCardException
+  class UnauthorizedException
+}
+
+package it.polito.ezshop.GUI {
+}
+
+
+package it.polito.ezshop.data {
+  class UserPersistance
+  class ProductPersistance
+  class ProductTypePersistance
+  class OrderPersistance
+  class CustomerPersistance
+  class CustomerCardPersistance
+  class SaleTransactionPersistance
+  class SaleProductPersistance
+  class ReturnTransactionPersistance
+  class TransactionProductPersistance
+  class CashPaymentPersistance
+  class CreditCardPaymentPersistance
+  class TicketPersistance
+}
+
+
+
+UserController --> UserPersistance
+ProductController --> ProductPersistance
+ProductController --> ProductTypePersistance
+OrderController --> OrderPersistance
+CustomerController --> CustomerPersistance
+CustomerController --> CustomerCardPersistance
+SaleTransactionController ---> TicketPersistance
+SaleTransactionController ---> TransactionProductPersistance
+SaleTransactionController ---> SaleTransactionPersistance
+ReturnTransactionController --> ReturnTransactionPersistance
+ReturnTransactionController --> TransactionProductPersistance
+PaymentController --> CreditCardPaymentPersistance
+PaymentController --> CashPaymentPersistance
+
+```
+
 
 ```plantuml
 @startuml
@@ -238,6 +435,8 @@ ReturnTransaction --> Ticket
 ReturnTransaction --> ReturnProduct
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
+
+
 
 @enduml
 ```
