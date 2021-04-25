@@ -336,19 +336,19 @@ package it.polito.ezshop.controller {
     + loadFromDb()
   }
 
-  abstract class DatabaseConnection {
+  class DatabaseConnection {
     + url
     + name
     + password
   }
-  BalanceController --|> DatabaseConnection
-  UserController --|> DatabaseConnection
-  ProductController --|> DatabaseConnection
-  OrderController --|> DatabaseConnection
-  CustomerController --|> DatabaseConnection
-  SaleTransactionController --|> DatabaseConnection
-  ReturnTransactionController --|> DatabaseConnection
-  PaymentController --|> DatabaseConnection
+  BalanceController --> DatabaseConnection
+  UserController --> DatabaseConnection
+  ProductController --> DatabaseConnection
+  OrderController --> DatabaseConnection
+  CustomerController --> DatabaseConnection
+  SaleTransactionController --> DatabaseConnection
+  ReturnTransactionController --> DatabaseConnection
+  PaymentController --> DatabaseConnection
 
   ControllerFactory -down-> BalanceController
   ControllerFactory -down-> UserController
