@@ -372,19 +372,30 @@ Shop --> ControllerFactory
 ```
 ```plantuml
 package it.polito.ezshop.exception {
-  class InvalidRoleException
-  class InvalidPasswordException
-  class InvalidProductDescriptionException
-  class InvalidPricePerUnitException
-  class InvalidLocationException
-  class InvalidCustomerIdException
-  class InvalidCustomerCardException
-  class InvalidDiscountRateException
-  class InvalidProductCodeException
-  class InvalidQuantityException
-  class InvalidPaymentException
-  class InvalidCreditCardException
-  class UnauthorizedException
+class InvalidUsernameException
+class InvalidPasswordException
+class InvalidRoleException
+
+class InvalidUserIdException
+class UnauthorizedException
+
+class InvalidProductDescriptionException
+class InvalidProductCodeException
+class InvalidPricePerUnitException
+class InvalidProductIdException
+class InvalidLocationException
+class InvalidQuantityException
+
+class InvalidOrderIdException
+class InvalidCustomerNameException
+class InvalidCustomerIdException
+class InvalidCustomerCardException
+
+class InvalidDiscountRateException
+class InvalidTransactionIdException
+class InvalidTicketNumberException
+
+class InvalidCreditCardException
 }
 ```
 Due to some GitLab limitation the entire Class Diagram can't be properly rendered, you can see the exported result [here](image/class-diagram.png).
@@ -423,6 +434,25 @@ In order to make the Class Diagram more clear, the get and set methods have been
 
 # Verification sequence diagrams
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
+
+
+## Sequence diagram for scenario 1.1
+```plantuml
+@startuml
+Shop -> Shop:1 : createProductType()
+Shop -> ControllerFactory:2 : getController(ProductController.class)
+activate ControllerFactory
+return
+Shop -> ProductController:3 : createProductType()
+activate ProductController
+return id
+
+Shop -> ProductController:4 : updatePosition()
+activate ProductController
+return
+
+@enduml
+```
 
 ## Sequence diagram for scenario 6.1
 ```plantuml
@@ -470,23 +500,5 @@ Shop -> BalanceController: 13 : recordBalanceUpdate()
 activate BalanceController
 return
 
-@enduml
-```
-
-## Sequence diagram for scenario "6.3"
-```plantuml
-@startuml
-"Shop" -> Shop:1 : searchProducts()
-Shop -> ProductType:2 : getBarcode()
-activate ProductType
-return
-Shop-> SaleTransaction:3 : addProducts()
-SaleTransaction-> Quantity:4: SetQuantity()
-activate Quantity
-return
-Shop -> SaleTranscation:5: getDiscountrate()
-Shop -> SaleTransaction:6: setPaymentType()
-Shop -> FinancialTransaction:7: setAmount()
-Shop -> AccountBook:8: UpdateBalance()
 @enduml
 ```
