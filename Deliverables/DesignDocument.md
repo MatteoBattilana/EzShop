@@ -89,6 +89,7 @@ package it.polito.ezshop.logic {
 + User login(String username, String password)
 + boolean logout()
 + Integer createProductType(String description, String productCode, double pricePerUnit, String note)
++ String scanProduct()
 + boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
 + boolean deleteProductType(Integer id)
 + List<ProductType> getAllProductTypes()
@@ -187,6 +188,7 @@ package it.polito.ezshop.model {
       + boolean modifyCustomer(String newCustomerName, String newCustomerCard)
   }
   class SaleTransaction {
+      + id
       + discount
       + pints
       + Optional<Ticket>
@@ -217,7 +219,6 @@ package it.polito.ezshop.model {
     + List<FinancialTransaction>
   }
   class Ticket{
-    + id
     + Optional<ReturnTransaction>
     + Payment
   }
@@ -257,6 +258,7 @@ package it.polito.ezshop.controller {
     + boolean updateUserRights(Integer id, String role)
     + User login(String username, String password)
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class ProductController {
     + Integer createProductType(String description, String productCode, double pricePerUnit, String note)
@@ -266,8 +268,11 @@ package it.polito.ezshop.controller {
     + ProductType getProductTypeByBarCode(String barCode)
     + List<ProductType> getProductTypesByDescription(String description)
     + boolean updateQuantity(Integer productId, int toBeAdded)
+    + boolean updateTemporaryQuantity(Integer productId, int toBeAdded)
+    + boolean commitTemporaryQuantity(Integer productId)
     + boolean updatePosition(Integer productId, String newPos)
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class OrderController {
     + Integer issueReorder(String productCode, int quantity, double pricePerUnit)
@@ -276,6 +281,7 @@ package it.polito.ezshop.controller {
     + boolean recordOrderArrival(Integer orderId)
     + List<Order> getAllOrders()
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class CustomerController {
     + Integer defineCustomer(String customerName)
@@ -284,6 +290,7 @@ package it.polito.ezshop.controller {
     + Customer getCustomer(Integer id)
     + List<Customer> getAllCustomers()
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class SaleTransactionController {
     + Integer startSaleTransaction()
@@ -297,6 +304,7 @@ package it.polito.ezshop.controller {
     + Ticket getSaleTicket(Integer transactionId)
     + Ticket getTicketByNumber(Integer ticketNumber)
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class ReturnTransactionController {
     + Integer startReturnTransaction(Integer ticketNumber)
@@ -304,23 +312,28 @@ package it.polito.ezshop.controller {
     + boolean endReturnTransaction(Integer returnId, boolean commit)
     + boolean deleteReturnTransaction(Integer returnId)
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class PaymentController {
     + double receiveCashPayment(Integer ticketNumber, double cash)
     + boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
     + double returnCashPayment(Integer returnId)
     + double returnCreditCardPayment(Integer returnId, String creditCard)
+    - boolean validateCrediCard(String creditCard)
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class BalanceController{
     + boolean recordBalanceUpdate(double toBeAdded)
     + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
     + double computeBalance()
     + updateFromModel(Object)
+    + loadFromDb()
   }
   class ControllerFactory {
     + HashMap<Class, Object> controllers
     + getController(Class): Object
+    + loadFromDb()
   }
 
   ControllerFactory -down-> BalanceController
@@ -400,20 +413,52 @@ In order to make the Class Diagram more clear, the get and set methods have been
 # Verification sequence diagrams
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
-## Sequence diagram for scenario "6.4"
+## Sequence diagram for scenario 6.1
 ```plantuml
 @startuml
-"Shop" -> Shop:1 : searchProducts()
-Shop -> ProductType:2 : getBarcode()
-activate ProductType
+Shop -> Shop:1 : startSaleTransaction()
+Shop -> ControllerFactory:2 : getController(SaleTransactionController.class)
+activate ControllerFactory
 return
-Shop-> SaleTransaction:3 : addProducts()
-SaleTransaction->Quantity: 4: setquantity()
-Shop -> Shop:5: searchCustomerCard()
-Shop -> LotaltyCard:6:addPoint()
-Shop -> SaleTransaction:7: setPaymentType()
-Shop -> FinancialTransaction:8: setAmount()
-Shop -> AccountBook:9: UpdateBalance()
+
+Shop -> SaleTransactionController:3 : startSaleTransaction()
+activate SaleTransactionController
+return
+
+Shop -> Shop:4 : scanProduct()
+
+Shop -> SaleTransactionController:5 : addProductToSale()
+activate SaleTransactionController
+  SaleTransactionController -> ControllerFactory:6 : getController(ProductController.class)
+  activate ControllerFactory
+  return
+  SaleTransactionController -> ProductController:7 : updateTemporaryQuantity()
+  activate ProductController
+  return
+return
+Shop -> SaleTransactionController:8 : closeSaleTransaction()
+activate SaleTransactionController
+return
+
+Shop -> ControllerFactory:2 : getController(PaymentController.class)
+activate ControllerFactory
+return
+Shop -> PaymentController:9 : receiveCreditCardPayment()
+activate PaymentController
+  PaymentController -> PaymentController:10 : validateCrediCard()
+return
+
+Shop -> ProductController:11 : commitTemporaryQuantity()
+activate ProductController
+return
+
+Shop -> ControllerFactory:12 : getController(BalanceController.class)
+activate ControllerFactory
+return
+Shop -> BalanceController: 13 : recordBalanceUpdate()
+activate BalanceController
+return
+
 @enduml
 ```
 
