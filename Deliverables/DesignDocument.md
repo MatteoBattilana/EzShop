@@ -373,11 +373,8 @@ package it.polito.ezshop.exception {
   class UnauthorizedException
 }
 ```
-
+Due to some GitLab limitation the entire Class Diagram can't be properly rendered, you can see the exported result [here](image/class-diagram.png).
 In order to make the Class Diagram more clear, the get and set methods have been committed from the diagram. For the same reason, the links from each class of the controller package to each classes of the model package have been omitted. The relation is 1:1 since the each calls of the controller internally works with the data representation given by the model.
-
-
-
 
 
 # Verification traceability matrix
