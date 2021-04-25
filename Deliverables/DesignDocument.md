@@ -339,14 +339,9 @@ it.polito.ezshop.controller --> it.polito.ezshop.model
 
 
 
-Shop --> User
+Shop -left-> User
 Shop --> ControllerFactory
 
-```
-
-
-```plantuml
-@startuml
 
 package it.polito.ezshop.exception {
   class InvalidRoleException
@@ -364,10 +359,8 @@ package it.polito.ezshop.exception {
   class UnauthorizedException
 }
 
-package it.polito.ezshop.GUI {
-}
-@enduml
 ```
+
 
 In order to make the Class Diagram more clear, the get and set methods have been committed from the diagram. For the same reason, the links from each class of the controller package to each classes of the model package have been omitted. The relation is 1:1 since the each calls of the controller internally works with the data representation given by the model.
 
