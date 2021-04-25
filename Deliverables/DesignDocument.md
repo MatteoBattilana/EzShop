@@ -36,23 +36,6 @@ The design must satisfy the Official Requirements document, notably functional a
 
 
 # Low level design
-## Package
-#### Exception
-InvalidRoleException
-InvalidPasswordException
-InvalidProductDescriptionException
-InvalidPricePerUnitException
-InvalidLocationException
-InvalidCustomerIdException
-InvalidCustomerCardException
-InvalidDiscountRateException
-InvalidProductCodeException
-InvalidQuantityException
-InvalidPaymentException
-InvalidCreditCardException
-UnauthorizedException
-
-#### Model
 
 - User(username, password, id)
   - Administrator, Cashier, ShopManager
@@ -92,8 +75,62 @@ Controller --> Exception
 ```
 
 ```plantuml
-class Shop {
-  loggedUser
+
+package it.polito.ezshop.logic {
+  left to right direction
+  class Shop {
+    + loggedUser: User
+    + reset()
++ Integer createUser(String username, String password, String role)
++ boolean deleteUser(Integer id)
++ List<User> getAllUsers()
++ User getUser(Integer id)
++ boolean updateUserRights(Integer id, String role)
++ User login(String username, String password)
++ boolean logout()
++ Integer createProductType(String description, String productCode, double pricePerUnit, String note)
++ boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
++ boolean deleteProductType(Integer id)
++ List<ProductType> getAllProductTypes()
++ ProductType getProductTypeByBarCode(String barCode)
++ List<ProductType> getProductTypesByDescription(String description)
++ boolean updateQuantity(Integer productId, int toBeAdded)
++ boolean updatePosition(Integer productId, String newPos)
++ Integer issueReorder(String productCode, int quantity, double pricePerUnit)
++ Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
++ boolean payOrder(Integer orderId)
++ boolean recordOrderArrival(Integer orderId)
++ List<Order> getAllOrders()
++ Integer defineCustomer(String customerName)
++ boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard)
++ boolean deleteCustomer(Integer id)
++ Customer getCustomer(Integer id)
++ List<Customer> getAllCustomers()
++ String createCard()
++ boolean attachCardToCustomer(String customerCard, Integer customerId)
++ boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded)
++ Integer startSaleTransaction()
++ boolean addProductToSale(Integer transactionId, String productCode, int amount)
++ boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
++ boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate)
++ boolean applyDiscountRateToSale(Integer transactionId, double discountRate)
++ int computePointsForSale(Integer transactionId)
++ boolean closeSaleTransaction(Integer transactionId)
++ boolean deleteSaleTicket(Integer ticketNumber)
++ Ticket getSaleTicket(Integer transactionId)
++ Ticket getTicketByNumber(Integer ticketNumber)
++ Integer startReturnTransaction(Integer ticketNumber)
++ boolean returnProduct(Integer returnId, String productCode, int amount)
++ boolean endReturnTransaction(Integer returnId, boolean commit)
++ boolean deleteReturnTransaction(Integer returnId)
++ double receiveCashPayment(Integer ticketNumber, double cash)
++ boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
++ double returnCashPayment(Integer returnId)
++ double returnCreditCardPayment(Integer returnId, String creditCard)
++ boolean recordBalanceUpdate(double toBeAdded)
++ List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
++ double computeBalance()
+  }
 }
 
 package it.polito.ezshop.model {
@@ -102,91 +139,99 @@ package it.polito.ezshop.model {
   interface Debit
   interface Payment
   class User {
-    id
-    name
-    surname
-    username
-    password
-    type
+    + id
+    + name
+    + surname
+    + username
+    + password
+    + role
+    + updateUserRights(String role)
   }
   class Product {
-    id
-    quantity
-    temporaryQuantity
-    position
-    ProductType
+    + id
+    + quantity
+    + temporaryQuantity
+    + position
+    + ProductType
+    + boolean updateProduct(String newDescription, String newCode, double newPrice, String newNote)
+    + boolean updateQuantity(int toBeAdded)
+    + boolean updatePosition(String newPos)
   }
   class ProductType{
-      id
-      barcode
-      description
-      pricePerUnit
-      discountRate
-      note
-      List<Product>
+      + id
+      + barcode
+      + description
+      + pricePerUnit
+      + discountRate
+      + note
   }
   class Order {
-    id
-    ProductType
-    supplier
-    pricePerUnit
-    quantity
-    status
-    arrival
+    + id
+    + ProductType
+    + supplier
+    + pricePerUnit
+    + quantity
+    + status
+    + arrival
   }
   class CustomerCard {
-      id
-      points
-      Customer
+      + id
+      + points
+      + Customer
+      + boolean modifyPointsOnCard(int pointsToBeAdded)
   }
   class Customer {
-      id
-      name
-      surname
+      + id
+      + name
+      + surname
+      + boolean modifyCustomer(String newCustomerName, String newCustomerCard)
   }
   class SaleTransaction {
-      discount
-      pints
-      Optional<Ticket>
-      List<TransactionProduct>
+      + discount
+      + pints
+      + Optional<Ticket>
+      + List<TransactionProduct>
+      + boolean applyDiscountRateToSale(double discountRate)
   }
   class ReturnTransaction {
-    Ticket
-    List<TransactionProduct>
-    committed
-    Payment
+    + Ticket
+    + List<TransactionProduct>
+    + committed
+    + Payment
   }
   class TransactionProduct {
-    Product
-    amount
+    + Product
+    + amount
+    + discountRate
+    + boolean applyDiscountRateToProduct(double discountRate)
   }
   class CashPayment {
-    cash
-    return
+    + cash
+    + return
   }
   class CreditCardPayment {
-    CreditCard
+    + CreditCard
   }
   class AccountBook{
-    balance
-    List<FinancialTransaction>
+    + balance
+    + List<FinancialTransaction>
   }
   class Ticket{
-    id
-    Optional<ReturnTransaction>
-    Payment
+    + id
+    + Optional<ReturnTransaction>
+    + Payment
   }
 
-  Credit -up-|> FinancialTransaction
-  Debit -up-|> FinancialTransaction
-  SaleTransaction -up-|> Credit
-  ReturnTransaction -up-|> Debit
-  Order -up-|> Debit
+  Credit --|> FinancialTransaction
+  Debit --|> FinancialTransaction
+  SaleTransaction --|> Credit
+  ReturnTransaction --|> Debit
+  Order --|> Debit
 
   Payment <|-- CreditCardPayment
   Payment <|-- CashPayment
 
-AccountBook -left-> FinancialTransaction
+AccountBook --> FinancialTransaction
 
 Ticket --> Payment
 ReturnTransaction --> Payment
@@ -196,36 +241,112 @@ TransactionProduct --> Product
 CustomerCard --> Customer
 SaleTransaction --> CustomerCard
 
-ProductType --> Product
+ProductType <-- Product
 Order --> ProductType
 SaleTransaction --> Ticket
 ReturnTransaction --> TransactionProduct
 }
 
 package it.polito.ezshop.controller {
-  class UserController
-  class ProductController
-  class OrderController
-  class CustomerController
-  class SaleTransactionController
-  class ReturnTransactionController
-  class PaymentController
+  class UserController{
+    + reset()
+    + Integer createUser(String username, String password, String role)
+    + boolean deleteUser(Integer id)
+    + List<User> getAllUsers()
+    + User getUser(Integer id)
+    + boolean updateUserRights(Integer id, String role)
+    + User login(String username, String password)
+    + updateFromModel(Object)
+  }
+  class ProductController {
+    + Integer createProductType(String description, String productCode, double pricePerUnit, String note)
+    + boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
+    + boolean deleteProductType(Integer id)
+    + List<ProductType> getAllProductTypes()
+    + ProductType getProductTypeByBarCode(String barCode)
+    + List<ProductType> getProductTypesByDescription(String description)
+    + boolean updateQuantity(Integer productId, int toBeAdded)
+    + boolean updatePosition(Integer productId, String newPos)
+    + updateFromModel(Object)
+  }
+  class OrderController {
+    + Integer issueReorder(String productCode, int quantity, double pricePerUnit)
+    + Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
+    + boolean payOrder(Integer orderId)
+    + boolean recordOrderArrival(Integer orderId)
+    + List<Order> getAllOrders()
+    + updateFromModel(Object)
+  }
+  class CustomerController {
+    + Integer defineCustomer(String customerName)
+    + boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard)
+    + boolean deleteCustomer(Integer id)
+    + Customer getCustomer(Integer id)
+    + List<Customer> getAllCustomers()
+    + updateFromModel(Object)
+  }
+  class SaleTransactionController {
+    + Integer startSaleTransaction()
+    + boolean addProductToSale(Integer transactionId, String productCode, int amount)
+    + boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
+    + boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate)
+    + boolean applyDiscountRateToSale(Integer transactionId, double discountRate)
+    + int computePointsForSale(Integer transactionId)
+    + boolean closeSaleTransaction(Integer transactionId)
+    + boolean deleteSaleTicket(Integer ticketNumber)
+    + Ticket getSaleTicket(Integer transactionId)
+    + Ticket getTicketByNumber(Integer ticketNumber)
+    + updateFromModel(Object)
+  }
+  class ReturnTransactionController {
+    + Integer startReturnTransaction(Integer ticketNumber)
+    + boolean returnProduct(Integer returnId, String productCode, int amount)
+    + boolean endReturnTransaction(Integer returnId, boolean commit)
+    + boolean deleteReturnTransaction(Integer returnId)
+    + updateFromModel(Object)
+  }
+  class PaymentController {
+    + double receiveCashPayment(Integer ticketNumber, double cash)
+    + boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
+    + double returnCashPayment(Integer returnId)
+    + double returnCreditCardPayment(Integer returnId, String creditCard)
+    + updateFromModel(Object)
+  }
+  class BalanceController{
+    + boolean recordBalanceUpdate(double toBeAdded)
+    + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
+    + double computeBalance()
+    + updateFromModel(Object)
+  }
+  class ControllerFactory {
+    + HashMap<Class, Object> controllers
+    + getController(Class): Object
+  }
+
+  ControllerFactory -down-> BalanceController
+  ControllerFactory -down-> UserController
+  ControllerFactory -down-> ProductController
+  ControllerFactory -down-> OrderController
+  ControllerFactory -down-> CustomerController
+  ControllerFactory -down-> SaleTransactionController
+  ControllerFactory -down-> ReturnTransactionController
+  ControllerFactory -down-> PaymentController
 }
 
-UserController --> User
-ProductController --> Product
-ProductController --> ProductType
-OrderController --> Order
-CustomerController --> Customer
-CustomerController --> CustomerCard
-SaleTransactionController ---> Ticket
-SaleTransactionController ---> TransactionProduct
-SaleTransactionController ---> SaleTransaction
-ReturnTransactionController --> ReturnTransaction
-ReturnTransactionController --> TransactionProduct
-PaymentController --> CreditCardPayment
-PaymentController --> CashPayment
+it.polito.ezshop.controller --> it.polito.ezshop.model
 
+
+
+
+
+Shop --> User
+Shop --> ControllerFactory
+
+```
+
+
+```plantuml
+@startuml
 
 package it.polito.ezshop.exception {
   class InvalidRoleException
@@ -245,204 +366,10 @@ package it.polito.ezshop.exception {
 
 package it.polito.ezshop.GUI {
 }
-
-
-package it.polito.ezshop.data {
-  class UserPersistance
-  class ProductPersistance
-  class ProductTypePersistance
-  class OrderPersistance
-  class CustomerPersistance
-  class CustomerCardPersistance
-  class SaleTransactionPersistance
-  class SaleProductPersistance
-  class ReturnTransactionPersistance
-  class TransactionProductPersistance
-  class CashPaymentPersistance
-  class CreditCardPaymentPersistance
-  class TicketPersistance
-}
-
-
-
-UserController --> UserPersistance
-ProductController --> ProductPersistance
-ProductController --> ProductTypePersistance
-OrderController --> OrderPersistance
-CustomerController --> CustomerPersistance
-CustomerController --> CustomerCardPersistance
-SaleTransactionController ---> TicketPersistance
-SaleTransactionController ---> TransactionProductPersistance
-SaleTransactionController ---> SaleTransactionPersistance
-ReturnTransactionController --> ReturnTransactionPersistance
-ReturnTransactionController --> TransactionProductPersistance
-PaymentController --> CreditCardPaymentPersistance
-PaymentController --> CashPaymentPersistance
-
-```
-
-
-```plantuml
-@startuml
-left to right direction
-class Shop {
-  User logged
-}
-
-class User {
- id
- name
- surname
- username
- password
-}
-User <|-- Administrator
-User <|-- Cashier
-User <|-- ShopManager
-
-
-Shop -up"*" User
-class AccountBook {
-    balance
-    List<FinancialTransaction>
-}
-AccountBook <-left- Shop
-class FinancialTransaction {
- description
- amount
- date
-}
-AccountBook --> FinancialTransaction
-
-class Credit
-class Debit
-
-Credit --|> FinancialTransaction
-Debit --|> FinancialTransaction
-
-class Order
-
-Order --|> Debit
-SaleTransaction --|> Credit
-ReturnTransaction --|> Debit
-
-
-class ProductType{
-    id
-    barcode
-    description
-    pricePerUnit
-    quantity
-    discountRate
-    note
-}
-
-Shop - "*" ProductType
-
-class Ticket {
-  id
-  Optional<ReturnTransaction>
-  Payment
-}
-Ticket --> ReturnTransaction
-Ticket --> Payment
-ReturnTransaction --> Payment
-class CashPayment {
-  cash
-  return
-}
-class CreditCardPayment {
-  CreditCard
-}
-CreditCardPayment --> CreditCard
-CreditCardPayment --|> Payment
-CashPayment --|> Payment
-
-class SaleTransaction {
-    discount
-    pints
-    Optional<SaleTransaction>
-    Optional<Ticket>
-    List<TransactionProduct>
-}
-SaleTransaction --> TransactionProduct
-TransactionProduct --> Product
-class TransactionProduct {
-  id
-  quantity
-  discount
-  Product
-}
-
-class CustomerCard {
-    id
-    points
-    Customer
-}
-class Customer {
-    id
-    name
-    surname
-}
-CustomerCard --> Customer
-SaleTransaction --> CustomerCard
-
-class Product {
-  id
-  quantity
-  temporaryQuantity
-  Optional<Position>
-  ProductType
-}
-
-class Position {
-    aisleID
-    rackID
-    levelID
-getPosition()
-setPosition()
-}
-
-ProductType --> Position
-
-ProductType <-- Product
-
-class Order {
-  id
-  ProductType
-  supplier
-  pricePerUnit
-  quantity
-  status
-  arrival
-}
-
-Order --> ProductType
-
-class ReturnTransaction {
-  Ticket
-  List<ReturnProduct>
-  committed
-  Payment
-}
-ReturnTransaction --> Payment
-class ReturnProduct {
-  Product
-  amount
-}
-ReturnProduct --> Product
-ReturnTransaction --> Ticket
-ReturnTransaction --> ReturnProduct
-ReturnTransaction "*" - SaleTransaction
-ReturnTransaction "*" - ProductType
-
-
-
 @enduml
 ```
 
-
-
+In order to make the Class Diagram more clear, the get and set methods have been committed from the diagram. For the same reason, the links from each class of the controller package to each classes of the model package have been omitted. The relation is 1:1 since the each calls of the controller internally works with the data representation given by the model.
 
 
 
@@ -450,7 +377,6 @@ ReturnTransaction "*" - ProductType
 
 # Verification traceability matrix
 
-\<for each functional requirement from the requirement document, list which classes concur to implement it>
 |  | Position | Product Type| Quantity | Sale Transaction | Customer | Loyalty card| Return Transaction | Order        | Shop | User | Financial Transaction | Credit        | Debit   | Sale| Account Book |Product|
 | :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:| :-------------: |:------------------:|:---:|:---:|:----:|
 | FR1   || | || || ||X |X| || || | |
@@ -481,19 +407,6 @@ ReturnTransaction "*" - ProductType
 
 # Verification sequence diagrams
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
-## Sequence diagram for scenario "RECORD ORDER PRODUCT"
-```plantuml
-@startuml
-"Shop" -> Shop:1 : getOrders()
-Shop -> Order:2 : getQuantity()
-activate Order
-return
-
-Shop-> ProductType:3 : setQuantity()
-activate ProductType
-Shop -> Order:4: setStatus()
-@enduml
-```
 
 ## Sequence diagram for scenario "6.4"
 ```plantuml
