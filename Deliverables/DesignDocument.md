@@ -75,7 +75,13 @@ Data --> Database
 ```
 
 ```plantuml
+
+  left to right direction
 package it.polito.ezshop.data {
+
+    class DatabaseConnection {
+      + dbUrl
+    }
   class Shop {
     + loggedUser: User
     + List<User> allUsers
@@ -139,6 +145,8 @@ package it.polito.ezshop.data {
 + double computeBalance()
 + boolean loadFromDb()
   }
+  Shop -[hidden]-> DatabaseConnection
+  Shop --> DatabaseConnection
 }
 
 package it.polito.ezshop.model {
@@ -280,7 +288,7 @@ AccountBook --> FinancialTransaction
 SaleTransaction --> Payment
 SaleTransaction --> ReturnTransaction
 ReturnTransaction --> Payment
-CreditCardPayment --> CreditCard
+CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> Product
 CustomerCard --> Customer
@@ -300,14 +308,6 @@ ReturnTransaction --> TransactionProduct
   Shop -> Customer
   Shop -> CustomerCard
   Shop -> AccountBook
-
-package it.polito.ezshop.database {
-  class DatabaseConnection {
-    + dbUrl
-  }
-}
-
-it.polito.ezshop.database <-- it.polito.ezshop.model
 
 
 
