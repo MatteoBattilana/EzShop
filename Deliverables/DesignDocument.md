@@ -141,7 +141,7 @@ package it.polito.ezshop.model {
     - password: String
     - role: String
     + updateUserRights(role: String)
-    + deleteFromDb()
+    + deleteFromDb(): Boolean
   }
   class Product {
     - id: Integer
@@ -163,7 +163,7 @@ package it.polito.ezshop.model {
       - note: String
       + updateProduct(newDescription: String, newCode: String, newPrice: Double, newNote: String): Boolean
       + updatePosition(newPos: String): Boolean
-      + deleteFromDb()
+      + deleteFromDb(): Boolean
   }
   class Order {
     - id: Integer
@@ -183,13 +183,13 @@ package it.polito.ezshop.model {
       - customer: Optional<Customer>
       + setCustomer(customer: Customer)
       + modifyPointsOnCard(pointsToBeAdded: Integer): Boolean
-      + deleteFromDb()
+      + deleteFromDb(): Boolean
   }
   class Customer {
       - id: Integer
       - name: String
       + modifyCustomer(newCustomerName: String, newCustomerCard: String): Boolean
-      + deleteFromDb()
+      + deleteFromDb(): Boolean
   }
   class SaleTransaction {
       - id: Integer
@@ -220,14 +220,14 @@ package it.polito.ezshop.model {
     + endReturnTransaction(Boolean commit): Boolean
     + receiveCashPayment(): Double
     + receiveCreditCardPayment(creditCard: String): Boolean
-    + deleteFromDb()
+    + deleteFromDb(): Boolean
   }
   class TransactionProduct {
     - product: Product
     - amount: Dobule
     - discountRate: Double
     + applyDiscountRateToProduct(discountRate: Double): Boolean
-    + deleteFromDb()
+    + deleteFromDb(): Boolean
   }
   class CashPayment {
     - cash: Double
