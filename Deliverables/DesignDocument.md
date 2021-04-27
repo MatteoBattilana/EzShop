@@ -39,15 +39,13 @@ The design must satisfy the Official Requirements document, notably functional a
 
 
 ```plantuml
-package Model
-package Data
-package Exception
-package Database
-package GUI
+package it.polito.ezshop.model
+package it.polito.ezshop.data
+package it.polito.ezshop.exception
+package it.polito.ezshop.gui
 
-Data --> Model
-Data --> Exception
-Data --> Database
+it.polito.ezshop.data --> it.polito.ezshop.model
+it.polito.ezshop.data --> it.polito.ezshop.exception
 ```
 
 ```plantuml
@@ -56,196 +54,200 @@ Data --> Database
 package it.polito.ezshop.data {
 
     class SingletonDatabaseConnection {
-      - dbUrl
+      - dbUrl: String
     }
   class Shop {
     - loggedUser: User
-    - List<User> allUsers
-    - List<SaleTransaction> allSales
-    - List<ProductType>
-    - List<Product>
-    - List<Order>
-    - List<Customer>
-    - List<CustomerCard>
-    - AccountBook
-    + reset()
-+ Integer createUser(String username, String password, String role)
-+ boolean deleteUser(Integer id)
-+ List<User> getAllUsers()
-+ User getUser(Integer id)
-+ boolean updateUserRights(Integer id, String role)
-+ User login(String username, String password)
-+ boolean logout()
-+ Integer createProductType(String description, String productCode, double pricePerUnit, String note)
-+ String scanProduct()
-+ boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
-+ boolean deleteProductType(Integer id)
-+ List<ProductType> getAllProductTypes()
-+ ProductType getProductTypeByBarCode(String barCode)
-+ List<ProductType> getProductTypesByDescription(String description)
-+ boolean updateQuantity(Integer productId, int toBeAdded)
-+ boolean updatePosition(Integer productId, String newPos)
-+ Integer issueReorder(String productCode, int quantity, double pricePerUnit)
-+ Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
-+ boolean payOrder(Integer orderId)
-+ boolean recordOrderArrival(Integer orderId)
-+ List<Order> getAllOrders()
-+ Integer defineCustomer(String customerName)
-+ boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard)
-+ boolean deleteCustomer(Integer id)
-+ Customer getCustomer(Integer id)
-+ List<Customer> getAllCustomers()
-+ String createCard()
-+ boolean attachCardToCustomer(String customerCard, Integer customerId)
-+ boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded)
-+ Integer startSaleTransaction()
-+ boolean addProductToSale(Integer transactionId, String productCode, int amount)
-+ boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
-+ boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate)
-+ boolean applyDiscountRateToSale(Integer transactionId, double discountRate)
-+ int computePointsForSale(Integer transactionId)
-+ boolean closeSaleTransaction(Integer transactionId)
-+ boolean deleteSaleTicket(Integer ticketNumber)
-+ Ticket getSaleTicket(Integer transactionId)
-+ Ticket getTicketByNumber(Integer ticketNumber)
-+ Integer startReturnTransaction(Integer ticketNumber)
-+ boolean returnProduct(Integer returnId, String productCode, int amount)
-+ boolean endReturnTransaction(Integer returnId, boolean commit)
-+ boolean deleteReturnTransaction(Integer returnId)
-+ double receiveCashPayment(Integer ticketNumber, double cash)
-+ boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
-+ double returnCashPayment(Integer returnId)
-+ double returnCreditCardPayment(Integer returnId, String creditCard)
-+ boolean recordBalanceUpdate(double toBeAdded)
-+ List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
-+ double computeBalance()
-+ boolean loadFromDb()
+    - allUsers: List<User>
+    - allSales: List<SaleTransaction>
+    - productTypes: List<ProductType>
+    - products: List<Product>
+    - orders: List<Order>
+    - customers: List<Customer>
+    - customerCards: List<CustomerCard>
+    - actualBook: AccountBook
+    + reset(): Boolean
++ createUser(username: String, password: String, role: String): Integer
++ deleteUser(id: Integer): Boolean
++ getAllUsers(): List<User>
++ getUser(id: Integer): User
++ updateUserRights(id: Integer, role: String): Boolean
++ login(username: String, password: String): User
++ logout(): Boolean
++ createProductType(description: String, productCode: String, pricePerUnit: Double, note: String): Integer
++ scanProduct(): String
++ updateProduct(id: Integer, newDescription: String, newCode: String, newPrice: Double, newNote: String): Boolean
++ deleteProductType(id: Integer): Boolean
++ getAllProductTypes(): List<ProductType>
++ getProductTypeByBarCode(barCode: String): ProductType
++ getProductTypesByDescription(description: String): List<ProductType>
++ updateQuantity(productId: Integer, toBeAdded: Integer): Boolean
++ updatePosition(productId: Integer, newPos: String): Boolean
++ issueReorder(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
++ payOrderFor(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
++ payOrder(orderId: Integer): Boolean
++ recordOrderArrival(orderId: Integer): Boolean
++ getAllOrders(): List<Order>
++ defineCustomer(customerName: String): Integer
++ modifyCustomer(id: Integer, newCustomerName: String, newCustomerCard: String): Boolean
++ deleteCustomer(id: Integer): Boolean
++ getCustomer(id: Integer): Customer
++ getAllCustomers(): List<Customer>
++ createCard(): String
++ attachCardToCustomer(customerCard: String, customerId: Integer): Boolean
++ modifyPointsOnCard(customerCard: String, pointsToBeAdded: Integer): Boolean
++ startSaleTransaction(): Integer
++ addProductToSale(transactionId: Integer, productCode: String, amount: Integer): Boolean
++ deleteProductFromSale(transactionId: Integer, productCode: String, amount: Integer): Boolean
++ applyDiscountRateToProduct(transactionId: Integer, productCode: String, discountRate: Double): Boolean
++ applyDiscountRateToSale(transactionId: Integer, discountRate: Double): Boolean
++ computePointsForSale(transactionId: Integer): Integer
++ closeSaleTransaction(transactionId: Integer): Boolean
++ deleteSaleTicket(ticketNumber: Integer): Boolean
++ getSaleTicket(transactionId: Integer): Ticket
++ getTicketByNumber(ticketNumber: Integer): Ticket
++ startReturnTransaction(ticketNumber: Integer): Integer
++ returnProduct(returnId: Integer, productCode: String, amount: Integer): Boolean
++ endReturnTransaction(returnId: Integer, Boolean commit): Boolean
++ deleteReturnTransaction(returnId: Integer): Boolean
++ receiveCashPayment(ticketNumber: Integer, cash: Double): Double
++ receiveCreditCardPayment(ticketNumber: Integer, creditCard: String): Boolean
++ returnCashPayment(returnId: Integer): Double
++ returnCreditCardPayment(returnId: Integer, creditCard: String): Double
++ recordBalanceUpdate(toBeAdded: Double): Boolean
++ getCreditsAndDebits(LocalDate from, LocalDate to): List<BalanceOperation>
++ computeBalance(): Double
++ loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
 }
 
 package it.polito.ezshop.model {
+
   note "All classes in the model package\nare persistent" as N1
   interface BalanceOperation {
-    - amount
-    - type
+    - amount: Dobule
+    - description: String
+    - date: LocalDate
   }
   interface Credit
   interface Debit
   interface Payment
   class User {
-    - id
-    - name
-    - surname
-    - username
-    - password
-    - role
-    - updateUserRights(String role)
+    - id: Integer
+    - name: String
+    - surname: String
+    - username: String
+    - password: String
+    - role: String
+    + updateUserRights(role: String)
     + deleteFromDb()
   }
   class Product {
-    - id
-    - quantity
-    - temporaryQuantity
-    - ProductType
-    + boolean updateQuantity(int toBeAdded)
-    + boolean updateTemporaryQuantity(int toBeAdded)
-    + boolean commitTemporaryQuantity()
+    - id: Integer
+    - quantity: Integer
+    - temporaryQuantity: Integer
+    - productType: ProductType
+    + updateQuantity(toBeAdded: Integer): Boolean
+    + updateTemporaryQuantity(toBeAdded: Integer): Boolean
+    + commitTemporaryQuantity(): Boolean
   }
 
   class ProductType{
-      - id
-      - barcode
-      - description
-      - pricePerUnit
-      - discountRate
-      - position
-      - note
-      + boolean updateProduct(String newDescription, String newCode, double newPrice, String newNote)
-      + boolean updatePosition(String newPos)
+      - id: Integer
+      - barcode: String
+      - description: String
+      - pricePerUnit: Double
+      - discountRate: Double
+      - position: String
+      - note: String
+      + updateProduct(newDescription: String, newCode: String, newPrice: Double, newNote: String): Boolean
+      + updatePosition(newPos: String): Boolean
       + deleteFromDb()
   }
   class Order {
-    - id
-    - ProductType
-    - supplier
-    - pricePerUnit
-    - quantity
-    - status
-    - arrival
-    - Payment
-    + Integer payOrder()
-    + boolean recordOrderArrival()
+    - id: Integer
+    - productType: ProductType
+    - supplier: String
+    - pricePerUnit: Double
+    - quantity: Integer
+    - status: String
+    - arrival: LocalDate
+    - payment: Optional<Payment>
+    + payOrder(): Integer
+    + recordOrderArrival(): Boolean
   }
   class CustomerCard {
-      - id
-      - points
-      - Customer
-      + boolean modifyPointsOnCard(int pointsToBeAdded)
+      - id: String
+      - points: Integer
+      - customer: Optional<Customer>
+      + setCustomer(customer: Customer)
+      + modifyPointsOnCard(pointsToBeAdded: Integer): Boolean
       + deleteFromDb()
   }
   class Customer {
-      - id
-      - name
-      + boolean modifyCustomer(String newCustomerName, String newCustomerCard)
+      - id: Integer
+      - name: String
+      + modifyCustomer(newCustomerName: String, newCustomerCard: String): Boolean
       + deleteFromDb()
   }
   class SaleTransaction {
-      - id
-      - discount
-      - points
-      - Optional<ReturnTransaction>
-      - List<TransactionProduct>
-      - boolean applyDiscountRateToSale(double discountRate)
-      - status
-      - Payment
-      - Optional<CustomerCard>
-      + boolean setCustomerCard(CustomerCard)
-      + boolean addProductToSale(Product, int amount)
-      + boolean deleteProductFromSale(Product, int amount)
-      + boolean applyDiscountRateToProduct(Product, double discountRate)
-      + boolean applyDiscountRateToSale(double discountRate)
-      + int computePointsForSale()
-      + boolean closeSaleTransaction()
-      + ReturnTransaction startReturnTransaction()
-      + boolean deleteReturnTransaction()
+      - id: Integer
+      - discount: Dobule
+      - points: Integer
+      - returnTransaction: Optional<ReturnTransaction>
+      - prodList: List<TransactionProduct>
+      - status: String
+      - payment: Optional<Payment>
+      - customerCard: Optional<CustomerCard>
+      + setCustomerCard(CustomerCard): Boolean
+      + addProductToSale(product: Product, amount: Integer): Boolean
+      + deleteProductFromSale(product: Product, amount: Integer): Boolean
+      + applyDiscountRateToProduct(product: Product, discountRate: Double): Boolean
+      + applyDiscountRateToSale(discountRate: Double): Boolean
+      + computePointsForSale(): Integer
+      + closeSaleTransaction(): Boolean
+      + startReturnTransaction(): ReturnTransaction
+      + deleteReturnTransaction(): Boolean
+      + payByCash(cash): Payment
+      + payByCreditCard(creditCard: String): Payment
   }
   class ReturnTransaction {
-    - List<TransactionProduct>
-    - committed
-    - Payment
-    + boolean returnProduct(Product, int amount)
-    + boolean endReturnTransaction(boolean commit)
-    + double receiveCashPayment(double cash)
-    + boolean receiveCreditCardPayment(Payment)
-    - deleteFromDb()
+    - prodList: List<TransactionProduct>
+    - committed: String
+    - payment: Payment
+    + returnProduct(Product, amount: Integer): Boolean
+    + endReturnTransaction(Boolean commit): Boolean
+    + receiveCashPayment(): Double
+    + receiveCreditCardPayment(creditCard: String): Boolean
+    + deleteFromDb()
   }
   class TransactionProduct {
-    - Product
-    - amount
-    - discountRate
-    + boolean applyDiscountRateToProduct(double discountRate)
+    - product: Product
+    - amount: Dobule
+    - discountRate: Double
+    + applyDiscountRateToProduct(discountRate: Double): Boolean
     + deleteFromDb()
   }
   class CashPayment {
-    - cash
-    - return
+    - cash: Double
+    - return: Double
   }
   class CreditCardPayment {
-    - CreditCard
-    + boolean validateCrediCard(CreditCard)
-	  + boolean pay(amount)
+    - creditCard: CreditCard
+    + validateCrediCard(creditCard: String): Boolean
+	  + pay(amount: Double): Boolean
   }
   Class CreditCard {
-    - code
+    - code: String
   }
   class AccountBook{
-    - balance
-    - List<BalanceOperation>
-    + boolean recordBalanceUpdate(double toBeAdded)
-    + boolean add(BalanceOperation)
-    + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
-    + double computeBalance()
+    - balance: Double
+    - opList: List<BalanceOperation>
+    + recordBalanceUpdate(toBeAdded: Double): Boolean
+    + add(BalanceOperation): Boolean
+    + getCreditsAndDebits(LocalDate from, LocalDate to): List<BalanceOperation>
+    + computeBalance(): Double
   }
 
 
@@ -273,7 +275,6 @@ ProductType <-- Product
 Order --> ProductType
 ReturnTransaction --> TransactionProduct
 }
-
 
   Shop -> User
   Shop -> SaleTransaction
