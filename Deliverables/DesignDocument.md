@@ -1,11 +1,11 @@
 # Design Document
 
 
-Authors:
+Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date:
+Date: 26/04/2021
 
-Version:
+Version: 1.0
 
 
 # Contents
@@ -36,30 +36,6 @@ The design must satisfy the Official Requirements document, notably functional a
 
 
 # Low level design
-
-- User(username, password, id)
-  - Administrator, Cashier, ShopManager
-- ProductType(id, description, barcode, pricePerUnit, note, Position position(optional))
-- Product(id, quantity, temporaryQuantity, ProductType)
-- Position(aisleNumber, rackAlphabeticIdentifier, levelNumber)
-- Order(id, String productCode, int quantity, double pricePerUnit, supplier(?), status, arrival)
-- Customer(id, name, CustomerCard cc)
-- CustomerCard(id, points)
-- SaleTransaction(id, list<TransactionProduct>, CustomerCard, points, Ticket)
-- TransactionProduct(id, quantity, discount)
-- Ticket(id, ReturnTransaction, Payment)
-- AccountBook(List<FinancialTransaction>)
-- FinancialTransaction
-- Credit
-- Debit
-- ReturnTransaction(Ticket, list<Product, amount>, committed: true;false, Payment)
-- Payment(id, )
-  - CashPayment(cash, return)
-  - CreditCardPayment(Credit card)
-- Credit card ?
-- BalanceOperation (Credit, Debit, Order, Sale, Return)
-- EZShop(User logged, )
-
 
 
 ```plantuml
@@ -340,9 +316,7 @@ class InvalidTicketNumberException
 
 class InvalidCreditCardException
 }
-```
-Due to some GitLab limitation the entire Class Diagram can't be properly rendered, you can see the exported result [here](image/class-diagram.png).
-In order to make the Class Diagram more clear, the get and set methods have been committed from the diagram. For the same reason, the links from each class of the controller package to each classes of the model package have been omitted. The relation is 1:1 since the each calls of the controller internally works with the data representation given by the model.
+
 
 
 # Verification traceability matrix
