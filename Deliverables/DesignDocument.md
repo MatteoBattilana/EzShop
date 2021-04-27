@@ -70,13 +70,14 @@ package Exception
 package GUI
 
 Controller --> Model
-Controller --> Data
+Data --> Controller
+Data --> Model
 Controller --> Exception
 ```
 
 ```plantuml
 
-package it.polito.ezshop.logic {
+package it.polito.ezshop.data {
   left to right direction
   class Shop {
     + loggedUser: User
@@ -191,12 +192,13 @@ package it.polito.ezshop.model {
       + id
       + discount
       + pints
-      + Optional<Ticket>
+      + Optional<ReturnTransaction>
       + List<TransactionProduct>
       + boolean applyDiscountRateToSale(double discountRate)
+      + status
+      + Payment
   }
   class ReturnTransaction {
-    + Ticket
     + List<TransactionProduct>
     + committed
     + Payment
@@ -218,10 +220,6 @@ package it.polito.ezshop.model {
     + balance
     + List<FinancialTransaction>
   }
-  class Ticket{
-    + Optional<ReturnTransaction>
-    + Payment
-  }
 
   Credit --|> FinancialTransaction
   Debit --|> FinancialTransaction
@@ -234,9 +232,10 @@ package it.polito.ezshop.model {
 
 AccountBook --> FinancialTransaction
 
-Ticket --> Payment
+SaleTransaction --> Payment
+SaleTransaction --> ReturnTransaction
 ReturnTransaction --> Payment
-CreditCardPayment -left-> CreditCard
+CreditCardPayment --> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> Product
 CustomerCard --> Customer
@@ -244,7 +243,6 @@ SaleTransaction --> CustomerCard
 
 ProductType <-- Product
 Order --> ProductType
-SaleTransaction --> Ticket
 ReturnTransaction --> TransactionProduct
 }
 

@@ -150,14 +150,14 @@ Project starts the 1th of April 2021
 
 
 [Unit test] lasts 7 days
-[Unit test] starts 15 days after [TASK1.2]'s end 
+[Unit test] starts 15 days after [TASK1.2]'s end
 [Unit test] is colored in LightBlue
 
 [Test each unit of the software] lasts 7 days
-[Test each unit of the software] starts 15 days after [TASK1.2]'s end 
+[Test each unit of the software] starts 15 days after [TASK1.2]'s end
 
 [Integration test] lasts 3 days
-[Integration test] starts 2 days after [Unit test]'s start 
+[Integration test] starts 2 days after [Unit test]'s start
 [Integration test] is colored in LightBlue
 [Combine individual units and test them as a group] lasts 3 days
 [Combine individual units and test them as a group] starts 2 days after [Unit test]'s start
