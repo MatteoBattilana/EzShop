@@ -79,7 +79,7 @@ Data --> Database
   left to right direction
 package it.polito.ezshop.data {
 
-    class DatabaseConnection {
+    class SingletonDatabaseConnection {
       + dbUrl
     }
   class Shop {
@@ -145,8 +145,7 @@ package it.polito.ezshop.data {
 + double computeBalance()
 + boolean loadFromDb()
   }
-  Shop -[hidden]-> DatabaseConnection
-  Shop --> DatabaseConnection
+  Shop -[hidden]-> SingletonDatabaseConnection
 }
 
 package it.polito.ezshop.model {
