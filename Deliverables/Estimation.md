@@ -55,7 +55,7 @@ Version: 1.0
 printscale daily
 Project starts the 1th of April 2021
 [Requirements Planning] as [TASK1] lasts 12 days
-[TASK1] is colored in Red
+[TASK1] is colored in #FF7700
 
 [Perform workflow analysis] lasts 1 day
 
@@ -83,7 +83,7 @@ Project starts the 1th of April 2021
 
 
 [Requirements V&V] as [TASK1.1] lasts 1 days
-[TASK1.1] is colored in LightBlue
+[TASK1.1] is colored in orchid
 [TASK1.1] starts at [TASK1]'s end
 
 [Requirements inspection] lasts 1 days
@@ -97,7 +97,7 @@ Project starts the 1th of April 2021
 
 
 [Design document] as [TASK2] lasts 3 days
-[TASK2] is colored in Red
+[TASK2] is colored in #FF7700
 [TASK2] starts at [TASK1]'s end
 
 [Analysis] lasts 1 days
@@ -110,7 +110,7 @@ Project starts the 1th of April 2021
 [Formalization]->[Verification]
 
 [Design document V&V] as [TASK2.1] lasts 1 days
-[TASK2.1] is colored in LightBlue
+[TASK2.1] is colored in orchid
 [TASK2.1] starts at [TASK2]'s end
 
 [Design document inspection] lasts 1 days
@@ -119,14 +119,14 @@ Project starts the 1th of April 2021
 
 
 [Coding] as [TASK3] lasts 15 days
-[TASK3] is colored in Red
+[TASK3] is colored in #FF7700
 [TASK3] starts at [TASK2.1]'s end
 
 [Implement the code] lasts 15 days
 [TASK2.1]->[Implement the code]
 
 [Documentation] as [TASK3.1] lasts 1 days
-[TASK3.1] is colored in LightBlue
+[TASK3.1] is colored in orchid
 [TASK3.1] starts at [TASK2.1]'s end
 
 [Explain design document and code] lasts 1 days
@@ -135,7 +135,7 @@ Project starts the 1th of April 2021
 
 
 [System test] as [TASK4] lasts 3 days
-[TASK4] is colored in Red
+[TASK4] is colored in #FF7700
 [TASK4] starts 2 days after [TASK3]'s end
 
 [Test all units of application] lasts 7 days
@@ -144,21 +144,21 @@ Project starts the 1th of April 2021
 
 
 [Test plan] as [TASK1.2] lasts 1 days
-[TASK1.2] is colored in LightBlue
+[TASK1.2] is colored in orchid
 
 [Prepare testing process] lasts 1 days
 
 
 [Unit test] lasts 7 days
 [Unit test] starts 15 days after [TASK1.2]'s end 
-[Unit test] is colored in LightBlue
+[Unit test] is colored in orchid
 
 [Test each unit of the software] lasts 7 days
 [Test each unit of the software] starts 15 days after [TASK1.2]'s end 
 
 [Integration test] lasts 3 days
 [Integration test] starts 2 days after [Unit test]'s start 
-[Integration test] is colored in LightBlue
+[Integration test] is colored in orchid
 [Combine individual units and test them as a group] lasts 3 days
 [Combine individual units and test them as a group] starts 2 days after [Unit test]'s start
 @enduml
