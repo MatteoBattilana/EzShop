@@ -125,6 +125,7 @@ package it.polito.ezshop.data {
 }
 
 package it.polito.ezshop.model {
+  note "All classes in the model package\nare persistent" as N1
   interface FinancialTransaction
   interface Credit
   interface Debit
@@ -196,7 +197,7 @@ package it.polito.ezshop.model {
       + status
       + Payment
       + Optional<CustomerCard>
-      + boolean setCustomerCard(String customerCardId)
+      + boolean setCustomerCard(customerCardId)
       + boolean addProductToSale(String productCode, int amount)
       + boolean deleteProductFromSale(String productCode, int amount)
       + boolean deleteProductFromSale(String productCode, int amount)
@@ -318,6 +319,7 @@ class InvalidCreditCardException
 }
 
 
+```
 
 # Verification traceability matrix
 
@@ -353,34 +355,12 @@ class InvalidCreditCardException
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
 
-## Sequence diagram for scenario 1.1
-```plantuml
-@startuml
-Shop -> Shop:1 : createProductType()
-Shop -> ControllerFactory:2 : getController(ProductController.class)
-activate ControllerFactory
-return
-Shop -> ProductController:3 : createProductType()
-activate ProductController
-return productId
-
-Shop -> ProductController:4 : updatePosition()
-activate ProductController
-return
-
-@enduml
-```
-
 ## Sequence diagram for scenario 6.1
 ```plantuml
 @startuml
-Shop -> Shop:1 : startSaleTransaction()
-Shop -> ControllerFactory:2 : getController(SaleTransactionController.class)
-activate ControllerFactory
-return
-
-Shop -> SaleTransactionController:3 : startSaleTransaction()
-activate SaleTransactionController
+-> Shop:1 : startSaleTransaction()
+Shop -> SaleTransaction:2 : addProductToSale()
+activate SaleTransaction
 return
 
 Shop -> Shop:4 : scanProduct()
