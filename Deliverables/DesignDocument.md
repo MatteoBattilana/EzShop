@@ -286,13 +286,13 @@ package it.polito.ezshop.model {
 AccountBook --> FinancialTransaction
 
 SaleTransaction --> Payment
-SaleTransaction --> ReturnTransaction
+SaleTransaction -right-> ReturnTransaction
 ReturnTransaction --> Payment
 CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> Product
 CustomerCard --> Customer
-SaleTransaction --> CustomerCard
+SaleTransaction -left-> CustomerCard
 
 ProductType <-- Product
 Order --> ProductType
