@@ -63,24 +63,31 @@ The design must satisfy the Official Requirements document, notably functional a
 
 
 ```plantuml
-package Controller
 package Model
 package Data
 package Exception
+package Database
 package GUI
 
-Controller --> Model
-Data --> Controller
 Data --> Model
-Controller --> Exception
+Data --> Exception
+Data --> Database
 ```
 
 ```plantuml
 
-package it.polito.ezshop.data {
   left to right direction
+package it.polito.ezshop.data {
   class Shop {
     + loggedUser: User
+    + List<User> allUsers
+    + List<SaleTransaction> allSales
+    + List<ProductType>
+    + List<Product>
+    + List<Order>
+    + List<Customer>
+    + List<CustomerCard>
+    + AccountBook
     + reset()
 + Integer createUser(String username, String password, String role)
 + boolean deleteUser(Integer id)
@@ -132,6 +139,7 @@ package it.polito.ezshop.data {
 + boolean recordBalanceUpdate(double toBeAdded)
 + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
 + double computeBalance()
++ boolean loadFromDb()
   }
 }
 
@@ -148,24 +156,29 @@ package it.polito.ezshop.model {
     + password
     + role
     + updateUserRights(String role)
+    - deleteFromDb()
   }
   class Product {
     + id
     + quantity
     + temporaryQuantity
-    + position
     + ProductType
-    + boolean updateProduct(String newDescription, String newCode, double newPrice, String newNote)
     + boolean updateQuantity(int toBeAdded)
-    + boolean updatePosition(String newPos)
+    + boolean updateTemporaryQuantity(int toBeAdded)
+    + boolean commitTemporaryQuantity()
   }
+
   class ProductType{
       + id
       + barcode
       + description
       + pricePerUnit
       + discountRate
+      + position
       + note
+      + boolean updateProduct(String newDescription, String newCode, double newPrice, String newNote)
+      + boolean updatePosition(String newPos)
+      - deleteFromDb()
   }
   class Order {
     + id
@@ -175,39 +188,63 @@ package it.polito.ezshop.model {
     + quantity
     + status
     + arrival
+    + Payment
+    + Integer payOrder()
+    + boolean recordOrderArrival()
   }
   class CustomerCard {
       + id
       + points
       + Customer
       + boolean modifyPointsOnCard(int pointsToBeAdded)
+      - deleteFromDb()
   }
   class Customer {
       + id
       + name
-      + surname
       + boolean modifyCustomer(String newCustomerName, String newCustomerCard)
+      - deleteFromDb()
   }
   class SaleTransaction {
       + id
       + discount
-      + pints
+      + points
       + Optional<ReturnTransaction>
       + List<TransactionProduct>
       + boolean applyDiscountRateToSale(double discountRate)
       + status
       + Payment
+      + Optional<CustomerCard>
+      + boolean setCustomerCard(String customerCardId)
+      + boolean addProductToSale(String productCode, int amount)
+      + boolean deleteProductFromSale(String productCode, int amount)
+      + boolean deleteProductFromSale(String productCode, int amount)
+      + boolean applyDiscountRateToProduct(String productCode, double discountRate)
+      + boolean applyDiscountRateToSale(double discountRate)
+      + int computePointsForSale()
+      + boolean closeSaleTransaction()
+      + Integer startReturnTransaction()
+      + boolean deleteReturnTransaction()
+      + boolean linkCustomerCard()
+      + boolean unlinkCustomerCard(String customerCardId)
+
   }
   class ReturnTransaction {
     + List<TransactionProduct>
     + committed
     + Payment
+    + boolean returnProduct(String productCode, int amount)
+    + boolean endReturnTransaction(boolean commit)
+    + double receiveCashPayment(double cash)
+    + boolean receiveCreditCardPayment(String creditCard)
+    - deleteFromDb()
   }
   class TransactionProduct {
     + Product
     + amount
     + discountRate
     + boolean applyDiscountRateToProduct(double discountRate)
+    - deleteFromDb()
   }
   class CashPayment {
     + cash
@@ -215,11 +252,21 @@ package it.polito.ezshop.model {
   }
   class CreditCardPayment {
     + CreditCard
+    + boolean validateCrediCard(String creditCard)
+	+ boolean pay(amount)
+  }
+  Class CreditCard {
+    + code
+    + boolean pay(amount)
   }
   class AccountBook{
     + balance
     + List<FinancialTransaction>
+    + boolean recordBalanceUpdate(double toBeAdded)
+    + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
+    + double computeBalance()
   }
+
 
   Credit --|> FinancialTransaction
   Debit --|> FinancialTransaction
@@ -246,126 +293,27 @@ Order --> ProductType
 ReturnTransaction --> TransactionProduct
 }
 
-package it.polito.ezshop.controller {
-  class UserController{
-    + reset()
-    + Integer createUser(String username, String password, String role)
-    + boolean deleteUser(Integer id)
-    + List<User> getAllUsers()
-    + User getUser(Integer id)
-    + boolean updateUserRights(Integer id, String role)
-    + User login(String username, String password)
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class ProductController {
-    + Integer createProductType(String description, String productCode, double pricePerUnit, String note)
-    + boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
-    + boolean deleteProductType(Integer id)
-    + List<ProductType> getAllProductTypes()
-    + ProductType getProductTypeByBarCode(String barCode)
-    + List<ProductType> getProductTypesByDescription(String description)
-    + boolean updateQuantity(Integer productId, int toBeAdded)
-    + boolean updateTemporaryQuantity(Integer productId, int toBeAdded)
-    + boolean commitTemporaryQuantity(Integer productId)
-    + boolean updatePosition(Integer productId, String newPos)
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class OrderController {
-    + Integer issueReorder(String productCode, int quantity, double pricePerUnit)
-    + Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
-    + boolean payOrder(Integer orderId)
-    + boolean recordOrderArrival(Integer orderId)
-    + List<Order> getAllOrders()
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class CustomerController {
-    + Integer defineCustomer(String customerName)
-    + boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard)
-    + boolean deleteCustomer(Integer id)
-    + Customer getCustomer(Integer id)
-    + List<Customer> getAllCustomers()
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class SaleTransactionController {
-    + Integer startSaleTransaction()
-    + boolean addProductToSale(Integer transactionId, String productCode, int amount)
-    + boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
-    + boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate)
-    + boolean applyDiscountRateToSale(Integer transactionId, double discountRate)
-    + int computePointsForSale(Integer transactionId)
-    + boolean closeSaleTransaction(Integer transactionId)
-    + boolean deleteSaleTicket(Integer ticketNumber)
-    + Ticket getSaleTicket(Integer transactionId)
-    + Ticket getTicketByNumber(Integer ticketNumber)
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class ReturnTransactionController {
-    + Integer startReturnTransaction(Integer ticketNumber)
-    + boolean returnProduct(Integer returnId, String productCode, int amount)
-    + boolean endReturnTransaction(Integer returnId, boolean commit)
-    + boolean deleteReturnTransaction(Integer returnId)
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class PaymentController {
-    + double receiveCashPayment(Integer ticketNumber, double cash)
-    + boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
-    + double returnCashPayment(Integer returnId)
-    + double returnCreditCardPayment(Integer returnId, String creditCard)
-    - boolean validateCrediCard(String creditCard)
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class BalanceController{
-    + boolean recordBalanceUpdate(double toBeAdded)
-    + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
-    + double computeBalance()
-    + updateFromModel(Object)
-    + loadFromDb()
-  }
-  class ControllerFactory {
-    + HashMap<Class, Object> controllers
-    + getController(Class): Object
-    + loadFromDb()
-  }
 
+  Shop -> User
+  Shop -> SaleTransaction
+  Shop -> ProductType
+  Shop -> Product
+  Shop -> Order
+  Shop -> Customer
+  Shop -> CustomerCard
+  Shop -> AccountBook
+
+package it.polito.ezshop.database {
   class DatabaseConnection {
-    + url
-    + name
-    + password
+    + dbUrl
   }
-  BalanceController --> DatabaseConnection
-  UserController --> DatabaseConnection
-  ProductController --> DatabaseConnection
-  OrderController --> DatabaseConnection
-  CustomerController --> DatabaseConnection
-  SaleTransactionController --> DatabaseConnection
-  ReturnTransactionController --> DatabaseConnection
-  PaymentController --> DatabaseConnection
-
-  ControllerFactory -down-> BalanceController
-  ControllerFactory -down-> UserController
-  ControllerFactory -down-> ProductController
-  ControllerFactory -down-> OrderController
-  ControllerFactory -down-> CustomerController
-  ControllerFactory -down-> SaleTransactionController
-  ControllerFactory -down-> ReturnTransactionController
-  ControllerFactory -down-> PaymentController
 }
 
-it.polito.ezshop.controller --> it.polito.ezshop.model
-
-
+it.polito.ezshop.database <-- it.polito.ezshop.model
 
 
 
 Shop -left-> User
-Shop --> ControllerFactory
 
 ```
 ```plantuml
