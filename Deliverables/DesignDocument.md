@@ -309,7 +309,7 @@ package it.polito.ezshop.database {
   }
 }
 
-it.polito.ezshop.database <-- it.polito.ezshop.model
+it.polito.ezshop.database <-left- it.polito.ezshop.model
 
 
 
