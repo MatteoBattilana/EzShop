@@ -56,18 +56,18 @@ Data --> Database
 package it.polito.ezshop.data {
 
     class SingletonDatabaseConnection {
-      + dbUrl
+      - dbUrl
     }
   class Shop {
-    + loggedUser: User
-    + List<User> allUsers
-    + List<SaleTransaction> allSales
-    + List<ProductType>
-    + List<Product>
-    + List<Order>
-    + List<Customer>
-    + List<CustomerCard>
-    + AccountBook
+    - loggedUser: User
+    - List<User> allUsers
+    - List<SaleTransaction> allSales
+    - List<ProductType>
+    - List<Product>
+    - List<Order>
+    - List<Customer>
+    - List<CustomerCard>
+    - AccountBook
     + reset()
 + Integer createUser(String username, String password, String role)
 + boolean deleteUser(Integer id)
@@ -126,132 +126,131 @@ package it.polito.ezshop.data {
 
 package it.polito.ezshop.model {
   note "All classes in the model package\nare persistent" as N1
-  interface FinancialTransaction
+  interface BalanceOperation {
+    - amount
+    - type
+  }
   interface Credit
   interface Debit
   interface Payment
   class User {
-    + id
-    + name
-    + surname
-    + username
-    + password
-    + role
-    + updateUserRights(String role)
-    - deleteFromDb()
+    - id
+    - name
+    - surname
+    - username
+    - password
+    - role
+    - updateUserRights(String role)
+    + deleteFromDb()
   }
   class Product {
-    + id
-    + quantity
-    + temporaryQuantity
-    + ProductType
+    - id
+    - quantity
+    - temporaryQuantity
+    - ProductType
     + boolean updateQuantity(int toBeAdded)
     + boolean updateTemporaryQuantity(int toBeAdded)
     + boolean commitTemporaryQuantity()
   }
 
   class ProductType{
-      + id
-      + barcode
-      + description
-      + pricePerUnit
-      + discountRate
-      + position
-      + note
+      - id
+      - barcode
+      - description
+      - pricePerUnit
+      - discountRate
+      - position
+      - note
       + boolean updateProduct(String newDescription, String newCode, double newPrice, String newNote)
       + boolean updatePosition(String newPos)
-      - deleteFromDb()
+      + deleteFromDb()
   }
   class Order {
-    + id
-    + ProductType
-    + supplier
-    + pricePerUnit
-    + quantity
-    + status
-    + arrival
-    + Payment
+    - id
+    - ProductType
+    - supplier
+    - pricePerUnit
+    - quantity
+    - status
+    - arrival
+    - Payment
     + Integer payOrder()
     + boolean recordOrderArrival()
   }
   class CustomerCard {
-      + id
-      + points
-      + Customer
+      - id
+      - points
+      - Customer
       + boolean modifyPointsOnCard(int pointsToBeAdded)
-      - deleteFromDb()
+      + deleteFromDb()
   }
   class Customer {
-      + id
-      + name
+      - id
+      - name
       + boolean modifyCustomer(String newCustomerName, String newCustomerCard)
-      - deleteFromDb()
+      + deleteFromDb()
   }
   class SaleTransaction {
-      + id
-      + discount
-      + points
-      + Optional<ReturnTransaction>
-      + List<TransactionProduct>
-      + boolean applyDiscountRateToSale(double discountRate)
-      + status
-      + Payment
-      + Optional<CustomerCard>
-      + boolean setCustomerCard(customerCardId)
-      + boolean addProductToSale(String productCode, int amount)
-      + boolean deleteProductFromSale(String productCode, int amount)
-      + boolean deleteProductFromSale(String productCode, int amount)
-      + boolean applyDiscountRateToProduct(String productCode, double discountRate)
+      - id
+      - discount
+      - points
+      - Optional<ReturnTransaction>
+      - List<TransactionProduct>
+      - boolean applyDiscountRateToSale(double discountRate)
+      - status
+      - Payment
+      - Optional<CustomerCard>
+      + boolean setCustomerCard(CustomerCard)
+      + boolean addProductToSale(Product, int amount)
+      + boolean deleteProductFromSale(Product, int amount)
+      + boolean applyDiscountRateToProduct(Product, double discountRate)
       + boolean applyDiscountRateToSale(double discountRate)
       + int computePointsForSale()
       + boolean closeSaleTransaction()
-      + Integer startReturnTransaction()
+      + ReturnTransaction startReturnTransaction()
       + boolean deleteReturnTransaction()
-      + boolean linkCustomerCard()
-      + boolean unlinkCustomerCard(String customerCardId)
-
   }
   class ReturnTransaction {
-    + List<TransactionProduct>
-    + committed
-    + Payment
-    + boolean returnProduct(String productCode, int amount)
+    - List<TransactionProduct>
+    - committed
+    - Payment
+    + boolean returnProduct(Product, int amount)
     + boolean endReturnTransaction(boolean commit)
     + double receiveCashPayment(double cash)
-    + boolean receiveCreditCardPayment(String creditCard)
+    + boolean receiveCreditCardPayment(Payment)
     - deleteFromDb()
   }
   class TransactionProduct {
-    + Product
-    + amount
-    + discountRate
+    - Product
+    - amount
+    - discountRate
     + boolean applyDiscountRateToProduct(double discountRate)
-    - deleteFromDb()
+    + deleteFromDb()
   }
   class CashPayment {
-    + cash
-    + return
+    - cash
+    - return
   }
   class CreditCardPayment {
-    + CreditCard
-    + boolean validateCrediCard(String creditCard)
-	+ boolean pay(amount)
+    - CreditCard
+    + boolean validateCrediCard(CreditCard)
+	  + boolean pay(amount)
   }
   Class CreditCard {
-    + code
-    + boolean pay(amount)
+    - code
   }
   class AccountBook{
-    + balance
-    + List<FinancialTransaction>
+    - balance
+    - List<BalanceOperation>
     + boolean recordBalanceUpdate(double toBeAdded)
+    + boolean add(BalanceOperation)
     + List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
     + double computeBalance()
   }
 
 
-  Credit --|> FinancialTransaction
-  Debit --|> FinancialTransaction
+  Credit --|> BalanceOperation
+  Debit --|> BalanceOperation
   SaleTransaction --|> Credit
   ReturnTransaction --|> Debit
   Order --|> Debit
@@ -259,7 +258,7 @@ package it.polito.ezshop.model {
   Payment <|-- CreditCardPayment
   Payment <|-- CashPayment
 
-AccountBook --> FinancialTransaction
+AccountBook --> BalanceOperation
 
 SaleTransaction --> Payment
 SaleTransaction -right-> ReturnTransaction
