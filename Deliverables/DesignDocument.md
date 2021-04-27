@@ -75,8 +75,6 @@ Data --> Database
 ```
 
 ```plantuml
-
-  left to right direction
 package it.polito.ezshop.data {
   class Shop {
     + loggedUser: User
@@ -309,7 +307,7 @@ package it.polito.ezshop.database {
   }
 }
 
-it.polito.ezshop.database <-left- it.polito.ezshop.model
+it.polito.ezshop.database <-- it.polito.ezshop.model
 
 
 
