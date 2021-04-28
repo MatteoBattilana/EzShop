@@ -126,7 +126,7 @@ printscale daily
 [Unit Test] lasts 18 days
 [Unit Test]  starts  1 days after [Implementation]'s start
 
-[GUI Test] lasts 3 days
+[GUI Test] lasts 8 days
 [GUI Test]  starts  10 days after [Unit Test]'s start
 
 [Integration Test] lasts 9 days
