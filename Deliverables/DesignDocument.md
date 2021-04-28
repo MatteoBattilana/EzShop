@@ -124,13 +124,11 @@ package it.polito.ezshop.data {
 package it.polito.ezshop.model {
 
   note "All classes in the model package\nare persistent" as N1
-  interface BalanceOperation {
+  abstract class BalanceOperation {
     - amount: Dobule
     - description: String
     - date: LocalDate
   }
-  interface Credit
-  interface Debit
   interface Payment
   class User {
     - id: Integer
@@ -246,11 +244,9 @@ package it.polito.ezshop.model {
   }
 
 
-  Credit --|> BalanceOperation
-  Debit --|> BalanceOperation
-  SaleTransaction --|> Credit
-  ReturnTransaction --|> Debit
-  Order --|> Debit
+  ReturnTransaction --|> BalanceOperation
+  SaleTransaction --|> BalanceOperation
+  Order --|> BalanceOperation
 
   Payment <|-- CreditCardPayment
   Payment <|-- CashPayment
