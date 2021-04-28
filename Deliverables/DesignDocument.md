@@ -262,7 +262,7 @@ TransactionProduct --> ProductType
 CustomerCard --> Customer
 SaleTransaction --> CustomerCard
 
-Order -up-> ProductType
+Order -right-> ProductType
 ReturnTransaction --> TransactionProduct
 }
 
