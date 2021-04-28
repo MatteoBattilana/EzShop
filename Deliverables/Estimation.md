@@ -148,7 +148,7 @@ printscale daily
 [TASK1.2] is colored in #FF7700
 
 [Human Resource Management] lasts 52 days
-[Human Resource Management] is colored in orchid
+
 
 [Project Management] lasts 52 days
 @enduml
