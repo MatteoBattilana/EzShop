@@ -46,120 +46,110 @@ Version: 1.0
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Documentation | 16 |
 | Testing | **74** |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unit testing | 27  |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Integration testing | 15 |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Integration test | 15 |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;On site test (at the shop) | 8 |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GUI testing | 24 |
+| Configuration and Installation | **16** |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database Set up |4 |
+| Management | **416** |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human Resource Management | 416 |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Management| 416 |
+
+
+
+
 ###
 ```plantuml
 @startuml
 printscale daily
-Project starts the 1th of April 2021
-[Requirements Planning] as [TASK1] lasts 12 days
+[Requirements Planning] as [TASK1] lasts 14 days
 [TASK1] is colored in #FF7700
 
-[Perform workflow analysis] lasts 1 day
+[Review existing systems] lasts 1 day
 
+[Perform work analysis] lasts 1 days
+[Review existing systems]->[Perform work analysis]
 
-[Model process] lasts 1 days
-[Perform workflow analysis]->[Model process]
+[Model Process] lasts 1 days
+[Perform work analysis]->[Model Process]
 
-[Identify user requirements] lasts 1 days
-[Model process]->[Identify user requirements]
+[Identify user requirements] lasts 2 days
+[Model Process]->[Identify user requirements]
 
-[Identify performance requirements] lasts 1 days
+[Identify performance requirements] lasts 2 days
 [Identify user requirements]->[Identify performance requirements]
 
-[Identify interface requirements] lasts 1 days
-[Identify performance requirements]->[Identify interface requirements]
+[Evaluate hardware requirements] lasts 2 days
+[Identify performance requirements]->[Evaluate hardware requirements]
 
-[Design GUI] lasts 2 days
-[Identify interface requirements]->[Design GUI]
+[Redact Requirements document] lasts 1 days
+[Evaluate hardware requirements]->[Redact Requirements document]
 
-[Prepare software requirements specification] lasts 5 days
-[Design GUI]->[Prepare software requirements specification]
-
-
-
-
+[Design GUI prototype] lasts 4 days
+[Redact Requirements document]->[Design GUI prototype]
 
 [Requirements V&V] as [TASK1.1] lasts 1 days
 [TASK1.1] is colored in orchid
 [TASK1.1] starts at [TASK1]'s end
 
-[Requirements inspection] lasts 1 days
-[TASK1]->[Requirements inspection]
 
-
-
-
-
-
-
-
-[Design document] as [TASK2] lasts 3 days
+[Design] as [TASK2] lasts 5 days
 [TASK2] is colored in #FF7700
 [TASK2] starts at [TASK1]'s end
 
-[Analysis] lasts 1 days
+[Analysis] lasts 2 days
 [TASK1]->[Analysis]
 
-[Formalization] lasts 1 days
+[Formalization] lasts 3 days
 [Analysis]->[Formalization]
 
-[Verification] lasts 1 days
-[Formalization]->[Verification]
-
-[Design document V&V] as [TASK2.1] lasts 1 days
+[Design V&V] as [TASK2.1] lasts 2 days
 [TASK2.1] is colored in orchid
 [TASK2.1] starts at [TASK2]'s end
 
-[Design document inspection] lasts 1 days
-[TASK2]->[Design document inspection]
 
-
-
-[Coding] as [TASK3] lasts 15 days
+[Implementation] as [TASK3] lasts 19 days
 [TASK3] is colored in #FF7700
 [TASK3] starts at [TASK2.1]'s end
 
-[Implement the code] lasts 15 days
-[TASK2.1]->[Implement the code]
+[Code] lasts 19 days
+[TASK2.1]->[Code]
 
 [Documentation] as [TASK3.1] lasts 1 days
 [TASK3.1] is colored in orchid
 [TASK3.1] starts at [TASK2.1]'s end
 
-[Explain design document and code] lasts 1 days
-[TASK2.1]->[Explain design document and code]
 
-
-
-[System test] as [TASK4] lasts 3 days
+[Testing] as [TASK4] lasts 10 days
 [TASK4] is colored in #FF7700
-[TASK4] starts 2 days after [TASK3]'s end
+[TASK4] starts at [TASK3]'s end
 
-[Test all units of application] lasts 7 days
-[Test all units of application] starts 2 days after [TASK3]'s end
+[Unit Test] lasts 4 days
+[Unit Test] starts at [TASK3]'s end
 
+[GUI Test] lasts 3 days
+[Unit Test]-> [GUI Test]
 
-
-[Test plan] as [TASK1.2] lasts 1 days
-[TASK1.2] is colored in orchid
-
-[Prepare testing process] lasts 1 days
-
-
-[Unit test] lasts 7 days
-[Unit test] starts 15 days after [TASK1.2]'s end 
-[Unit test] is colored in orchid
-
-[Test each unit of the software] lasts 7 days
-[Test each unit of the software] starts 15 days after [TASK1.2]'s end 
-
-[Integration test] lasts 3 days
-[Integration test] starts 2 days after [Unit test]'s start 
+[Integration test] lasts 2 days
+[GUI Test]-> [Integration test]
 [Integration test] is colored in orchid
-[Combine individual units and test them as a group] lasts 3 days
-[Combine individual units and test them as a group] starts 2 days after [Unit test]'s start
+
+[On site test] lasts 1 days
+[Integration test]-> [On site test]
+
+[Configuration and Installation] as [TASK5] lasts 2 days
+[TASK5] is colored in #FF7700
+[TASK5] starts at [TASK4]'s end
+
+[Database Set up] lasts 1 days
+[Database Set up] starts at [TASK4]'s end
+
+[Management] as [TASK1.2] lasts 52 days
+[TASK1.2] is colored in #FF7700
+
+[Human Resource Management] lasts 52 days
+[Human Resource Management] is colored in orchid
+
+[Project Management] lasts 52 days
 @enduml
 ```
