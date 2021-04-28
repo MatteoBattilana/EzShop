@@ -62,7 +62,7 @@ Version: 1.0
 ```plantuml
 @startuml
 printscale daily
-[Requirements Planning] as [TASK1] lasts 14 days
+[Requirements Planning] as [TASK1] lasts 15 days
 [TASK1] is colored in #FF7700
 
 [Review existing systems] lasts 1 day
@@ -90,10 +90,9 @@ printscale daily
 
 [Requirements V&V] as [TASK1.1] lasts 1 days
 [TASK1.1] is colored in orchid
-[TASK1.1] starts at [TASK1]'s end
+[Design GUI prototype]->[Requirements V&V]
 
-
-[Design] as [TASK2] lasts 5 days
+[Design] as [TASK2] lasts 7 days
 [TASK2] is colored in #FF7700
 [TASK2] starts at [TASK1]'s end
 
@@ -105,7 +104,7 @@ printscale daily
 
 [Design V&V] as [TASK2.1] lasts 2 days
 [TASK2.1] is colored in orchid
-[TASK2.1] starts at [TASK2]'s end
+[Formalization]->[Design V&V]
 
 
 [Implementation] as [TASK3] lasts 19 days
@@ -115,27 +114,27 @@ printscale daily
 [Code] lasts 19 days
 [TASK2.1]->[Code]
 
-[Documentation] as [TASK3.1] lasts 1 days
+[Documentation] as [TASK3.1] lasts 19 days
 [TASK3.1] is colored in orchid
 [TASK3.1] starts at [TASK2.1]'s end
 
 
-[Testing] as [TASK4] lasts 10 days
+[Testing] as [TASK4] lasts 19 days
 [TASK4] is colored in #FF7700
-[TASK4] starts at [TASK3]'s end
+[TASK4] starts  1 days after [Implementation]'s start
 
-[Unit Test] lasts 4 days
-[Unit Test] starts at [TASK3]'s end
+[Unit Test] lasts 18 days
+[Unit Test]  starts  1 days after [Implementation]'s start
 
 [GUI Test] lasts 3 days
-[Unit Test]-> [GUI Test]
+[GUI Test]  starts  10 days after [Unit Test]'s start
 
-[Integration test] lasts 2 days
-[GUI Test]-> [Integration test]
-[Integration test] is colored in orchid
+[Integration Test] lasts 9 days
+[Integration Test]  starts  9 days after [Unit Test]'s start
+[Integration Test] is colored in orchid
 
-[On site test] lasts 1 days
-[Integration test]-> [On site test]
+[On site Test] lasts 1 days
+[Integration Test]-> [On site Test]
 
 [Configuration and Installation] as [TASK5] lasts 2 days
 [TASK5] is colored in #FF7700
