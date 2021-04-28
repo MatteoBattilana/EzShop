@@ -60,8 +60,7 @@ package it.polito.ezshop.data {
     - loggedUser: User
     - allUsers: List<User>
     - allSales: List<SaleTransaction>
-    - productTypes: List<ProductType>
-    - products: List<Product>
+    - products: List<ProductType>
     - orders: List<Order>
     - customers: List<Customer>
     - customerCards: List<CustomerCard>
@@ -143,15 +142,6 @@ package it.polito.ezshop.model {
     + updateUserRights(role: String)
     + deleteFromDb(): Boolean
   }
-  class Product {
-    - id: Integer
-    - quantity: Integer
-    - temporaryQuantity: Integer
-    - productType: ProductType
-    + updateQuantity(toBeAdded: Integer): Boolean
-    + updateTemporaryQuantity(toBeAdded: Integer): Boolean
-    + commitTemporaryQuantity(): Boolean
-  }
 
   class ProductType{
       - id: Integer
@@ -161,8 +151,13 @@ package it.polito.ezshop.model {
       - discountRate: Double
       - position: String
       - note: String
+      - quantity: Integer
+      - temporaryQuantity: Integer
       + updateProduct(newDescription: String, newCode: String, newPrice: Double, newNote: String): Boolean
       + updatePosition(newPos: String): Boolean
+      + updateQuantity(toBeAdded: Integer): Boolean
+      + updateTemporaryQuantity(toBeAdded: Integer): Boolean
+      + commitTemporaryQuantity(): Boolean
       + deleteFromDb(): Boolean
   }
   class Order {
@@ -201,9 +196,9 @@ package it.polito.ezshop.model {
       - payment: Optional<Payment>
       - customerCard: Optional<CustomerCard>
       + setCustomerCard(CustomerCard): Boolean
-      + addProductToSale(product: Product, amount: Integer): Boolean
-      + deleteProductFromSale(product: Product, amount: Integer): Boolean
-      + applyDiscountRateToProduct(product: Product, discountRate: Double): Boolean
+      + addProductToSale(product: ProductType, amount: Integer): Boolean
+      + deleteProductFromSale(product: ProductType, amount: Integer): Boolean
+      + applyDiscountRateToProduct(product: ProductType, discountRate: Double): Boolean
       + applyDiscountRateToSale(discountRate: Double): Boolean
       + computePointsForSale(): Integer
       + closeSaleTransaction(): Boolean
@@ -216,14 +211,14 @@ package it.polito.ezshop.model {
     - prodList: List<TransactionProduct>
     - committed: String
     - payment: Payment
-    + returnProduct(Product, amount: Integer): Boolean
+    + returnProduct(product: ProductType, amount: Integer): Boolean
     + endReturnTransaction(Boolean commit): Boolean
     + receiveCashPayment(): Double
     + receiveCreditCardPayment(creditCard: String): Boolean
     + deleteFromDb(): Boolean
   }
   class TransactionProduct {
-    - product: Product
+    - product: ProductType
     - amount: Dobule
     - discountRate: Double
     + applyDiscountRateToProduct(discountRate: Double): Boolean
@@ -267,11 +262,10 @@ SaleTransaction -right-> ReturnTransaction
 ReturnTransaction --> Payment
 CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
-TransactionProduct --> Product
+TransactionProduct --> ProductType
 CustomerCard --> Customer
 SaleTransaction -left-> CustomerCard
 
-ProductType <-- Product
 Order --> ProductType
 ReturnTransaction --> TransactionProduct
 }
@@ -279,7 +273,6 @@ ReturnTransaction --> TransactionProduct
   Shop -> User
   Shop -> SaleTransaction
   Shop -> ProductType
-  Shop -> Product
   Shop -> Order
   Shop -> Customer
   Shop -> CustomerCard
