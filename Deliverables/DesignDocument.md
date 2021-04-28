@@ -207,6 +207,7 @@ package it.polito.ezshop.model {
       + deleteReturnTransaction(): Boolean
       + payByCash(cash): Payment
       + payByCreditCard(creditCard: String): Payment
+      + commitAllTemporaryQuantity()
   }
   class ReturnTransaction {
     - prodList: List<TransactionProduct>
@@ -370,6 +371,69 @@ activate Shop
 Shop -> ProductType: 8: setPosition()
 activate ProductType
 return
+return
+@enduml
+```
+
+
+## Sequence diagram for scenario 6.1 - scenario 7.4
+```plantuml
+@startuml
+  ->Shop: 1: startSaleTransaction()
+  activate Shop
+    Shop -> SaleTransaction: 2: <<create>>
+    activate SaleTransaction
+    return
+  return
+
+  ->Shop: 3: addProductToSale()
+  activate Shop
+    Shop -> Shop: 4: getProductByBarcode()
+    Shop -> SaleTransaction: 5: addProductToSale()
+    activate SaleTransaction
+      SaleTransaction -> ProductType: 6: setTemporaryQuantity()
+      activate ProductType
+      return
+    return
+return
+
+-> Shop: 7: endSaleTransaction()
+activate Shop
+  Shop -> SaleTransaction: 8: endSaleTransaction()
+  activate SaleTransaction
+  return
+return
+
+-> Shop: 9: receiveCashPayment()
+activate Shop
+  Shop -> SaleTransaction: 10: payByCash()
+  activate SaleTransaction
+    SaleTransaction -> CashPayment: 11: <<create>>
+    activate CashPayment
+    return
+  return
+  Shop -> AccountBook: 12: add()
+  activate AccountBook
+  return
+
+
+Shop -> AccountBook: 13: updateBalance()
+activate AccountBook
+return
+
+  Shop -> SaleTransaction: 14: commitAllTemporaryQuantity()
+  activate SaleTransaction
+    SaleTransaction -> TransactionProduct: 15 getProductType()
+    activate TransactionProduct
+      TransactionProduct -> ProductType: 16 commitTemporaryQuantity()
+      activate ProductType
+      TransactionProduct -> TransactionProduct: 17: setQuantity()
+      TransactionProduct -> TransactionProduct: 18: setTemporaryQuantity()
+
+      return
+    return
+  return
+
 return
 @enduml
 ```
