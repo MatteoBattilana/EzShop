@@ -258,13 +258,13 @@ package it.polito.ezshop.model {
 AccountBook --> BalanceOperation
 
 SaleTransaction --> Payment
-SaleTransaction -right-> ReturnTransaction
+SaleTransaction --> ReturnTransaction
 ReturnTransaction --> Payment
 CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> ProductType
 CustomerCard --> Customer
-SaleTransaction -left-> CustomerCard
+SaleTransaction --> CustomerCard
 
 Order --> ProductType
 ReturnTransaction --> TransactionProduct
@@ -280,7 +280,7 @@ ReturnTransaction --> TransactionProduct
 
 
 
-Shop -left-> User
+Shop --> User
 
 ```
 ```plantuml
