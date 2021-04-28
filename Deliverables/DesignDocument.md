@@ -55,15 +55,17 @@ package it.polito.ezshop.data {
 
     class SingletonDatabaseConnection {
       - dbUrl: String
+      + getInstance(): SingletonDatabaseConnection
+      + getConnection(): Connection
     }
   class Shop {
     - loggedUser: User
-    - allUsers: List<User>
-    - allSales: List<SaleTransaction>
-    - products: List<ProductType>
-    - orders: List<Order>
-    - customers: List<Customer>
-    - customerCards: List<CustomerCard>
+    - allUsers: Map<Integer, User>
+    - allSales: Map<Integer, SaleTransaction>
+    - products: Map<Integer, ProductType>
+    - orders: Map<Integer, Order>
+    - customers: Map<Integer, Customer>
+    - customerCards: Map<String, CustomerCard>
     - actualBook: AccountBook
     + reset(): Boolean
 + createUser(username: String, password: String, role: String): Integer
@@ -74,7 +76,6 @@ package it.polito.ezshop.data {
 + login(username: String, password: String): User
 + logout(): Boolean
 + createProductType(description: String, productCode: String, pricePerUnit: Double, note: String): Integer
-+ scanProduct(): String
 + updateProduct(id: Integer, newDescription: String, newCode: String, newPrice: Double, newNote: String): Boolean
 + deleteProductType(id: Integer): Boolean
 + getAllProductTypes(): List<ProductType>
@@ -116,7 +117,8 @@ package it.polito.ezshop.data {
 + recordBalanceUpdate(toBeAdded: Double): Boolean
 + getCreditsAndDebits(LocalDate from, LocalDate to): List<BalanceOperation>
 + computeBalance(): Double
-+ loadFromDb(): Boolean
+- getProductByBarcode(barcode: String): ProductType
+- loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
 }
@@ -195,7 +197,7 @@ package it.polito.ezshop.model {
       - customerCard: CustomerCard
       + setCustomerCard(CustomerCard): Boolean
       + addProductToSale(product: ProductType, amount: Integer): Boolean
-      + deleteProductFromSale(product: ProductType, amount: Integer): Boolean
+      + deleteProductFromSale(product: String, amount: Integer): Boolean
       + applyDiscountRateToProduct(product: ProductType, discountRate: Double): Boolean
       + applyDiscountRateToSale(discountRate: Double): Boolean
       + computePointsForSale(): Integer
@@ -210,6 +212,7 @@ package it.polito.ezshop.model {
     - committed: String
     - payment: Payment
     + returnProduct(product: ProductType, amount: Integer): Boolean
+    + deleteReturnProduct(product: String, amount: Integer): Boolean
     + endReturnTransaction(Boolean commit): Boolean
     + receiveCashPayment(): Double
     + receiveCreditCardPayment(creditCard: String): Boolean
