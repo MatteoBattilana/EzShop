@@ -13,7 +13,7 @@ Version: 1.0
 
 # Estimation approach
 The chosen Estimation approach follows the Decomposition technique. The Size, the Effort and the Cost estimation are performed breaking down a Project into related Software Engineering Activities.
-Since the past data is not available the Estimation is based on documents,knowledge and assumptions.
+Since the past data is not available the Estimation is based on documents, knowledge and assumptions.
 
 # Estimate by product decomposition
 ###
