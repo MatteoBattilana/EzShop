@@ -246,7 +246,7 @@ package it.polito.ezshop.model {
 
   ReturnTransaction --|> BalanceOperation
   SaleTransaction --|> BalanceOperation
-  Order --|> BalanceOperation
+  Order -up-|> BalanceOperation
 
   Payment <|-- CreditCardPayment
   Payment <|-- CashPayment
@@ -260,7 +260,7 @@ CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> ProductType
 CustomerCard --> Customer
-SaleTransaction -left-> CustomerCard
+SaleTransaction --> CustomerCard
 
 Order --> ProductType
 ReturnTransaction --> TransactionProduct
