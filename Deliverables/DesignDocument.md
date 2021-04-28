@@ -360,6 +360,7 @@ return
 ```
 
 
+
 ## Sequence diagram for scenario 6.1 - scenario 7.4
 ```plantuml
 @startuml
@@ -414,15 +415,10 @@ return
   activate SaleTransaction
 
     loop prodList
-    SaleTransaction -> TransactionProduct: 16: getProductType()
-    activate TransactionProduct
-      TransactionProduct -> ProductType: 17: commitTemporaryQuantity()
-      activate ProductType
-      TransactionProduct -> TransactionProduct: 18: setQuantity()
-      TransactionProduct -> TransactionProduct: 19: setTemporaryQuantity()
-
-      return
+    SaleTransaction -> ProductType: 16: commitTemporaryQuantity()
+    activate ProductType
     return
+
     end
   return
 
@@ -445,32 +441,62 @@ return
 
 ->Shop: 4: returnProduct()
   activate Shop
-    Shop -> Shop: 2: getProductByBarcode()
-    Shop -> Shop: 8: getSaleTransactionByReturnTransactionId()
-    Shop -> SaleTransaction: 8: getSoldQuantity()
+    Shop -> Shop: 5: getProductByBarcode()
+    Shop -> Shop: 6: getSaleTransactionByReturnTransactionId()
+    Shop -> SaleTransaction: 7: getSoldQuantity()
     activate SaleTransaction
     return
 
 
-    Shop -> SaleTransaction: 9: setReturnProduct()
+    Shop -> SaleTransaction: 8: setReturnProduct()
     activate SaleTransaction
-          SaleTransaction -> ReturnTransaction: setProduct()
+          SaleTransaction -> ReturnTransaction: 9: setProduct()
           activate ReturnTransaction
           return
-          SaleTransaction -> ReturnTransaction: quantity()
+          SaleTransaction -> ReturnTransaction: 10: quantity()
           activate ReturnTransaction
           return
     return
 return
--> Shop: 8: endReturnTransaction()
+
+
+
+
+
+-> Shop: 11: returnCashPayment()
 activate Shop
-    Shop -> Shop: 8: getSaleTransactionByReturnTransactionId()
-          Shop -> SaleTransaction: endReturnTransaction()
+    Shop -> Shop: 12: getSaleTransactionByReturnTransactionId()
+
+    Shop -> SaleTransaction: 13: getReturnTransactionStatus()
+    activate SaleTransaction
+    return
+
+  Shop -> SaleTransaction: 14: getReturnTransactionTotal()
+    activate SaleTransaction
+     SaleTransaction -> ReturnTransaction: 15: computeTotal()
+      activate ReturnTransaction
+      return
+    return
+
+   Shop -> AddressBook: 16: recordBalanceUpdate()
+   activate AddressBook
+   return
+   Shop -> SaleTransaction: 17: getReturnTransaction()
+   activate SaleTransaction
+   return
+   Shop -> AddressBook: 18: add()
+   activate AddressBook
+   return
+return
+-> Shop: 19: endReturnTransaction()
+activate Shop
+    Shop -> Shop: 20: getSaleTransactionByReturnTransactionId()
+          Shop -> SaleTransaction: 21: endReturnTransaction()
           activate SaleTransaction
 
-                   SaleTransaction -> ReturnTransaction: updateProductQuantity()
+                   SaleTransaction -> ReturnTransaction: 22: updateProductQuantity()
                    activate ReturnTransaction
-                   ReturnTransaction -> ProductType: setQuantity()
+                   ReturnTransaction -> ProductType: 23: setQuantity()
                    activate ProductType
                    return
 
@@ -480,34 +506,5 @@ activate Shop
           return
 return
 
-
-
-
-
--> Shop: 10: returnCashPayment()
-activate Shop
-    Shop -> Shop: 8: getSaleTransactionByReturnTransactionId()
-
-    Shop -> SaleTransaction: getReturnTransactionStatus()
-    activate SaleTransaction
-    return
-
-  Shop -> SaleTransaction: getReturnTransactionTotal()
-    activate SaleTransaction
-     SaleTransaction -> ReturnTransaction: computeTotal()
-      activate ReturnTransaction
-      return
-    return
-
-   Shop -> AddressBook: recordBalanceUpdate()
-   activate AddressBook
-   return
-   Shop -> SaleTransaction: getReturnTransaction()
-   activate SaleTransaction
-   return
-   Shop -> AddressBook: add()
-   activate AddressBook
-   return
-return
 @enduml
 ```
