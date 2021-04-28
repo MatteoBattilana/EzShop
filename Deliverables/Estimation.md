@@ -12,7 +12,9 @@ Version: 1.0
 - [Estimate by activity decomposition](#estimate-by-activity-decomposition)
 
 # Estimation approach
-<Consider the EZGas  project as described in YOUR requirement document, assume that you are going to develop the project INDEPENDENT of the deadlines of the course>
+The chosen Estimation approach follows the Decomposition technique. The Size, the Effort and the Cost estimation are performed breaking down a Project into related Software Engineering Activities.
+Since the past data is not available the Estimation is based on documents,Knowledge and assumptions.
+
 # Estimate by product decomposition
 ###
 |             | Estimate                        |             
