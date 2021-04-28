@@ -168,14 +168,14 @@ package it.polito.ezshop.model {
     - quantity: Integer
     - status: String
     - arrival: LocalDate
-    - payment: Optional<Payment>
+    - payment: Payment
     + payOrder(): Integer
     + recordOrderArrival(): Boolean
   }
   class CustomerCard {
       - id: String
       - points: Integer
-      - customer: Optional<Customer>
+      - customer: Customer
       + setCustomer(customer: Customer)
       + modifyPointsOnCard(pointsToBeAdded: Integer): Boolean
       + deleteFromDb(): Boolean
@@ -190,11 +190,11 @@ package it.polito.ezshop.model {
       - id: Integer
       - discount: Dobule
       - points: Integer
-      - returnTransaction: Optional<ReturnTransaction>
+      - returnTransaction: ReturnTransaction
       - prodList: List<TransactionProduct>
       - status: String
-      - payment: Optional<Payment>
-      - customerCard: Optional<CustomerCard>
+      - payment: Payment
+      - customerCard: CustomerCard
       + setCustomerCard(CustomerCard): Boolean
       + addProductToSale(product: ProductType, amount: Integer): Boolean
       + deleteProductFromSale(product: ProductType, amount: Integer): Boolean
@@ -258,13 +258,13 @@ package it.polito.ezshop.model {
 AccountBook --> BalanceOperation
 
 SaleTransaction --> Payment
-SaleTransaction --> ReturnTransaction
+SaleTransaction -right-> ReturnTransaction
 ReturnTransaction --> Payment
 CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> ProductType
 CustomerCard --> Customer
-SaleTransaction --> CustomerCard
+SaleTransaction -left-> CustomerCard
 
 Order --> ProductType
 ReturnTransaction --> TransactionProduct
