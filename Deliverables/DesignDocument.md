@@ -66,7 +66,7 @@ package it.polito.ezshop.data {
     - orders: Map<Integer, Order>
     - customers: Map<Integer, Customer>
     - customerCards: Map<String, CustomerCard>
-    - actualBook: AccountBook
+    - accountBook: AccountBook
     + reset(): Boolean
 + createUser(username: String, password: String, role: String): Integer
 + deleteUser(id: Integer): Boolean
