@@ -118,6 +118,7 @@ package it.polito.ezshop.data {
 + getCreditsAndDebits(LocalDate from, LocalDate to): List<BalanceOperation>
 + computeBalance(): Double
 - getProductByBarcode(barcode: String): ProductType
+- getSaleTransactionByReturnTransactionId(id: Integer): SaleTransaction
 - loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
@@ -131,7 +132,6 @@ package it.polito.ezshop.model {
     - description: String
     - date: LocalDate
   }
-  interface Payment
   class User {
     - id: Integer
     - name: String
@@ -168,8 +168,6 @@ package it.polito.ezshop.model {
     - quantity: Integer
     - status: String
     - arrival: LocalDate
-    - payment: Payment
-    + payOrder(): Integer
     + recordOrderArrival(): Boolean
   }
   class CustomerCard {
@@ -191,10 +189,9 @@ package it.polito.ezshop.model {
       - id: Integer
       - discount: Dobule
       - points: Integer
-      - returnTransaction: ReturnTransaction
-      - prodList: List<TransactionProduct>
+      - returnTransactions: Map<Integer, ReturnTransaction>
+      - prodList: Map<ProductType, TransactionProduct>
       - status: String
-      - payment: Payment
       - customerCard: CustomerCard
       + setCustomerCard(CustomerCard): Boolean
       + addProductToSale(product: ProductType, amount: Integer): Boolean
@@ -205,40 +202,33 @@ package it.polito.ezshop.model {
       + endSaleTransaction(): Boolean
       + startReturnTransaction(): ReturnTransaction
       + deleteReturnTransaction(): Boolean
-      + payByCash(cash): Payment
-      + payByCreditCard(creditCard: String): Payment
+      + getSoldQuantity(product: ProductType): Integer
+      + computeTotal(): Double
+      + endReturnTransaction(id: Integer, Boolean commit): Boolean
+      + deleteReturnTransaction(id: Integer): Boolean
+      + setReturnProduct(returnId: Integer, product: ProductType, amount: Integer): Boolean
+      + getReturnTransactionStatus(id: Integer): Boolean
+      + getReturnTransactionTotal(id: Integer): Boolean
+      + getReturnTransaction(id: Integer): ReturnTransaction
       + commitAllTemporaryQuantity()
   }
   class ReturnTransaction {
-    - prodList: List<TransactionProduct>
+    - id: Integer
+    - product: ProductType
+    - quantity: Integer
     - committed: String
-    - payment: Payment
-    + returnProduct(product: ProductType, amount: Integer): Boolean
-    + deleteReturnProduct(product: String, amount: Integer): Boolean
-    + endReturnTransaction(Boolean commit): Boolean
-    + receiveCashPayment(): Double
-    + receiveCreditCardPayment(creditCard: String): Boolean
+    - status: Boolean
+    + updateProductQuantity(): Boolean
+    + computeTotal(): Double
     + deleteFromDb(): Boolean
   }
   class TransactionProduct {
-    - product: ProductType
-    - amount: Dobule
+    - quantity: Integer
     - discountRate: Double
     + applyDiscountRateToProduct(discountRate: Double): Boolean
     + deleteFromDb(): Boolean
   }
-  class CashPayment {
-    - cash: Double
-    - return: Double
-  }
-  class CreditCardPayment {
-    - creditCard: CreditCard
-    + validateCrediCard(creditCard: String): Boolean
-	  + pay(amount: Double): Boolean
-  }
-  Class CreditCard {
-    - code: String
-  }
+
   class AccountBook{
     - balance: Double
     - opList: List<BalanceOperation>
@@ -253,22 +243,16 @@ package it.polito.ezshop.model {
   SaleTransaction --|> BalanceOperation
   Order -up-|> BalanceOperation
 
-  Payment <|-- CreditCardPayment
-  Payment <|-- CashPayment
-
 AccountBook --> BalanceOperation
 
-SaleTransaction --> Payment
 SaleTransaction -right-> ReturnTransaction
-ReturnTransaction --> Payment
-CreditCardPayment -left-> CreditCard
 SaleTransaction --> TransactionProduct
 TransactionProduct --> ProductType
 CustomerCard --> Customer
 SaleTransaction --> CustomerCard
 
 Order -right-> ProductType
-ReturnTransaction --> TransactionProduct
+ReturnTransaction --> ProductType
 }
 
   Shop -> User
@@ -406,34 +390,124 @@ return
 
 -> Shop: 9: receiveCashPayment()
 activate Shop
-  Shop -> SaleTransaction: 10: payByCash()
+  Shop -> SaleTransaction: 10: computeTotal()
   activate SaleTransaction
-    SaleTransaction -> CashPayment: 11: <<create>>
-    activate CashPayment
-    return
+      loop prodList
+          SaleTransaction -> TransactionProduct: 11: getDiscountRate()
+          activate TransactionProduct
+          return
+          SaleTransaction -> TransactionProduct: 12: getQuantity()
+          activate TransactionProduct
+          return
+      end
   return
-  Shop -> AccountBook: 12: add()
+  Shop -> AccountBook: 13: add()
   activate AccountBook
   return
 
 
-Shop -> AccountBook: 13: updateBalance()
+Shop -> AccountBook: 14: updateBalance()
 activate AccountBook
 return
 
-  Shop -> SaleTransaction: 14: commitAllTemporaryQuantity()
+  Shop -> SaleTransaction: 15: commitAllTemporaryQuantity()
   activate SaleTransaction
-    SaleTransaction -> TransactionProduct: 15 getProductType()
+
+    loop prodList
+    SaleTransaction -> TransactionProduct: 16: getProductType()
     activate TransactionProduct
-      TransactionProduct -> ProductType: 16 commitTemporaryQuantity()
+      TransactionProduct -> ProductType: 17: commitTemporaryQuantity()
       activate ProductType
-      TransactionProduct -> TransactionProduct: 17: setQuantity()
-      TransactionProduct -> TransactionProduct: 18: setTemporaryQuantity()
+      TransactionProduct -> TransactionProduct: 18: setQuantity()
+      TransactionProduct -> TransactionProduct: 19: setTemporaryQuantity()
 
       return
     return
+    end
   return
 
+return
+@enduml
+```
+
+## Sequence diagram for scenario 8.1 - scenario 7.4
+```plantuml
+@startuml
+->Shop: 1: startReturnTransaction()
+activate Shop
+  Shop -> SaleTransaction: 2: startReturnTransaction()
+  activate SaleTransaction
+    SaleTransaction -> ReturnTransaction: 3: <<create>>
+    activate ReturnTransaction
+    return : instance
+  return
+return
+
+->Shop: 4: returnProduct()
+  activate Shop
+    Shop -> Shop: 2: getProductByBarcode()
+    Shop -> Shop: 8: getSaleTransactionByReturnTransactionId()
+    Shop -> SaleTransaction: 8: getSoldQuantity()
+    activate SaleTransaction
+    return
+
+
+    Shop -> SaleTransaction: 9: setReturnProduct()
+    activate SaleTransaction
+          SaleTransaction -> ReturnTransaction: setProduct()
+          activate ReturnTransaction
+          return
+          SaleTransaction -> ReturnTransaction: quantity()
+          activate ReturnTransaction
+          return
+    return
+return
+-> Shop: 8: endReturnTransaction()
+activate Shop
+    Shop -> Shop: 8: getSaleTransactionByReturnTransactionId()
+          Shop -> SaleTransaction: endReturnTransaction()
+          activate SaleTransaction
+
+                   SaleTransaction -> ReturnTransaction: updateProductQuantity()
+                   activate ReturnTransaction
+                   ReturnTransaction -> ProductType: setQuantity()
+                   activate ProductType
+                   return
+
+
+                 return
+
+          return
+return
+
+
+
+
+
+-> Shop: 10: returnCashPayment()
+activate Shop
+    Shop -> Shop: 8: getSaleTransactionByReturnTransactionId()
+
+    Shop -> SaleTransaction: getReturnTransactionStatus()
+    activate SaleTransaction
+    return
+
+  Shop -> SaleTransaction: getReturnTransactionTotal()
+    activate SaleTransaction
+     SaleTransaction -> ReturnTransaction: computeTotal()
+      activate ReturnTransaction
+      return
+    return
+
+   Shop -> AddressBook: recordBalanceUpdate()
+   activate AddressBook
+   return
+   Shop -> SaleTransaction: getReturnTransaction()
+   activate SaleTransaction
+   return
+   Shop -> AddressBook: add()
+   activate AddressBook
+   return
 return
 @enduml
 ```
