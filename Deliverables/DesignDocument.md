@@ -102,16 +102,16 @@ package it.polito.ezshop.data {
 + applyDiscountRateToProduct(transactionId: Integer, productCode: String, discountRate: Double): Boolean
 + applyDiscountRateToSale(transactionId: Integer, discountRate: Double): Boolean
 + computePointsForSale(transactionId: Integer): Integer
-+ closeSaleTransaction(transactionId: Integer): Boolean
-+ deleteSaleTicket(ticketNumber: Integer): Boolean
-+ getSaleTicket(transactionId: Integer): Ticket
-+ getTicketByNumber(ticketNumber: Integer): Ticket
-+ startReturnTransaction(ticketNumber: Integer): Integer
++ endSaleTransaction(transactionId: Integer): Boolean
++ deleteSaleTransaction(transactionID: Integer): Boolean
++ getSaleTransaction(transactionId: Integer): Ticket
++ getTicketByNumber(transactionID: Integer): Ticket
++ startReturnTransaction(transactionID: Integer): Integer
 + returnProduct(returnId: Integer, productCode: String, amount: Integer): Boolean
 + endReturnTransaction(returnId: Integer, Boolean commit): Boolean
 + deleteReturnTransaction(returnId: Integer): Boolean
-+ receiveCashPayment(ticketNumber: Integer, cash: Double): Double
-+ receiveCreditCardPayment(ticketNumber: Integer, creditCard: String): Boolean
++ receiveCashPayment(transactionID: Integer, cash: Double): Double
++ receiveCreditCardPayment(transactionID: Integer, creditCard: String): Boolean
 + returnCashPayment(returnId: Integer): Double
 + returnCreditCardPayment(returnId: Integer, creditCard: String): Double
 + recordBalanceUpdate(toBeAdded: Double): Boolean
@@ -177,6 +177,7 @@ package it.polito.ezshop.model {
       - points: Integer
       - customer: Customer
       + setCustomer(customer: Customer)
+      + removeCustomer()
       + modifyPointsOnCard(pointsToBeAdded: Integer): Boolean
       + deleteFromDb(): Boolean
   }
@@ -201,7 +202,7 @@ package it.polito.ezshop.model {
       + applyDiscountRateToProduct(product: ProductType, discountRate: Double): Boolean
       + applyDiscountRateToSale(discountRate: Double): Boolean
       + computePointsForSale(): Integer
-      + closeSaleTransaction(): Boolean
+      + endSaleTransaction(): Boolean
       + startReturnTransaction(): ReturnTransaction
       + deleteReturnTransaction(): Boolean
       + payByCash(cash): Payment
@@ -305,7 +306,7 @@ class InvalidCustomerCardException
 
 class InvalidDiscountRateException
 class InvalidTransactionIdException
-class InvalidTicketNumberException
+class InvalidtransactionIDException
 
 class InvalidCreditCardException
 }
@@ -347,47 +348,28 @@ class InvalidCreditCardException
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
 
-## Sequence diagram for scenario 6.1
+## Sequence diagram for scenario 1.1
 ```plantuml
 @startuml
--> Shop:1 : startSaleTransaction()
-Shop -> SaleTransaction:2 : addProductToSale()
-activate SaleTransaction
-return
+->Shop: 1: createProductType()
+activate Shop
+Shop -> ProductType: 2: <<create>>
 
-Shop -> Shop:4 : scanProduct()
+activate ProductType
 
-Shop -> SaleTransactionController:5 : addProductToSale()
-activate SaleTransactionController
-  SaleTransactionController -> ControllerFactory:6 : getController(ProductController.class)
-  activate ControllerFactory
-  return
-  SaleTransactionController -> ProductController:7 : updateTemporaryQuantity()
-  activate ProductController
-  return
-return
-Shop -> SaleTransactionController:8 : closeSaleTransaction()
-activate SaleTransactionController
-return
+ProductType ->ProductType:   3: setBarcode()
 
-Shop -> ControllerFactory:2 : getController(PaymentController.class)
-activate ControllerFactory
-return
-Shop -> PaymentController:9 : receiveCreditCardPayment()
-activate PaymentController
-  PaymentController -> PaymentController:10 : validateCrediCard()
-return
+ProductType ->ProductType:   4: setPricePerUnit()
 
-Shop -> ProductController:11 : commitTemporaryQuantity()
-activate ProductController
+ProductType ->ProductType:   5: setNote()
+ProductType ->ProductType:   6: setDescription()
+return instance
 return
-
-Shop -> ControllerFactory:12 : getController(BalanceController.class)
-activate ControllerFactory
+->Shop: 7: updatePosition()
+activate Shop
+Shop -> ProductType: 8: setPosition()
+activate ProductType
 return
-Shop -> BalanceController: 13 : recordBalanceUpdate()
-activate BalanceController
 return
-
 @enduml
 ```
