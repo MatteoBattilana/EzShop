@@ -251,7 +251,7 @@ package it.polito.ezshop.model {
 
 AccountBook --"*" BalanceOperation
 
-SaleTransaction -down-"*" ReturnTransaction
+SaleTransaction -right-"*" ReturnTransaction
 SaleTransaction --"*" TransactionProduct
 TransactionProduct "*" -- ProductType
 CustomerCard "0..1"-- Customer
