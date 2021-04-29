@@ -67,6 +67,10 @@ package it.polito.ezshop.data {
       + getInstance(): SingletonDatabaseConnection
       + getConnection(): Connection
     }
+  class CreditCardManager {
+    + validateCreditCart(creditCardId: String): Boolean
+    + pay(creditCardId: String, amount: Double): Boolean
+  }
   class Shop {
     - loggedUser: User
     - allUsers: Map<Integer, User>
@@ -128,7 +132,6 @@ package it.polito.ezshop.data {
 + computeBalance(): Double
 - getProductByBarcode(barcode: String): ProductType
 - getSaleTransactionByReturnTransactionId(id: Integer): SaleTransaction
-- validateCreditCart(id: String): Boolean
 - loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
