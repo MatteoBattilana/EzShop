@@ -66,7 +66,7 @@ package it.polito.ezshop.data {
     - orders: Map<Integer, Order>
     - customers: Map<Integer, Customer>
     - customerCards: Map<String, CustomerCard>
-    - accountBook: AccountBook
+    - actualBook: AccountBook
     + reset(): Boolean
 + createUser(username: String, password: String, role: String): Integer
 + deleteUser(id: Integer): Boolean
@@ -119,6 +119,7 @@ package it.polito.ezshop.data {
 + computeBalance(): Double
 - getProductByBarcode(barcode: String): ProductType
 - getSaleTransactionByReturnTransactionId(id: Integer): SaleTransaction
+- loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
 }
@@ -353,6 +354,113 @@ return
 ```
 
 
+## Sequence diagram for scenario 2.1
+```plantuml
+@startuml
+->Shop: 1: createUser()
+activate Shop
+Shop -> User: 2: <<create>>
+
+activate User
+
+User ->User:   3: setUsername()
+
+User ->User:   4: setPassword()
+
+User ->User:   5: setRole()
+return instance
+return
+@enduml
+```
+
+## Sequence diagram for scenario 2.3
+```plantuml
+@startuml
+->Shop: 1: updateUserRights()
+activate Shop
+  Shop -> User: 2: setRole()
+  activate User
+  return
+return
+@enduml
+```
+
+## Sequence diagram for scenario 3.1
+```plantuml
+@startuml
+->Shop: 1: issueOrder()
+activate Shop
+  Shop -> Order: 2: <<create>>
+  activate Order
+    Order -> Order: 3: setQuantity()
+    Order -> Order: 4: setPricePerUnit()
+    Order -> Order: 5: setStatus()
+  return instance
+return
+@enduml
+```
+
+## Sequence diagram for scenario 3.2
+```plantuml
+@startuml
+->Shop: 1: payOrder()
+activate Shop
+    Shop -> Order: 2: setStatus()
+    activate Order
+    return
+  Shop --> AccountBook: 3: recordBalanceUpdate()
+  activate AccountBook
+  return
+
+  Shop --> AccountBook: 5: add()
+  activate AccountBook
+  return
+return
+@enduml
+```
+
+## Sequence diagram for scenario 3.3
+```plantuml
+@startuml
+->Shop: 1: recordOrderArrival()
+activate Shop
+    Shop -> Order: 2: setStatus()
+    activate Order
+      Order -> ProductType: 3 updateQuantity()
+      activate ProductType
+      return
+    return
+return
+@enduml
+```
+
+
+## Sequence diagram for scenario 4.1
+```plantuml
+@startuml
+->Shop: 1: defineCustomer()
+activate Shop
+    Shop -> Customer: 2: <<create>>
+    activate Customer
+      Customer -> Customer: 3: setName()
+    return: instance
+return
+@enduml
+```
+
+## Sequence diagram for scenario 4.3
+```plantuml
+@startuml
+->Shop: 1: modifyCustomer()
+activate Shop
+    Shop -> CustomerCard: 2: <<create>>
+    activate CustomerCard
+      CustomerCard -> CustomerCard: 3: removeCustomer()
+    return
+return
+@enduml
+```
+
 
 ## Sequence diagram for scenario 6.1 - scenario 7.4
 ```plantuml
@@ -499,5 +607,18 @@ activate Shop
           return
 return
 
+@enduml
+```
+
+
+## Sequence diagram for scenario 9.1
+```plantuml
+@startuml
+->Shop: 1: getCreditsAndDebits()
+activate Shop
+    Shop -> AccountBook: 2: getCreditsAndDebits()
+    activate AccountBook
+    return
+return
 @enduml
 ```
