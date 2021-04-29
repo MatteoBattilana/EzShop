@@ -94,7 +94,7 @@ package it.polito.ezshop.data {
 + getProductTypesByDescription(description: String): List<ProductType>
 + updateQuantity(productId: Integer, toBeAdded: Integer): Boolean
 + updatePosition(productId: Integer, newPos: String): Boolean
-+ issueReorder(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
++ issueOrder(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
 + payOrderFor(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
 + payOrder(orderId: Integer): Boolean
 + recordOrderArrival(orderId: Integer): Boolean
