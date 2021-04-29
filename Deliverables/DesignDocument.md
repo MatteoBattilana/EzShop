@@ -36,9 +36,15 @@ The design must satisfy the Official Requirements document, notably functional a
 
 # High level design
 
-<discuss architectural styles used, if any>
-<report package diagram>
+```plantuml
+package it.polito.ezshop.model
+package it.polito.ezshop.data
+package it.polito.ezshop.exception
+package it.polito.ezshop.gui
 
+it.polito.ezshop.data --> it.polito.ezshop.model
+it.polito.ezshop.data --> it.polito.ezshop.exception
+```
 
 The  Architecture style selected is single application.
 The application is organized according to the 3-layered model: Presentation layer, Application logic and Data layer,last one implemented by a DBMS to provide the persistence of the data.
@@ -55,15 +61,6 @@ Packages:
 
 # Low level design
 
-```plantuml
-package it.polito.ezshop.model
-package it.polito.ezshop.data
-package it.polito.ezshop.exception
-package it.polito.ezshop.gui
-
-it.polito.ezshop.data --> it.polito.ezshop.model
-it.polito.ezshop.data --> it.polito.ezshop.exception
-```
 
 ```plantuml
 
