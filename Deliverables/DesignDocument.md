@@ -119,7 +119,6 @@ package it.polito.ezshop.data {
 + computeBalance(): Double
 - getProductByBarcode(barcode: String): ProductType
 - getSaleTransactionByReturnTransactionId(id: Integer): SaleTransaction
-- loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
 }
@@ -140,7 +139,6 @@ package it.polito.ezshop.model {
     - password: String
     - role: String
     + updateUserRights(role: String)
-    + deleteFromDb(): Boolean
   }
 
   class ProductType{
@@ -158,7 +156,6 @@ package it.polito.ezshop.model {
       + updateQuantity(toBeAdded: Integer): Boolean
       + updateTemporaryQuantity(toBeAdded: Integer): Boolean
       + commitTemporaryQuantity(): Boolean
-      + deleteFromDb(): Boolean
   }
   class Order {
     - id: Integer
@@ -177,13 +174,11 @@ package it.polito.ezshop.model {
       + setCustomer(customer: Customer)
       + removeCustomer()
       + modifyPointsOnCard(pointsToBeAdded: Integer): Boolean
-      + deleteFromDb(): Boolean
   }
   class Customer {
       - id: Integer
       - name: String
       + modifyCustomer(newCustomerName: String, newCustomerCard: String): Boolean
-      + deleteFromDb(): Boolean
   }
   class SaleTransaction {
       - id: Integer
@@ -220,13 +215,11 @@ package it.polito.ezshop.model {
     - status: Boolean
     + updateProductQuantity(): Boolean
     + computeTotal(): Double
-    + deleteFromDb(): Boolean
   }
   class TransactionProduct {
     - quantity: Integer
     - discountRate: Double
     + applyDiscountRateToProduct(discountRate: Double): Boolean
-    + deleteFromDb(): Boolean
   }
 
   class AccountBook{
