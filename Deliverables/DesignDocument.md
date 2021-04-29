@@ -119,6 +119,7 @@ package it.polito.ezshop.data {
 + computeBalance(): Double
 - getProductByBarcode(barcode: String): ProductType
 - getSaleTransactionByReturnTransactionId(id: Integer): SaleTransaction
+- validateCreditCart(id: String): Boolean
 - loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
