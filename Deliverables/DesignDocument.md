@@ -25,8 +25,8 @@ Version: 1.0
   - [Sequence diagram for scenario 3.3](#sequence-diagram-for-scenario-33)
   - [Sequence diagram for scenario 4.1](#sequence-diagram-for-scenario-41)
   - [Sequence diagram for scenario 4.3](#sequence-diagram-for-scenario-43)
-  - [Sequence diagram for scenario 6.1 - scenario 7.4](#sequence-diagram-for-scenario-61-scenario-74)
-  - [Sequence diagram for scenario 8.1 - scenario 7.4](#sequence-diagram-for-scenario-81-scenario-74)
+  - [Sequence diagram for scenario 6.1 - scenario 7.4](#sequence-diagram-for-scenario-61---scenario-74)
+  - [Sequence diagram for scenario 8.1 - scenario 7.4](#sequence-diagram-for-scenario-81---scenario-74)
   - [Sequence diagram for scenario 9.1](#sequence-diagram-for-scenario-91)
 
 
@@ -322,14 +322,14 @@ class InvalidCreditCardException
 | FR3.1 | X| | || |X| || |X| | |
 | FR3.2 | X|  | || |X| || |X| | |
 | FR3.3 |X |  | || || || |X| | |
-| FR3.4 |X |  | || |X| || |X| | |
+| FR3.4 |X |  | || || || |X| | |
 | FR4   | X|X| || |X| || X|X|X |X |
 | FR4.1 |X|  | || |X| || |X| | |
 | FR4.2 |X |  | || |X| || |X| | |
-| FR4.3 |X |  | || || || |X| | |
-| FR4.4 |X |X| || || ||X |X|X |X |
-| FR4.5 |X |X || || || |X|X | X|
-| FR4.6 | X|| || || || X|X| | |
+| FR4.3 |X |  | || || ||X |X| | |
+| FR4.4 |X |X| || || || X|X|X |X |
+| FR4.5 |X |X || || || |X|X | X|X|
+| FR4.6 | X|| || |X| || X|X| | |
 | FR4.7 |X || || || |||X| | |
 | FR5   | X||  || ||X |X| |X| | |
 | FR5.1 |X || || || X|| |X| | |
@@ -339,31 +339,31 @@ class InvalidCreditCardException
 | FR5.5 |X ||  || || |X| |X| | |
 | FR5.6 | X||  || ||X |X| |X| | |
 | FR5.7 |X ||  || || |X| |X| | |
-| FR6   |X |X|X |X|X || || |X| X|X |
+| FR6   |X |X|X |X|X || |X| |X| X|X |
 | FR6.1 | X|| || || || |X| | |
-| FR6.2 | X||X || || || |X| | |
-| FR6.3 |X ||X || || || |X| | |
+| FR6.2 | X||X || |X| || |X| | |
+| FR6.3 |X ||X || |X| || |X| | |
 | FR6.4 |X ||X || || || |X|| | |
 | FR6.5 |X ||X ||X || || |X|| |
-| FR6.6 |X ||X || || || |X| | |
+| FR6.6 |X ||X || || |X| |X| | |
 | FR6.7 | X|| || || || |X| | |
 | FR6.8 |X || || || || |X| | |
 | FR6.10| X||X || || || |X| | |
-| FR6.11| X|X|X || || || |X| X|X |
+| FR6.11| X|X|X || |X| || |X| X|X |
 | FR6.12|X ||X || || || |X| | |
 | FR6.13| X|| || || || |X| | |
 | FR6.14| X|| |X| || || |X| | |
-| FR6.15| X|X| |X| || || |X|X | X|
+| FR6.15| X|X| |X| |X| || |X|X | X|
 | FR7   |X |X| X|| || || |X|X |X |
-| FR7.1 |X ||X || || || |X| X|X |
-| FR7.2 | X|X|X || || || |X| X|X |
-| FR7.3 |X || |X| || || |X|X |X |
-| FR7.4 | X|X| |X| || || |X| X|X |
+| FR7.1 |X || || || || |X| X|X |
+| FR7.2 | X|X| || || || |X| X|X |
+| FR7.3 |X || || || || |X|X |X |
+| FR7.4 | X|X| || || || |X| X|X |
 | FR8   | X|| || || || |X| X| X|
 | FR8.1 | X|| || || || |X|X | X|
 | FR8.2 |X || || || || |X| X|X |
 | FR8.3 |X || || || || |X|X | X|
-| FR8.4 | X|| || || || |X| | |
+| FR8.4 | X|| || || || |X| X| |
 
 
 
@@ -629,14 +629,14 @@ activate Shop
       return
     return
 
-   Shop -> AddressBook: 16: recordBalanceUpdate()
+   Shop -> AccountBook: 16: recordBalanceUpdate()
    activate AddressBook
    return
    Shop -> SaleTransaction: 17: getReturnTransaction()
    activate SaleTransaction
    return
-   Shop -> AddressBook: 18: add()
-   activate AddressBook
+   Shop -> AccountBook: 18: add()
+   activate AccountBook
    return
 return
 -> Shop: 19: endReturnTransaction()
