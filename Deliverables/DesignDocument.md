@@ -72,14 +72,12 @@ package it.polito.ezshop.data {
     + pay(creditCardId: String, amount: Double): Boolean
   }
   class Shop {
-    - loggedUser: User
     - allUsers: Map<Integer, User>
     - allSales: Map<Integer, SaleTransaction>
     - products: Map<Integer, ProductType>
     - orders: Map<Integer, Order>
     - customers: Map<Integer, Customer>
     - customerCards: Map<String, CustomerCard>
-    - actualBook: AccountBook
     + reset(): Boolean
 + createUser(username: String, password: String, role: String): Integer
 + deleteUser(id: Integer): Boolean
@@ -135,6 +133,9 @@ package it.polito.ezshop.data {
 - loadFromDb(): Boolean
   }
   Shop -[hidden]-> SingletonDatabaseConnection
+
+    Shop -- CreditCardManager
+    Shop -[hidden]-> CreditCardManager
 }
 
 package it.polito.ezshop.model {
@@ -144,6 +145,7 @@ package it.polito.ezshop.model {
     - amount: Dobule
     - description: String
     - date: LocalDate
+    - type: String
   }
   class User {
     - id: Integer
@@ -173,7 +175,6 @@ package it.polito.ezshop.model {
   }
   class Order {
     - id: Integer
-    - productType: ProductType
     - supplier: String
     - pricePerUnit: Double
     - quantity: Integer
@@ -184,7 +185,6 @@ package it.polito.ezshop.model {
   class CustomerCard {
       - id: String
       - points: Integer
-      - customer: Customer
       + setCustomer(customer: Customer)
       + removeCustomer()
       + modifyPointsOnCard(pointsToBeAdded: Integer): Boolean
@@ -223,7 +223,6 @@ package it.polito.ezshop.model {
   }
   class ReturnTransaction {
     - id: Integer
-    - product: ProductType
     - quantity: Integer
     - committed: String
     - status: Boolean
@@ -250,29 +249,27 @@ package it.polito.ezshop.model {
   SaleTransaction --|> BalanceOperation
   Order -up-|> BalanceOperation
 
-AccountBook --> BalanceOperation
+AccountBook --"*" BalanceOperation
 
-SaleTransaction -right-> ReturnTransaction
-SaleTransaction --> TransactionProduct
-TransactionProduct --> ProductType
-CustomerCard --> Customer
-SaleTransaction --> CustomerCard
+SaleTransaction -right-"*" ReturnTransaction
+SaleTransaction --"*" TransactionProduct
+TransactionProduct "*" -- ProductType
+CustomerCard "0..1"-- Customer
+SaleTransaction -- "0..1" CustomerCard
 
-Order -right-> ProductType
-ReturnTransaction --> ProductType
+Order -right- ProductType
+ReturnTransaction -- ProductType
 }
 
-  Shop -> User
-  Shop -> SaleTransaction
-  Shop -> ProductType
-  Shop -> Order
-  Shop -> Customer
-  Shop -> CustomerCard
-  Shop -> AccountBook
+  Shop - "*" User
+  Shop - "*" SaleTransaction
+  Shop - "*" ProductType
+  Shop - "*" Order
+  Shop - "*" Customer
+  Shop - "*" CustomerCard
+  Shop - AccountBook
 
 
-
-Shop --> User
 
 ```
 ```plantuml
