@@ -120,8 +120,7 @@ package it.polito.ezshop.data {
 + computePointsForSale(transactionId: Integer): Integer
 + endSaleTransaction(transactionId: Integer): Boolean
 + deleteSaleTransaction(transactionID: Integer): Boolean
-+ getSaleTransaction(transactionId: Integer): Ticket
-+ getTicketByNumber(transactionID: Integer): Ticket
++ getSaleTransaction(transactionId: Integer): SaleTransaction
 + startReturnTransaction(transactionID: Integer): Integer
 + returnProduct(returnId: Integer, productCode: String, amount: Integer): Boolean
 + endReturnTransaction(returnId: Integer, Boolean commit): Boolean
@@ -300,7 +299,7 @@ class InvalidCustomerCardException
 
 class InvalidDiscountRateException
 class InvalidTransactionIdException
-class InvalidtransactionIDException
+class InvalidPaymentException
 
 class InvalidCreditCardException
 }
@@ -630,7 +629,7 @@ activate Shop
     return
 
    Shop -> AccountBook: 16: recordBalanceUpdate()
-   activate AddressBook
+   activate AccountBook
    return
    Shop -> SaleTransaction: 17: getReturnTransaction()
    activate SaleTransaction
