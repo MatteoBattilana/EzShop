@@ -280,15 +280,15 @@ ReturnTransaction -- ProductType
 
 # Verification traceability matrix
 
-| | Shop  | CreditCardCircuit |  SaleTransaction |ReturnTransaction | TransactionProduct|ProductType| Customer |CustomerCard|Order    | User |  AccountBook |BalanceOperation|
-| :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:| :-------------: |
-| FR1   |X|  || |||| || X|| |
-| FR3   |X || || |X| || |X| | |
-| FR4   | X|X| || |X| || X|X|X |X |
-| FR5   | X||  || ||X |X| |X| | |
-| FR6   |X |X|X |X|X || |X| |X| X|X |
-| FR7   |X |X| X|| || || |X|X |X |
-| FR8   | X|| || || || |X| X| X|
+| | Shop  | CreditCardCircuit |  SaleTransaction |ReturnTransaction | TransactionProduct|ProductType| Customer |CustomerCard|Order    | User |  AccountBook |
+| :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:| 
+| FR1   |X|  || |||| || X|| 
+| FR3   |X || || |X| || |X| | 
+| FR4   | X|| || |X| || X|X|X |
+| FR5   | X||  || ||X |X| |X| | 
+| FR6   |X |X|X |X|X || |X| |X| X|
+| FR7   |X |X| || || || |X|X |
+| FR8   | X|| || || || |X| X| 
 
 
 
