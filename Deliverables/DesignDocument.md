@@ -72,9 +72,10 @@ package it.polito.ezshop.data {
       + getInstance(): SingletonDatabaseConnection
       + getConnection(): Connection
     }
-  class CreditCardManager {
+  class CreditCardCircuit {
     + validateCreditCart(creditCardId: String): Boolean
     + pay(creditCardId: String, amount: Double): Boolean
+    + isValid(creditCardId: String): Boolean
   }
   class Shop {
     - allUsers: Map<Integer, User>
@@ -138,8 +139,8 @@ package it.polito.ezshop.data {
   }
   Shop -[hidden]-> SingletonDatabaseConnection
 
-    Shop -- CreditCardManager
-    Shop -[hidden]-> CreditCardManager
+    Shop -- CreditCardCircuit
+    Shop -[hidden]-> CreditCardCircuit
 }
 
 package it.polito.ezshop.model {
@@ -205,7 +206,6 @@ package it.polito.ezshop.model {
       - returnTransactions: Map<Integer, ReturnTransaction>
       - prodList: Map<ProductType, TransactionProduct>
       - status: String
-      - customerCard: CustomerCard
       + setCustomerCard(CustomerCard): Boolean
       + addProductToSale(product: ProductType, amount: Integer): Boolean
       + deleteProductFromSale(product: String, amount: Integer): Boolean
@@ -276,40 +276,11 @@ ReturnTransaction -- ProductType
 
 
 ```
-```plantuml
-package it.polito.ezshop.exception {
-class InvalidUsernameException
-class InvalidPasswordException
-class InvalidRoleException
 
-class InvalidUserIdException
-class UnauthorizedException
-
-class InvalidProductDescriptionException
-class InvalidProductCodeException
-class InvalidPricePerUnitException
-class InvalidProductIdException
-class InvalidLocationException
-class InvalidQuantityException
-
-class InvalidOrderIdException
-class InvalidCustomerNameException
-class InvalidCustomerIdException
-class InvalidCustomerCardException
-
-class InvalidDiscountRateException
-class InvalidTransactionIdException
-class InvalidPaymentException
-
-class InvalidCreditCardException
-}
-
-
-```
 
 # Verification traceability matrix
 
-| | Shop  | CreditCardManager |  SaleTransaction |ReturnTransaction | TransactionProduct|ProductType| Customer |CustomerCard|Order    | User |  AccountBook |BalanceOperation|
+| | Shop  | CreditCardCircuit |  SaleTransaction |ReturnTransaction | TransactionProduct|ProductType| Customer |CustomerCard|Order    | User |  AccountBook |BalanceOperation|
 | :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:| :-------------: |
 | FR1   |X|  || |||| || X|| |
 | FR1.1 |X|  || || || ||X || |
