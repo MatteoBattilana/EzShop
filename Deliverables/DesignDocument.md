@@ -307,7 +307,7 @@ ReturnTransaction -- ProductType
 @startuml
 ->Shop: 1: createProductType()
 activate Shop
-Shop -> ProductType: 2: <<create>>
+Shop -> ProductType: 2: new ProductType
 
 activate ProductType
 
@@ -334,7 +334,7 @@ return
 @startuml
 ->Shop: 1: createUser()
 activate Shop
-Shop -> User: 2: <<create>>
+Shop -> User: 2: new User
 
 activate User
 
@@ -365,7 +365,7 @@ return
 @startuml
 ->Shop: 1: issueOrder()
 activate Shop
-  Shop -> Order: 2: <<create>>
+  Shop -> Order: 2: new Order
   activate Order
     Order -> Order: 3: setQuantity()
     Order -> Order: 4: setPricePerUnit()
@@ -415,7 +415,7 @@ return
 @startuml
 ->Shop: 1: defineCustomer()
 activate Shop
-    Shop -> Customer: 2: <<create>>
+    Shop -> Customer: 2: new Customer
     activate Customer
       Customer -> Customer: 3: setName()
     return: instance
@@ -428,7 +428,7 @@ return
 @startuml
 ->Shop: 1: modifyCustomer()
 activate Shop
-    Shop -> CustomerCard: 2: <<create>>
+    Shop -> CustomerCard: 2: new CustomerCard
     activate CustomerCard
       CustomerCard -> CustomerCard: 3: removeCustomer()
     return
@@ -442,7 +442,7 @@ return
 @startuml
   ->Shop: 1: startSaleTransaction()
   activate Shop
-    Shop -> SaleTransaction: 2: <<create>>
+    Shop -> SaleTransaction: 2: new SaleTransaction
     activate SaleTransaction
     return
   return
@@ -509,7 +509,7 @@ return
 activate Shop
   Shop -> SaleTransaction: 2: startReturnTransaction()
   activate SaleTransaction
-    SaleTransaction -> ReturnTransaction: 3: <<create>>
+    SaleTransaction -> ReturnTransaction: 3: new ReturnTransaction
     activate ReturnTransaction
     return : instance
   return
