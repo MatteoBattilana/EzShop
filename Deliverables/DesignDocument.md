@@ -47,8 +47,8 @@ it.polito.ezshop.data --> it.polito.ezshop.exception
 ```
 
 The  Architecture style selected is single application.
-The application is organized according to the 3-layered model: Presentation layer, Application logic and Data layer,last one implemented by a DBMS to provide the persistence of the data.
-It used the MVC pattern, with the V in the Presentation layer and the MC implemented in the others layers.
+The application is organized accordingly to the 3-layered model: Presentation layer, Application logic and Data layer, the last one implemented with an Embedded Database to provide the persistence of the data.
+This solution used the MVC pattern, with the V in the Presentation layer and the MC implemented in the others layers.
 The others  patterns used are:
 - Singleton Pattern: to handle the database connection
 - Façade Pattern: to use the packages without see all the details inside
