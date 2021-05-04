@@ -3,49 +3,213 @@ package it.polito.ezshop.data;
 import it.polito.ezshop.exceptions.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class EZShop implements EZShopInterface {
+    // Map used to store the users, indexed by the user id
+    Map<Integer, User> mUsers;
+    User mLoggedUser;
 
+    public EZShop() {
+        mUsers = new HashMap<>();
+        mLoggedUser = null;
+    }
 
+    /**
+     * This method should reset the application to its base state: balance zero, no transacations, no products
+     */
     @Override
     public void reset() {
-
     }
 
+    /**
+     * This method creates a new user with given username, password and role. The returned value is a unique identifier
+     * for the new user.
+     *
+     * @param username the username of the new user. This value should be unique and not empty.
+     * @param password the password of the new user. This value should not be empty.
+     * @param role     the role of the new user. This value should not be empty and it should assume
+     *                 one of the following values : "Administrator", "Cashier", "ShopManager"
+     * @return The id of the new user ( > 0 ).
+     * -1 if there is an error while saving the user or if another user with the same username exists
+     * @throws InvalidUsernameException If the username has an invalid value (empty or null)
+     * @throws InvalidPasswordException If the password has an invalid value (empty or null)
+     * @throws InvalidRoleException     If the role has an invalid value (empty, null or not among the set of admissible values)
+     */
     @Override
     public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-        return null;
+        if (username == null || username.length() == 0) {
+            throw new InvalidUsernameException("The username is empty");
+        }
+        if (password == null || password.length() == 0) {
+            throw new InvalidPasswordException("The password is empty");
+        }
+        if (role == null || role.length() == 0) {
+            throw new InvalidRoleException("The role is empty");
+        }
+        if (!role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager")) {
+            throw new InvalidRoleException("The role " + role + " is not correct");
+        }
+
+        // Get last id in the system
+        int newId = -1;
+        for (Integer id : mUsers.keySet()) {
+            if (id > newId) {
+                newId = id;
+            }
+        }
+
+        mUsers.put(
+                ++newId,
+                new UserImpl(newId, username, password, role)
+        );
+        return newId;
     }
 
+    /**
+     * This method deletes the user with given id. It can be invoked only after a user with role "Administrator" is
+     * logged in.
+     *
+     * @param id the user id, this value should not be less than or equal to 0 or null.
+     * @return true if the user was deleted
+     * false if the user cannot be deleted
+     * @throws InvalidUserIdException if id is less than or equal to 0 or if it is null.
+     * @throws UnauthorizedException  if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        return false;
+        // Check if the user is logged
+        if (mLoggedUser != null && mLoggedUser.getRole().equals("Administrator")) {
+            throw new UnauthorizedException();
+        }
+        if (id == null || id <= 0) {
+            throw new InvalidUserIdException("User id not valid");
+        }
+
+        // Try to remove the user
+        User user = mUsers.remove(id);
+        return user != null;
     }
 
+    /**
+     * This method returns the list of all registered users. It can be invoked only after a user with role "Administrator" is
+     * logged in.
+     *
+     * @return a list of all registered users. If there are no users the list should be empty
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-        return null;
+        // Check if the user is logged
+        if (mLoggedUser != null && mLoggedUser.getRole().equals("Administrator")) {
+            throw new UnauthorizedException();
+        }
+
+        return new ArrayList<>(mUsers.values());
     }
 
+    /**
+     * This method returns a User object with given id. It can be invoked only after a user with role "Administrator" is
+     * logged in.
+     *
+     * @param id the id of the user
+     * @return the requested user if it exists, null otherwise
+     * @throws InvalidUserIdException if id is less than or equal to zero or if it is null
+     * @throws UnauthorizedException  if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        return null;
+        // Check if the user is logged
+        if (mLoggedUser != null && mLoggedUser.getRole().equals("Administrator")) {
+            throw new UnauthorizedException();
+        }
+        if (id == null || id <= 0) {
+            throw new InvalidUserIdException("User id not valid");
+        }
+
+        // Get the user given the id
+        return mUsers.get(id);
     }
 
+    /**
+     * This method updates the role of a user with given id. It can be invoked only after a user with role "Administrator" is
+     * logged in.
+     *
+     * @param id   the id of the user
+     * @param role the new role the user should be assigned to
+     * @return true if the update was successful, false if the user does not exist
+     * @throws InvalidUserIdException if the user Id is less than or equal to 0 or if it is null
+     * @throws InvalidRoleException   if the new role is empty, null or not among one of the following : {"Administrator", "Cashier", "ShopManager"}
+     * @throws UnauthorizedException  if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
+        // Check if the user is logged
+        if (mLoggedUser != null && mLoggedUser.getRole().equals("Administrator")) {
+            throw new UnauthorizedException();
+        }
+        if (id == null || id <= 0) {
+            throw new InvalidUserIdException("User id not valid");
+        }
+        if (role == null || role.length() == 0) {
+            throw new InvalidRoleException("The role is empty");
+        }
+        if (!role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager")) {
+            throw new InvalidRoleException("The role " + role + " is not correct");
+        }
+
+        User user = mUsers.get(id);
+        if (user != null) {
+            user.setRole(role);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method lets a user with given username and password login into the system
+     *
+     * @param username the username of the user
+     * @param password the password of the user
+     * @return an object of class User filled with the logged user's data if login is successful, null otherwise ( wrong credentials or db problems)
+     * @throws InvalidUsernameException if the username is empty or null
+     * @throws InvalidPasswordException if the password is empty or null
+     */
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
-        return null;
+        logout();
+        if (username == null || username.length() == 0) {
+            throw new InvalidUsernameException();
+        }
+        if (password == null || password.length() == 0) {
+            throw new InvalidPasswordException();
+        }
+
+        // Find user with the username and password that corresponds
+        for (User u : mUsers.values()) {
+            if (u.getPassword().equals(password) && u.getUsername().equals(username)) {
+                mLoggedUser = u;
+            }
+        }
+        return mLoggedUser;
     }
 
+    /**
+     * This method makes a user to logout from the system
+     *
+     * @return true if the logout is successful, false otherwise (there is no logged user)
+     */
     @Override
     public boolean logout() {
+        // Check if a user was logged
+        if (mLoggedUser != null) {
+            mLoggedUser = null;
+            return true;
+        }
         return false;
     }
 
