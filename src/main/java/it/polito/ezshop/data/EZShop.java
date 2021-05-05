@@ -811,14 +811,8 @@ public class EZShop implements EZShopInterface {
      */
     private void validateLoggedUser(String minRight) throws UnauthorizedException {
         if (mLoggedUser == null ) throw new UnauthorizedException();
-        switch (mLoggedUser.getRole()) {
-            case "ShopManager":
-                if (minRight.equals("Administrator")) throw new UnauthorizedException();
-                break;
-            case "Administrator":
-                if (!minRight.equals("Administrator")) throw new UnauthorizedException();
-                break;
-        }
+        else if (mLoggedUser.getRole().equals("ShopManager") && minRight.equals("Administrator")) throw new UnauthorizedException();
+        else if(!mLoggedUser.getRole().equals("Administrator") && minRight.equals("Administrator")) throw new UnauthorizedException();
     }
 
     /**
