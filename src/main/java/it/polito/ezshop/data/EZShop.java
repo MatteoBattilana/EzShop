@@ -63,10 +63,11 @@ public class EZShop implements EZShopInterface {
 
         // Get last id in the system
         int newId = 0;
-        for (Integer id : mUsers.keySet()) {
-            if (id > newId) {
-                newId = id;
-            }
+        for (User user : mUsers.values()) {
+            if (user.getUsername().equals(username))
+                return -1;
+            else if (user.getId() > newId)
+                newId = user.getId();
         }
 
         mUsers.put(
@@ -463,14 +464,16 @@ public class EZShop implements EZShopInterface {
         // Check if the user is logged
         validateLoggedUser("ShopManager");
 
-        // Check barcode validity
-        validateBarcode(productCode);
-
         // Check quantity
         if (quantity <= 0) throw new InvalidQuantityException("Quantity " + quantity + " not allowed");
 
         // Check price
         if (pricePerUnit <= 0) throw new InvalidPricePerUnitException("Price " + pricePerUnit + " not allowed");
+
+        // Check barcode validity
+        ProductType product = getProductTypeByBarCode(productCode);
+        if (product == null)
+            return -1;
 
 
         // Get last id in the system
@@ -515,15 +518,16 @@ public class EZShop implements EZShopInterface {
         // Check if the user is logged
         validateLoggedUser("ShopManager");
 
-        // Check barcode validity
-        validateBarcode(productCode);
-
         // Check quantity
         if (quantity <= 0) throw new InvalidQuantityException("Quantity " + quantity + " not allowed");
 
         // Check price
         if (pricePerUnit <= 0) throw new InvalidPricePerUnitException("Price " + pricePerUnit + " not allowed");
 
+        // Check barcode validity
+        ProductType product = getProductTypeByBarCode(productCode);
+        if (product == null)
+            return -1;
 
         // Get last id in the system
         int newId = 0;
@@ -533,7 +537,7 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-
+        // Add a balance as paid for ORDER type
         int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "PAID", "ORDER");
         // Add the order to the system
         mOrders.put(
