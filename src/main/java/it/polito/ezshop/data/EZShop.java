@@ -30,6 +30,8 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public void reset() {
+        mAccountBook.reset();
+        mProducts.clear();
     }
 
     /**
@@ -48,13 +50,13 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-        if (username == null || username.length() == 0) {
+        if (username == null || username.isEmpty()) {
             throw new InvalidUsernameException("The username is empty");
         }
-        if (password == null || password.length() == 0) {
+        if (password == null || password.isEmpty()) {
             throw new InvalidPasswordException("The password is empty");
         }
-        if (role == null || role.length() == 0) {
+        if (role == null || role.isEmpty()) {
             throw new InvalidRoleException("The role is empty");
         }
         if (!role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager")) {
@@ -154,7 +156,7 @@ public class EZShop implements EZShopInterface {
         if (id == null || id <= 0) {
             throw new InvalidUserIdException("User id not valid");
         }
-        if (role == null || role.length() == 0) {
+        if (role == null || role.isEmpty()) {
             throw new InvalidRoleException("The role is empty");
         }
         if (!role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager")) {
@@ -181,10 +183,10 @@ public class EZShop implements EZShopInterface {
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         logout();
-        if (username == null || username.length() == 0) {
+        if (username == null || username.isEmpty()) {
             throw new InvalidUsernameException();
         }
-        if (password == null || password.length() == 0) {
+        if (password == null || password.isEmpty()) {
             throw new InvalidPasswordException();
         }
 
@@ -212,9 +214,48 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    /**
+     * This method creates a product type and returns its unique identifier. It can be invoked only after a user with role "Administrator"
+     * or "ShopManager" is logged in.
+     *
+     * @param description the description of product to be created
+     * @param productCode  the unique barcode of the product
+     * @param pricePerUnit the price per single unit of product
+     * @param note the notes on the product (if null an empty string should be saved as description)
+     *
+     * @return The unique identifier of the new product type ( > 0 ).
+     *         -1 if there is an error while saving the product type or if it exists a product with the same barcode
+     *
+     * @throws InvalidProductDescriptionException if the product description is null or empty
+     * @throws InvalidProductCodeException if the product code is null or empty, if it is not a number or if it is not a valid barcode
+     * @throws InvalidPricePerUnitException if the price per unit si less than or equal to 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        // Check logged user
+        validateLoggedUser("ShopManager");
+
+        // Check description
+        if (description == null || description.isEmpty()) throw new InvalidProductDescriptionException();
+
+        // Check bardcode
+        validateBarcode(productCode);
+
+        // Check price
+        if (pricePerUnit <= 0) throw new InvalidPricePerUnitException();
+
+        // Get new id
+        int newId = 0;
+        for (Integer id : mProducts.keySet())
+            if (id > newId)
+                newId = id;
+
+        mProducts.put(
+                ++newId,
+                new ProductTypeImpl(0, null, note == null ? "" : note, description, productCode, pricePerUnit, newId)
+        );
+        return newId;
     }
 
     /**
@@ -246,18 +287,13 @@ public class EZShop implements EZShopInterface {
         if(id == null || id <= 0) throw new InvalidProductIdException();
 
         // Check description
-        if(newDescription == null || newDescription.length() == 0) throw new InvalidProductDescriptionException();
+        if(newDescription == null || newDescription.isEmpty()) throw new InvalidProductDescriptionException();
 
         // Check barcode
         validateBarcode(newCode);
 
         // Check price
         if (newPrice <= 0) throw new InvalidPricePerUnitException();
-
-        // Check for product with the same barcode
-        for(ProductType p: mProducts.values())
-            if (p.getBarCode().equals(newCode))
-                return false;
 
         // Update product information
         ProductType product = mProducts.get(id);
@@ -352,7 +388,7 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check if description is empty
-        if(description == null || description.length() == 0) return new ArrayList<>(mProducts.values());
+        if(description == null || description.isEmpty()) return new ArrayList<>(mProducts.values());
 
         // Filter by description
         List<ProductType> filtered = new ArrayList<>();
@@ -484,7 +520,6 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-
         int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "UNPAID", "ORDER");
         // Add the order to the system
         mOrders.put(
@@ -537,14 +572,17 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-        // Add a balance as paid for ORDER type
-        int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "PAID", "ORDER");
-        // Add the order to the system
-        mOrders.put(
-                ++newId,
-                new OrderImpl(balanceId, productCode, pricePerUnit, quantity, "PAYED", newId));
+        if ( mAccountBook.checkIfEnoughMoney(-quantity * pricePerUnit) ) {
+            // Add a balance as paid for ORDER type
+            int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "PAID", "ORDER");
+            // Add the order to the system
+            mOrders.put(
+                    ++newId,
+                    new OrderImpl(balanceId, productCode, pricePerUnit, quantity, "PAYED", newId));
 
-        return newId;
+            return newId;
+        }
+        return -1;
     }
 
     /**
@@ -566,11 +604,15 @@ public class EZShop implements EZShopInterface {
         // Check order id
         if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
 
+        // Get order by id
         Order order = mOrders.get(orderId);
         if (order != null && order.getStatus().equals("ISSUED")) {
-            mAccountBook.setAsPaid(order.getBalanceId());
-            order.setStatus("PAYED");
-            return true;
+            // Check if balance would be negative
+            if ( mAccountBook.checkIfEnoughMoney(-order.getQuantity()*order.getPricePerUnit()) ) {
+                mAccountBook.setAsPaid(order.getBalanceId());
+                order.setStatus("PAYED");
+                return true;
+            }
         }
 
         return false;
@@ -603,7 +645,7 @@ public class EZShop implements EZShopInterface {
                 // Update product quantity
                 ProductType productType = getProductTypeByBarCode(order.getProductCode());
                 // Check if the product has a location
-                if (productType.getLocation() == null || productType.getLocation().length() == 0)
+                if (productType.getLocation() == null || productType.getLocation().isEmpty())
                     throw new InvalidLocationException();
 
                 productType.setQuantity(productType.getQuantity() + order.getQuantity());
@@ -764,10 +806,14 @@ public class EZShop implements EZShopInterface {
         // Check if the user is logged
         validateLoggedUser("ShopManager");
 
-        // Record the balance update
-        mAccountBook.recordBalanceUpdate(toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
+        // Check if balance would be negative
+        if ( mAccountBook.checkIfEnoughMoney(toBeAdded) ) {
+            // Record the balance update
+            mAccountBook.recordBalanceUpdate(toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
 
-        return mAccountBook.computeBalance() >= 0;
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -60,4 +60,14 @@ public class AccountBook {
     public double computeBalance() {
         return mBalance;
     }
+
+    public void reset() {
+        mBalanceOperations = new HashMap<>();
+        mBalance = 0.0;
+        mCurrentId = 0;
+    }
+
+    public boolean checkIfEnoughMoney(double toBeAdded) {
+        return computeBalance() + toBeAdded >= 0;
+    }
 }
