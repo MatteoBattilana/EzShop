@@ -89,9 +89,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || !mLoggedUser.getRole().equals("Administrator")) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("Administrator");
         if (id == null || id <= 0) {
             throw new InvalidUserIdException("User id not valid");
         }
@@ -111,9 +109,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || !mLoggedUser.getRole().equals("Administrator")) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("Administrator");
 
         return new ArrayList<>(mUsers.values());
     }
@@ -130,9 +126,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || !mLoggedUser.getRole().equals("Administrator")) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("Administrator");
         if (id == null || id <= 0) {
             throw new InvalidUserIdException("User id not valid");
         }
@@ -155,9 +149,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || !mLoggedUser.getRole().equals("Administrator")) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("Administrator");
         if (id == null || id <= 0) {
             throw new InvalidUserIdException("User id not valid");
         }
@@ -224,38 +216,228 @@ public class EZShop implements EZShopInterface {
         return null;
     }
 
+    /**
+     * This method updates the product id with given barcode and id. It can be invoked only after a user with role "Administrator"
+     * or "ShopManager" is logged in.
+     *
+     * @param id the type of product to be updated
+     * @param newDescription the new product type
+     * @param newCode the new product code
+     * @param newPrice the new product price
+     * @param newNote the new product notes
+     *
+     * @return  true if the update is successful
+     *          false if the update is not successful (no products with given product id or another product already has
+     *              the same barcode)
+     *
+     * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
+     * @throws InvalidProductDescriptionException if the product description is null or empty
+     * @throws InvalidProductCodeException if the product code is null or empty, if it is not a number or if it is not a valid barcode
+     * @throws InvalidPricePerUnitException if the price per unit si less than or equal to 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("ShopManager");
+
+        // Check product id
+        if(id == null || id <= 0) throw new InvalidProductIdException();
+
+        // Check description
+        if(newDescription == null || newDescription.length() == 0) throw new InvalidProductDescriptionException();
+
+        // Check barcode
+        validateBarcode(newCode);
+
+        // Check price
+        if (newPrice <= 0) throw new InvalidPricePerUnitException();
+
+        // Check for product with the same barcode
+        for(ProductType p: mProducts.values())
+            if (p.getBarCode().equals(newCode))
+                return false;
+
+        // Update product information
+        ProductType product = mProducts.get(id);
+        if (product != null){
+            product.setProductDescription(newDescription);
+            product.setBarCode(newCode);
+            product.setPricePerUnit(newPrice);
+            product.setNote(newNote);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method deletes a product with given product id. It can be invoked only after a user with role "Administrator"
+     * or "ShopManager" is logged in.
+     *
+     * @param id the id of the product to be deleted
+     *
+     * @return true if the product was deleted, false otherwise
+     *
+     * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
-        return false;
+        // Check logged user
+        validateLoggedUser("ShopManager");
+
+        // Check product id
+        if(id == null || id <= 0) throw new InvalidProductIdException();
+
+        ProductType removed = mProducts.remove(id);
+        return removed != null;
     }
 
+    /**
+     * This method returns the list of all registered product types. It can be invoked only after a user with role "Administrator",
+     * "ShopManager" or "Cashier" is logged in.
+     *
+     * @return a list containing all saved product types
+     *
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        return Collections.emptyList();
+        // Check logged user
+        validateLoggedUser("Cashier");
+        return new ArrayList<>(mProducts.values());
     }
 
+    /**
+     * This method returns a product type with given barcode. It can be invoked only after a user with role "Administrator"
+     * or "ShopManager" is logged in.
+     *
+     * @param barCode the unique barCode of a product
+     *
+     * @return the product type with given barCode if present, null otherwise
+     *
+     * @throws InvalidProductCodeException if barCode is not a valid bar code, if is it empty or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("ShopManager");
+
+        // Check barcode
+        validateBarcode(barCode);
+
+        for (ProductType p: mProducts.values()) {
+            if (p.getBarCode().equals(barCode))
+                return p;
+        }
         return null;
     }
 
+    /**
+     * This method returns a list of all products with a description containing the string received as parameter. It can be invoked only after a user with role "Administrator"
+     * or "ShopManager" is logged in.
+     *
+     * @param description the description (or part of it) of the products we are searching for.
+     *                    Null should be considered as the empty string.
+     *
+     * @return a list of products containing the requested string in their description
+     *
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-        return null;
+        // Check logged user
+        validateLoggedUser("ShopManager");
+
+        // Check if description is empty
+        if(description == null || description.length() == 0) return new ArrayList<>(mProducts.values());
+
+        // Filter by description
+        List<ProductType> filtered = new ArrayList<>();
+        for (ProductType p: mProducts.values()) {
+            if(p.getProductDescription().contains(description))
+                filtered.add(p);
+        }
+
+        return filtered;
     }
 
+    /**
+     * This method updates the quantity of product available in store. <toBeAdded> can be negative but the final updated
+     * quantity cannot be negative. The product should have a location assigned to it.
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param productId the id of the product to be updated
+     * @param toBeAdded the quantity to be added. If negative it decrease the available quantity of <toBeAdded> elements.
+     *
+     * @return  true if the update was successful
+     *          false if the product does not exists, if <toBeAdded> is negative and the resulting amount would be
+     *          negative too or if the product type has not an assigned location.
+     *
+     * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
+        //Check login
+        validateLoggedUser("ShopManager");
+
+        // Check product id
+        if(productId == null || productId <= 0) throw new InvalidProductIdException();
+
+        // Set the new quantity only if the product exists
+        ProductType productType = mProducts.get(productId);
+        if(productType != null) {
+            if (productType.getLocation() == null || (toBeAdded < 0 && toBeAdded > productType.getQuantity()))
+                return false;
+
+            productType.setQuantity(productType.getQuantity() + toBeAdded);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method assign a new position to the product with given product id. The position has the following format :
+     * <aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+     * The position should be unique (unless it is an empty string, in this case this means that the product type
+     * has not an assigned location). If <newPos> is null or empty it should reset the position of given product type.
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param productId the id of the product to be updated
+     * @param newPos the new position the product should be placed to.
+     *
+     * @return true if the update was successful
+     *          false if the product does not exists or if <newPos> is already assigned to another product
+     *
+     * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
+     * @throws InvalidLocationException if the product location is in an invalid format (not <aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>)
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
+        //Check login
+        validateLoggedUser("ShopManager");
+
+        // Check product id
+        if(productId == null || productId <= 0) throw new InvalidProductIdException();
+
+        // Check position format
+        if(newPos == null || newPos.split("-").length != 3) throw new InvalidLocationException();
+
+        // Check if the position is used by other products
+        for(ProductType p: mProducts.values()) {
+            if(p.getLocation() != null && p.getLocation().equals(newPos))
+                return false;
+        }
+
+        // Set the new position only if the product exists
+        ProductType productType = mProducts.get(productId);
+        if(productType != null) {
+            productType.setLocation(newPos);
+            return true;
+        }
         return false;
     }
 
@@ -279,9 +461,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
 
         // Check barcode validity
         validateBarcode(productCode);
@@ -333,9 +513,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
 
         // Check barcode validity
         validateBarcode(productCode);
@@ -380,9 +558,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
         // Check order id
         if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
 
@@ -413,9 +589,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
         // Check order id
         if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
 
@@ -584,9 +758,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
 
         // Record the balance update
         mAccountBook.recordBalanceUpdate(toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
@@ -610,9 +782,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
 
         // Get all operations
         return mAccountBook.getCreditAndDebits(from, to);
@@ -627,15 +797,35 @@ public class EZShop implements EZShopInterface {
     @Override
     public double computeBalance() throws UnauthorizedException {
         // Check if the user is logged
-        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
-            throw new UnauthorizedException();
-        }
+        validateLoggedUser("ShopManager");
 
         // Get current balance
         return mAccountBook.computeBalance();
     }
 
+    /**
+     * This method check if the user has the minumum right expressed as paramenter for this method.
+     * @param minRight Cashier or ShopManager or Administrator
+     * @throws UnauthorizedException if the user is not logged or if the rights are not correct for the
+     * r                             requested operation
+     */
+    private void validateLoggedUser(String minRight) throws UnauthorizedException {
+        if (mLoggedUser == null ) throw new UnauthorizedException();
+        switch (mLoggedUser.getRole()) {
+            case "ShopManager":
+                if (minRight.equals("Administrator")) throw new UnauthorizedException();
+                break;
+            case "Administrator":
+                if (!minRight.equals("Administrator")) throw new UnauthorizedException();
+                break;
+        }
+    }
 
+    /**
+     * Method used to validate the barcode, base on 12, 13 and 14 digits
+     * @param productCode 12, 13 or 14 digits that represents the
+     * @throws InvalidProductCodeException if the code is not compliant with the standard
+     */
     private void validateBarcode(String productCode) throws InvalidProductCodeException {
         if (productCode == null || !productCode.matches("[0-9]+") || productCode.length() < 12)
             throw new InvalidProductCodeException();
