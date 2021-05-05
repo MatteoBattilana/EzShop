@@ -23,7 +23,7 @@ public class BalanceOperationImpl implements BalanceOperation {
 
     @Override
     public int getBalanceId() {
-        return 0;
+        return mBalanceId;
     }
 
     @Override

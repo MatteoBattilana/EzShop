@@ -9,20 +9,25 @@ import java.util.Map;
 public class AccountBook {
     Map<Integer, BalanceOperationImpl> mBalanceOperations;
     double mBalance;
+    int mCurrentId;
 
     public AccountBook() {
         mBalanceOperations = new HashMap<>();
         mBalance = 0.0;
+        mCurrentId = 0;
     }
 
-    public boolean recordBalanceUpdate(double toBeAdded) {
-        mBalance += toBeAdded;
+    public int recordBalanceUpdate(double toBeAdded, String status, String type) {
+        BalanceOperationImpl operation = new BalanceOperationImpl(++mCurrentId, LocalDate.now(), toBeAdded, type, status);
         mBalanceOperations.put(
-                getNextId(),
-                new BalanceOperationImpl(getNextId(), LocalDate.now(), toBeAdded, toBeAdded >= 0 ? "CREDIT" : "DEBIT", "PAID")
+                mCurrentId,
+                operation
         );
 
-        return mBalance >= 0;
+        if(operation.getStatus().equals("PAID"))
+            mBalance += toBeAdded;
+
+        return operation.getBalanceId();
     }
 
     public void add(BalanceOperationImpl operation) {
@@ -44,7 +49,7 @@ public class AccountBook {
      * Mark a balance as paid
      * @param id of the balance operation
      */
-    public void setAsPaid(String id) {
+    public void setAsPaid(Integer id) {
         BalanceOperationImpl balanceOperation = mBalanceOperations.get(id);
         if (balanceOperation != null) {
             mBalance += balanceOperation.getMoney();
@@ -54,9 +59,5 @@ public class AccountBook {
 
     public double computeBalance() {
         return mBalance;
-    }
-
-    public int getNextId() {
-        return mBalanceOperations.get(mBalanceOperations.size() - 1).getBalanceId() + 1;
     }
 }

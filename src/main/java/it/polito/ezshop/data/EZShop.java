@@ -3,20 +3,24 @@ package it.polito.ezshop.data;
 import it.polito.ezshop.exceptions.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 
 public class EZShop implements EZShopInterface {
     // Map used to store the users, indexed by the user id
     Map<Integer, User> mUsers;
+    // Map for the orders
+    Map<Integer, Order> mOrders;
+    // Keep track of the logged user
+    Map<Integer, ProductType> mProducts;
     User mLoggedUser;
     AccountBook mAccountBook;
 
     public EZShop() {
         mUsers = new HashMap<>();
+        mOrders = new HashMap<>();
+        mProducts = new HashMap<>();
         mLoggedUser = null;
         mAccountBook = new AccountBook();
     }
@@ -58,7 +62,7 @@ public class EZShop implements EZShopInterface {
         }
 
         // Get last id in the system
-        int newId = -1;
+        int newId = 0;
         for (Integer id : mUsers.keySet()) {
             if (id > newId) {
                 newId = id;
@@ -232,7 +236,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -255,29 +259,189 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    /**
+     * This method issues an order of <quantity> units of product with given <productCode>, each unit will be payed
+     * <pricePerUnit> to the supplier. <pricePerUnit> can differ from the re-selling price of the same product. The
+     * product might have no location assigned in this step.
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param productCode  the code of the product that we should order as soon as possible
+     * @param quantity     the quantity of product that we should order
+     * @param pricePerUnit the price to correspond to the supplier (!= than the resale price of the shop) per unit of
+     *                     product
+     * @return the id of the order (> 0)
+     * -1 if the product does not exists, if there are problems with the db
+     * @throws InvalidProductCodeException  if the productCode is not a valid bar code, if it is null or if it is empty
+     * @throws InvalidQuantityException     if the quantity is less than or equal to 0
+     * @throws InvalidPricePerUnitException if the price per unit of product is less than or equal to 0
+     * @throws UnauthorizedException        if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        // Check if the user is logged
+        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
+            throw new UnauthorizedException();
+        }
+
+        // Check barcode validity
+        validateBarcode(productCode);
+
+        // Check quantity
+        if (quantity <= 0) throw new InvalidQuantityException("Quantity " + quantity + " not allowed");
+
+        // Check price
+        if (pricePerUnit <= 0) throw new InvalidPricePerUnitException("Price " + pricePerUnit + " not allowed");
+
+
+        // Get last id in the system
+        int newId = 0;
+        for (Integer id : mOrders.keySet()) {
+            if (id > newId) {
+                newId = id;
+            }
+        }
+
+
+        int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "UNPAID", "ORDER");
+        // Add the order to the system
+        mOrders.put(
+                ++newId,
+                new OrderImpl(balanceId, productCode, pricePerUnit, quantity, "ISSUED", newId));
+
+        return newId;
     }
 
+    /**
+     * This method directly orders and pays <quantity> units of product with given <productCode>, each unit will be payed
+     * <pricePerUnit> to the supplier. <pricePerUnit> can differ from the re-selling price of the same product. The
+     * product might have no location assigned in this step.
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param productCode  the code of the product to be ordered
+     * @param quantity     the quantity of product to be ordered
+     * @param pricePerUnit the price to correspond to the supplier (!= than the resale price of the shop) per unit of
+     *                     product
+     * @return the id of the order (> 0)
+     * -1 if the product does not exists, if the balance is not enough to satisfy the order, if there are some
+     * problems with the db
+     * @throws InvalidProductCodeException  if the productCode is not a valid bar code, if it is null or if it is empty
+     * @throws InvalidQuantityException     if the quantity is less than or equal to 0
+     * @throws InvalidPricePerUnitException if the price per unit of product is less than or equal to 0
+     * @throws UnauthorizedException        if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        // Check if the user is logged
+        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
+            throw new UnauthorizedException();
+        }
+
+        // Check barcode validity
+        validateBarcode(productCode);
+
+        // Check quantity
+        if (quantity <= 0) throw new InvalidQuantityException("Quantity " + quantity + " not allowed");
+
+        // Check price
+        if (pricePerUnit <= 0) throw new InvalidPricePerUnitException("Price " + pricePerUnit + " not allowed");
+
+
+        // Get last id in the system
+        int newId = 0;
+        for (Integer id : mOrders.keySet()) {
+            if (id > newId) {
+                newId = id;
+            }
+        }
+
+
+        int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "PAID", "ORDER");
+        // Add the order to the system
+        mOrders.put(
+                ++newId,
+                new OrderImpl(balanceId, productCode, pricePerUnit, quantity, "PAYED", newId));
+
+        return newId;
     }
 
+    /**
+     * This method change the status the order with given <orderId> into the "PAYED" state. The order should be either
+     * issued (in this case the status changes) or payed (in this case the method has no effect).
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param orderId the id of the order to be ORDERED
+     * @return true if the order has been successfully ordered
+     * false if the order does not exist or if it was not in an ISSUED/ORDERED state
+     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
+     * @throws UnauthorizedException   if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
+        // Check if the user is logged
+        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
+            throw new UnauthorizedException();
+        }
+        // Check order id
+        if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
+
+        Order order = mOrders.get(orderId);
+        if (order != null && order.getStatus().equals("ISSUED")) {
+            mAccountBook.setAsPaid(order.getBalanceId());
+            order.setStatus("PAYED");
+            return true;
+        }
+
         return false;
     }
 
+    /**
+     * This method records the arrival of an order with given <orderId>. This method changes the quantity of available product.
+     * The product type affected must have a location registered. The order should be either in the PAYED state (in this
+     * case the state will change to the COMPLETED one and the quantity of product type will be updated) or in the
+     * COMPLETED one (in this case this method will have no effect at all).
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param orderId the id of the order that has arrived
+     * @return true if the operation was successful
+     * false if the order does not exist or if it was not in an ORDERED/COMPLETED state
+     * @throws InvalidOrderIdException  if the order id is less than or equal to 0 or if it is null.
+     * @throws InvalidLocationException if the ordered product type has not an assigned location.
+     * @throws UnauthorizedException    if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
+        // Check if the user is logged
+        if (mLoggedUser == null || (mLoggedUser.getRole().equals("Cashier"))) {
+            throw new UnauthorizedException();
+        }
+        // Check order id
+        if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
+
+        Order order = mOrders.get(orderId);
+        if (order != null && order.getStatus().equals("PAYED")) {
+            try {
+                // Update product quantity
+                ProductType productType = getProductTypeByBarCode(order.getProductCode());
+                // Check if the product has a location
+                if (productType.getLocation() == null || productType.getLocation().length() == 0)
+                    throw new InvalidLocationException();
+
+                productType.setQuantity(productType.getQuantity() + order.getQuantity());
+                order.setStatus("COMPLETED");
+                return true;
+            } catch (InvalidProductCodeException e) {
+                return false;
+            }
+        }
+
         return false;
     }
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        return null;
+        return new ArrayList<>(mOrders.values());
     }
 
     @Override
@@ -302,12 +466,12 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public String createCard() throws UnauthorizedException {
-        return null;
+        return "";
     }
 
     @Override
@@ -322,7 +486,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
-        return null;
+        return 1;
     }
 
     @Override
@@ -367,7 +531,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
-        return null;
+        return 1;
     }
 
     @Override
@@ -413,9 +577,8 @@ public class EZShop implements EZShopInterface {
      *
      * @param toBeAdded the amount of money (positive or negative) to be added to the current balance. If this value
      *                  is >= 0 than it should be considered as a CREDIT, if it is < 0 as a DEBIT
-     *
-     * @return  true if the balance has been successfully updated
-     *          false if toBeAdded + currentBalance < 0.
+     * @return true if the balance has been successfully updated
+     * false if toBeAdded + currentBalance < 0.
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
@@ -426,7 +589,9 @@ public class EZShop implements EZShopInterface {
         }
 
         // Record the balance update
-        return mAccountBook.recordBalanceUpdate(toBeAdded);
+        mAccountBook.recordBalanceUpdate(toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
+
+        return mAccountBook.computeBalance() >= 0;
     }
 
     /**
@@ -437,12 +602,9 @@ public class EZShop implements EZShopInterface {
      * Both <from> and <to> are included in the range of dates and might be null. This means the absence of one (or
      * both) temporal constraints.
      *
-     *
      * @param from the start date : if null it means that there should be no constraint on the start date
-     * @param to the end date : if null it means that there should be no constraint on the end date
-     *
+     * @param to   the end date : if null it means that there should be no constraint on the end date
      * @return All the operations on the balance whose date is <= to and >= from
-     *
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
@@ -460,7 +622,6 @@ public class EZShop implements EZShopInterface {
      * This method returns the actual balance of the system.
      *
      * @return the value of the current balance
-     *
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
@@ -472,5 +633,25 @@ public class EZShop implements EZShopInterface {
 
         // Get current balance
         return mAccountBook.computeBalance();
+    }
+
+
+    private void validateBarcode(String productCode) throws InvalidProductCodeException {
+        if (productCode == null || !productCode.matches("[0-9]+") || productCode.length() < 12)
+            throw new InvalidProductCodeException();
+
+        // Adding zero pattern at start
+        for (int i = productCode.length(); i < 14; i++) {
+            productCode = "0" + productCode;
+        }
+
+        int sum = 0;
+        for (int i = 0; i < productCode.length() - 1; i++) {
+            int val = Integer.parseInt(String.valueOf(productCode.charAt(i)));
+            if (i % 2 == 0) val *= 3;
+            sum += val;
+        }
+        int check = (10 - (sum % 10)) % 10;
+        if (check != Integer.parseInt(String.valueOf(productCode.charAt(13)))) throw new InvalidProductCodeException();
     }
 }
