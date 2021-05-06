@@ -8,7 +8,6 @@ public class ProductTypeImpl implements ProductType {
     String mBarcode;
     double mPricePerUnit;
     int mId;
-    private int mTemporaryQuantity;
 
     public ProductTypeImpl(int mQuantity, String mLocation, String mNote, String mDescription, String mBarcode, double mPricePerUnit, int mId) {
         this.mQuantity = mQuantity;
@@ -18,20 +17,12 @@ public class ProductTypeImpl implements ProductType {
         this.mBarcode = mBarcode;
         this.mPricePerUnit = mPricePerUnit;
         this.mId = mId;
-        this.mTemporaryQuantity = 0;
+
     }
 
     @Override
     public Integer getQuantity() {
         return mQuantity;
-    }
-
-    public void setTemporaryQuantity(int temporaryQuantity) {
-        this.mTemporaryQuantity += temporaryQuantity;
-    }
-
-    public int getTemporaryQuantity() {
-        return mTemporaryQuantity;
     }
 
     @Override

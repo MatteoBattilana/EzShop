@@ -60,10 +60,4 @@ public class TransactionProduct implements TicketEntry {
     public void setDiscountRate(double discountRate) {
         this.discount = discountRate;
     }
-
-    public TransactionProduct clone() {
-        TransactionProduct t = new TransactionProduct(productType.clone(), quantity);
-        t.setDiscountRate(discount);
-        return t;
-    }
 }

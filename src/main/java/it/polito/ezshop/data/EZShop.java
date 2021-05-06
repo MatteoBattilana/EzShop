@@ -9,14 +9,14 @@ import java.util.regex.Pattern;
 
 public class EZShop implements EZShopInterface {
     // Map used to store the users, indexed by the user id
-    Map<Integer, UserImpl> mUsers;
+    Map<Integer, User> mUsers;
     // Map for the orders
     Map<Integer, OrderImpl> mOrders;
     // Keep track of the logged user
     Map<Integer, ProductTypeImpl> mProducts;
     // Keep track of the logged user
     Map<Integer, SaleTransactionImpl> mSaleTransactions;
-    UserImpl mLoggedUser;
+    User mLoggedUser;
     AccountBook mAccountBook;
 
     public EZShop() {
@@ -117,10 +117,6 @@ public class EZShop implements EZShopInterface {
         // Check if the user is logged
         validateLoggedUser("Administrator");
 
-        List<User> ret = new ArrayList<>();
-        for (UserImpl u: mUsers.values())
-            ret.add(u.clone());
-
         return new ArrayList<>(mUsers.values());
     }
 
@@ -142,7 +138,7 @@ public class EZShop implements EZShopInterface {
         }
 
         // Get the user given the id
-        return mUsers.get(id).clone();
+        return mUsers.get(id);
     }
 
     /**
@@ -198,12 +194,12 @@ public class EZShop implements EZShopInterface {
         }
 
         // Find user with the username and password that corresponds
-        for (UserImpl u : mUsers.values()) {
+        for (User u : mUsers.values()) {
             if (u.getPassword().equals(password) && u.getUsername().equals(username)) {
                 mLoggedUser = u;
             }
         }
-        return mLoggedUser.clone();
+        return mLoggedUser;
     }
 
     /**
@@ -364,7 +360,7 @@ public class EZShop implements EZShopInterface {
         // Check logged user
         validateLoggedUser("ShopManager");
 
-        return getProductTypeImplByBarCode(barCode).clone();
+        return getProductTypeImplByBarCode(barCode);
     }
 
     /**
@@ -388,7 +384,7 @@ public class EZShop implements EZShopInterface {
         List<ProductType> filtered = new ArrayList<>();
         for (ProductTypeImpl p : mProducts.values()) {
             if (p.getProductDescription().contains(description))
-                filtered.add(p.clone());
+                filtered.add(p);
         }
 
         return filtered;
@@ -651,10 +647,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        List<Order> orders = new ArrayList<>();
-        for(OrderImpl o: mOrders.values())
-            orders.add(o.clone());
-        return orders;
+        return new ArrayList<>(mOrders.values());
     }
 
     @Override
@@ -967,7 +960,7 @@ public class EZShop implements EZShopInterface {
         if (transaction != null && !transaction.getStatus().equals("PAID")) {
             mSaleTransactions.remove(transactionId);
             mAccountBook.remove(transaction.getBalanceId());
-            transaction.resetTemporaryQuantity();
+            transaction.rollbackQuantity();
             return true;
         }
         return false;
@@ -1052,8 +1045,6 @@ public class EZShop implements EZShopInterface {
         if (transaction != null && cash - transaction.getMoney() >= 0) {
             mAccountBook.setAsPaid(transaction.getBalanceId());
 
-            // Commit temporary quantities
-            transaction.commitAllTemporaryQuantity();
             return cash - transaction.getMoney();
         }
         return -1;
