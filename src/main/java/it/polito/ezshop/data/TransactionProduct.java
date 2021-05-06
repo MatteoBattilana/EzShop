@@ -1,11 +1,11 @@
 package it.polito.ezshop.data;
 
 public class TransactionProduct implements TicketEntry {
-    private ProductType productType;
+    private ProductTypeImpl productType;
     int quantity;
     double discount;
 
-    public TransactionProduct(ProductType productType, int quantity) {
+    public TransactionProduct(ProductTypeImpl productType, int quantity) {
         this.productType = productType;
         this.quantity = quantity;
         this.discount = 0;
@@ -59,5 +59,11 @@ public class TransactionProduct implements TicketEntry {
     @Override
     public void setDiscountRate(double discountRate) {
         this.discount = discountRate;
+    }
+
+    public TransactionProduct clone() {
+        TransactionProduct t = new TransactionProduct(productType.clone(), quantity);
+        t.setDiscountRate(discount);
+        return t;
     }
 }

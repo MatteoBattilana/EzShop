@@ -12,6 +12,23 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     private double mDiscountRate;
     private String mTransactionStatus;
 
+    public SaleTransaction clone() {
+        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(mTicketNumer);
+        saleTransaction.setDiscountRate(mDiscountRate);
+        saleTransaction.setTransactionStatus(mTransactionStatus);
+
+        Map<ProductTypeImpl, TransactionProduct> map = new HashMap<>();
+        for (Map.Entry<ProductTypeImpl, TransactionProduct> entry : mTicketEntries.entrySet()) {
+            map.put(entry.getKey().clone(), entry.getValue().clone());
+        }
+        saleTransaction.setTransactionProductMap(map);
+        return saleTransaction;
+    }
+
+    public void setTransactionProductMap (Map<ProductTypeImpl, TransactionProduct> map) {
+        mTicketEntries = map;
+    }
+
     public SaleTransactionImpl(int mTicketNumber) {
         super(-1, LocalDate.now(), "SALE", "UNPAID");
         this.mTicketNumer = mTicketNumber;
@@ -153,6 +170,12 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     public void commitAllTemporaryQuantity() {
         for (ProductTypeImpl pt: mTicketEntries.keySet()) {
             pt.setQuantity(pt.getQuantity() + pt.getTemporaryQuantity());
+        }
+        resetTemporaryQuantity();
+    }
+
+    public void resetTemporaryQuantity() {
+        for (ProductTypeImpl pt: mTicketEntries.keySet()) {
             pt.setTemporaryQuantity(-pt.getTemporaryQuantity());
         }
     }

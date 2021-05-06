@@ -934,8 +934,6 @@ public class EZShop implements EZShopInterface {
         if (transaction != null && transaction.getTransactionStatus().equals("OPENED")) {
             transaction.setTransactionStatus("CLOSED");
             transaction.setBalanceId(mAccountBook.getLastId() + 1);
-            // Commit temporary quantities
-            transaction.commitAllTemporaryQuantity();
             mAccountBook.add(transaction);
             return true;
         }
@@ -969,6 +967,7 @@ public class EZShop implements EZShopInterface {
         if (transaction != null && !transaction.getStatus().equals("PAID")) {
             mSaleTransactions.remove(transactionId);
             mAccountBook.remove(transaction.getBalanceId());
+            transaction.resetTemporaryQuantity();
             return true;
         }
         return false;
@@ -1052,6 +1051,9 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null && cash - transaction.getMoney() >= 0) {
             mAccountBook.setAsPaid(transaction.getBalanceId());
+
+            // Commit temporary quantities
+            transaction.commitAllTemporaryQuantity();
             return cash - transaction.getMoney();
         }
         return -1;
