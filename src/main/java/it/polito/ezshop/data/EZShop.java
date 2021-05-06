@@ -18,6 +18,7 @@ public class EZShop implements EZShopInterface {
     Map<Integer, SaleTransactionImpl> mSaleTransactions;
     User mLoggedUser;
     AccountBook mAccountBook;
+    CreditCardCircuit mCreditCardCircuit;
 
     public EZShop() {
         mUsers = new HashMap<>();
@@ -26,6 +27,7 @@ public class EZShop implements EZShopInterface {
         mSaleTransactions = new HashMap<>();
         mLoggedUser = null;
         mAccountBook = new AccountBook();
+        mCreditCardCircuit = new CreditCardCircuit();
     }
 
     /**
@@ -1050,8 +1052,44 @@ public class EZShop implements EZShopInterface {
         return -1;
     }
 
+    /**
+     * This method record the payment of a sale with credit card. If the card has not enough money the payment should
+     * be refused.
+     * The credit card number validity should be checked. It should follow the luhn algorithm.
+     * The credit card should be registered in the system.
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the sale that the customer wants to pay
+     * @param creditCard the credit card number of the customer
+     *
+     * @return  true if the operation is successful
+     *          false   if the sale does not exists,
+     *                  if the card has not enough money,
+     *                  if the card is not registered,
+     *                  if there is some problem with the db connection
+     *
+     * @throws InvalidTransactionIdException if the sale number is less than or equal to 0 or if it is null
+     * @throws InvalidCreditCardException if the credit card number is empty, null or if luhn algorithm does not
+     *                                      validate the credit card
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
-    public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
+    public boolean receiveCreditCardPayment(Integer transactionId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check transaction id
+        if(!mCreditCardCircuit.validateCreditCard(creditCard)) throw new InvalidCreditCardException();
+
+        // Pay transaction
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null) {
+            return mCreditCardCircuit.pay(creditCard, transaction.getMoney());
+        }
         return false;
     }
 
@@ -1059,6 +1097,7 @@ public class EZShop implements EZShopInterface {
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
         return 0;
     }
+
 
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
