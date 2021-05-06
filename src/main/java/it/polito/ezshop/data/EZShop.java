@@ -9,18 +9,21 @@ import java.util.regex.Pattern;
 
 public class EZShop implements EZShopInterface {
     // Map used to store the users, indexed by the user id
-    Map<Integer, User> mUsers;
+    Map<Integer, UserImpl> mUsers;
     // Map for the orders
-    Map<Integer, Order> mOrders;
+    Map<Integer, OrderImpl> mOrders;
     // Keep track of the logged user
-    Map<Integer, ProductType> mProducts;
-    User mLoggedUser;
+    Map<Integer, ProductTypeImpl> mProducts;
+    // Keep track of the logged user
+    Map<Integer, SaleTransactionImpl> mSaleTransactions;
+    UserImpl mLoggedUser;
     AccountBook mAccountBook;
 
     public EZShop() {
         mUsers = new HashMap<>();
         mOrders = new HashMap<>();
         mProducts = new HashMap<>();
+        mSaleTransactions = new HashMap<>();
         mLoggedUser = null;
         mAccountBook = new AccountBook();
     }
@@ -114,6 +117,10 @@ public class EZShop implements EZShopInterface {
         // Check if the user is logged
         validateLoggedUser("Administrator");
 
+        List<User> ret = new ArrayList<>();
+        for (UserImpl u: mUsers.values())
+            ret.add(u.clone());
+
         return new ArrayList<>(mUsers.values());
     }
 
@@ -135,7 +142,7 @@ public class EZShop implements EZShopInterface {
         }
 
         // Get the user given the id
-        return mUsers.get(id);
+        return mUsers.get(id).clone();
     }
 
     /**
@@ -191,12 +198,12 @@ public class EZShop implements EZShopInterface {
         }
 
         // Find user with the username and password that corresponds
-        for (User u : mUsers.values()) {
+        for (UserImpl u : mUsers.values()) {
             if (u.getPassword().equals(password) && u.getUsername().equals(username)) {
                 mLoggedUser = u;
             }
         }
-        return mLoggedUser;
+        return mLoggedUser.clone();
     }
 
     /**
@@ -218,18 +225,16 @@ public class EZShop implements EZShopInterface {
      * This method creates a product type and returns its unique identifier. It can be invoked only after a user with role "Administrator"
      * or "ShopManager" is logged in.
      *
-     * @param description the description of product to be created
+     * @param description  the description of product to be created
      * @param productCode  the unique barcode of the product
      * @param pricePerUnit the price per single unit of product
-     * @param note the notes on the product (if null an empty string should be saved as description)
-     *
+     * @param note         the notes on the product (if null an empty string should be saved as description)
      * @return The unique identifier of the new product type ( > 0 ).
-     *         -1 if there is an error while saving the product type or if it exists a product with the same barcode
-     *
+     * -1 if there is an error while saving the product type or if it exists a product with the same barcode
      * @throws InvalidProductDescriptionException if the product description is null or empty
-     * @throws InvalidProductCodeException if the product code is null or empty, if it is not a number or if it is not a valid barcode
-     * @throws InvalidPricePerUnitException if the price per unit si less than or equal to 0
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidProductCodeException        if the product code is null or empty, if it is not a number or if it is not a valid barcode
+     * @throws InvalidPricePerUnitException       if the price per unit si less than or equal to 0
+     * @throws UnauthorizedException              if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
@@ -262,21 +267,19 @@ public class EZShop implements EZShopInterface {
      * This method updates the product id with given barcode and id. It can be invoked only after a user with role "Administrator"
      * or "ShopManager" is logged in.
      *
-     * @param id the type of product to be updated
+     * @param id             the type of product to be updated
      * @param newDescription the new product type
-     * @param newCode the new product code
-     * @param newPrice the new product price
-     * @param newNote the new product notes
-     *
-     * @return  true if the update is successful
-     *          false if the update is not successful (no products with given product id or another product already has
-     *              the same barcode)
-     *
-     * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
+     * @param newCode        the new product code
+     * @param newPrice       the new product price
+     * @param newNote        the new product notes
+     * @return true if the update is successful
+     * false if the update is not successful (no products with given product id or another product already has
+     * the same barcode)
+     * @throws InvalidProductIdException          if the product id is less than or equal to 0 or if it is null
      * @throws InvalidProductDescriptionException if the product description is null or empty
-     * @throws InvalidProductCodeException if the product code is null or empty, if it is not a number or if it is not a valid barcode
-     * @throws InvalidPricePerUnitException if the price per unit si less than or equal to 0
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidProductCodeException        if the product code is null or empty, if it is not a number or if it is not a valid barcode
+     * @throws InvalidPricePerUnitException       if the price per unit si less than or equal to 0
+     * @throws UnauthorizedException              if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
@@ -284,10 +287,10 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check product id
-        if(id == null || id <= 0) throw new InvalidProductIdException();
+        if (id == null || id <= 0) throw new InvalidProductIdException();
 
         // Check description
-        if(newDescription == null || newDescription.isEmpty()) throw new InvalidProductDescriptionException();
+        if (newDescription == null || newDescription.isEmpty()) throw new InvalidProductDescriptionException();
 
         // Check barcode
         validateBarcode(newCode);
@@ -297,7 +300,7 @@ public class EZShop implements EZShopInterface {
 
         // Update product information
         ProductType product = mProducts.get(id);
-        if (product != null){
+        if (product != null) {
             product.setProductDescription(newDescription);
             product.setBarCode(newCode);
             product.setPricePerUnit(newPrice);
@@ -312,11 +315,9 @@ public class EZShop implements EZShopInterface {
      * or "ShopManager" is logged in.
      *
      * @param id the id of the product to be deleted
-     *
      * @return true if the product was deleted, false otherwise
-     *
      * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws UnauthorizedException     if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
@@ -324,7 +325,7 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check product id
-        if(id == null || id <= 0) throw new InvalidProductIdException();
+        if (id == null || id <= 0) throw new InvalidProductIdException();
 
         ProductType removed = mProducts.remove(id);
         return removed != null;
@@ -335,14 +336,18 @@ public class EZShop implements EZShopInterface {
      * "ShopManager" or "Cashier" is logged in.
      *
      * @return a list containing all saved product types
-     *
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
         // Check logged user
         validateLoggedUser("Cashier");
-        return new ArrayList<>(mProducts.values());
+
+        List<ProductType> ret = new ArrayList<>();
+        for(ProductTypeImpl p : mProducts.values())
+            ret.add(p.clone());
+
+        return ret;
     }
 
     /**
@@ -350,25 +355,16 @@ public class EZShop implements EZShopInterface {
      * or "ShopManager" is logged in.
      *
      * @param barCode the unique barCode of a product
-     *
      * @return the product type with given barCode if present, null otherwise
-     *
      * @throws InvalidProductCodeException if barCode is not a valid bar code, if is it empty or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws UnauthorizedException       if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
         // Check logged user
         validateLoggedUser("ShopManager");
 
-        // Check barcode
-        validateBarcode(barCode);
-
-        for (ProductType p: mProducts.values()) {
-            if (p.getBarCode().equals(barCode))
-                return p;
-        }
-        return null;
+        return getProductTypeImplByBarCode(barCode).clone();
     }
 
     /**
@@ -377,9 +373,7 @@ public class EZShop implements EZShopInterface {
      *
      * @param description the description (or part of it) of the products we are searching for.
      *                    Null should be considered as the empty string.
-     *
      * @return a list of products containing the requested string in their description
-     *
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
@@ -388,13 +382,13 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check if description is empty
-        if(description == null || description.isEmpty()) return new ArrayList<>(mProducts.values());
+        if (description == null || description.isEmpty()) return new ArrayList<>(mProducts.values());
 
         // Filter by description
         List<ProductType> filtered = new ArrayList<>();
-        for (ProductType p: mProducts.values()) {
-            if(p.getProductDescription().contains(description))
-                filtered.add(p);
+        for (ProductTypeImpl p : mProducts.values()) {
+            if (p.getProductDescription().contains(description))
+                filtered.add(p.clone());
         }
 
         return filtered;
@@ -407,13 +401,11 @@ public class EZShop implements EZShopInterface {
      *
      * @param productId the id of the product to be updated
      * @param toBeAdded the quantity to be added. If negative it decrease the available quantity of <toBeAdded> elements.
-     *
-     * @return  true if the update was successful
-     *          false if the product does not exists, if <toBeAdded> is negative and the resulting amount would be
-     *          negative too or if the product type has not an assigned location.
-     *
+     * @return true if the update was successful
+     * false if the product does not exists, if <toBeAdded> is negative and the resulting amount would be
+     * negative too or if the product type has not an assigned location.
      * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws UnauthorizedException     if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
@@ -421,11 +413,11 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check product id
-        if(productId == null || productId <= 0) throw new InvalidProductIdException();
+        if (productId == null || productId <= 0) throw new InvalidProductIdException();
 
         // Set the new quantity only if the product exists
         ProductType productType = mProducts.get(productId);
-        if(productType != null) {
+        if (productType != null) {
             if (productType.getLocation() == null || (toBeAdded < 0 && toBeAdded > productType.getQuantity()))
                 return false;
 
@@ -443,14 +435,12 @@ public class EZShop implements EZShopInterface {
      * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
      *
      * @param productId the id of the product to be updated
-     * @param newPos the new position the product should be placed to.
-     *
+     * @param newPos    the new position the product should be placed to.
      * @return true if the update was successful
-     *          false if the product does not exists or if <newPos> is already assigned to another product
-     *
+     * false if the product does not exists or if <newPos> is already assigned to another product
      * @throws InvalidProductIdException if the product id is less than or equal to 0 or if it is null
-     * @throws InvalidLocationException if the product location is in an invalid format (not <aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>)
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidLocationException  if the product location is in an invalid format (not <aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>)
+     * @throws UnauthorizedException     if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
@@ -458,20 +448,20 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check product id
-        if(productId == null || productId <= 0) throw new InvalidProductIdException();
+        if (productId == null || productId <= 0) throw new InvalidProductIdException();
 
         // Check position format
-        if(newPos == null || newPos.split("-").length != 3) throw new InvalidLocationException();
+        if (newPos == null || newPos.split("-").length != 3) throw new InvalidLocationException();
 
         // Check if the position is used by other products
-        for(ProductType p: mProducts.values()) {
-            if(p.getLocation() != null && p.getLocation().equals(newPos))
+        for (ProductType p : mProducts.values()) {
+            if (p.getLocation() != null && p.getLocation().equals(newPos))
                 return false;
         }
 
         // Set the new position only if the product exists
         ProductType productType = mProducts.get(productId);
-        if(productType != null) {
+        if (productType != null) {
             productType.setLocation(newPos);
             return true;
         }
@@ -572,7 +562,7 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-        if ( mAccountBook.checkIfEnoughMoney(-quantity * pricePerUnit) ) {
+        if (mAccountBook.checkIfEnoughMoney(-quantity * pricePerUnit)) {
             // Add a balance as paid for ORDER type
             int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "PAID", "ORDER");
             // Add the order to the system
@@ -608,7 +598,7 @@ public class EZShop implements EZShopInterface {
         Order order = mOrders.get(orderId);
         if (order != null && order.getStatus().equals("ISSUED")) {
             // Check if balance would be negative
-            if ( mAccountBook.checkIfEnoughMoney(-order.getQuantity()*order.getPricePerUnit()) ) {
+            if (mAccountBook.checkIfEnoughMoney(-order.getQuantity() * order.getPricePerUnit())) {
                 mAccountBook.setAsPaid(order.getBalanceId());
                 order.setStatus("PAYED");
                 return true;
@@ -661,7 +651,10 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        return new ArrayList<>(mOrders.values());
+        List<Order> orders = new ArrayList<>();
+        for(OrderImpl o: mOrders.values())
+            orders.add(o.clone());
+        return orders;
     }
 
     @Override
@@ -704,48 +697,306 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    /**
+     * This method starts a new sale transaction and returns its unique identifier.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @return the id of the transaction (greater than or equal to 0)
+     */
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
-        return 1;
+        // Checked logged user
+        validateLoggedUser("Cashier");
+
+        // Get last id in the system
+        int newId = 0;
+        for (Integer id : mSaleTransactions.keySet()) {
+            if (id > newId) {
+                newId = id;
+            }
+        }
+
+        // Create the new sale
+        SaleTransactionImpl operation = new SaleTransactionImpl(++newId);
+        mSaleTransactions.put(
+                newId,
+                operation
+        );
+
+        return newId;
     }
 
+    /**
+     * This method adds a product to a sale transaction decreasing the temporary amount of product available on the
+     * shelves for other customers.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param productCode   the barcode of the product to be added
+     * @param amount        the quantity of product to be added
+     * @return true if the operation is successful
+     * false   if the product code does not exist,
+     * if the quantity of product cannot satisfy the request,
+     * if the transaction id does not identify a started and open transaction.
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidProductCodeException   if the product code is empty, null or invalid
+     * @throws InvalidQuantityException      if the quantity is less than 0
+     * @throws UnauthorizedException         if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check quantity
+        if (amount < 0) throw new InvalidQuantityException();
+
+        // Add the product to sale
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null) {
+            return transaction.addProductToSale(getProductTypeImplByBarCode(productCode), amount);
+        }
+
         return false;
     }
 
+    /**
+     * This method deletes a product from a sale transaction increasing the temporary amount of product available on the
+     * shelves for other customers.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param productCode the barcode of the product to be deleted
+     * @param amount the quantity of product to be deleted
+     *
+     * @return  true if the operation is successful
+     *          false   if the product code does not exist,
+     *                  if the quantity of product cannot satisfy the request,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidProductCodeException if the product code is empty, null or invalid
+     * @throws InvalidQuantityException if the quantity is less than 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check quantity
+        if (amount < 0) throw new InvalidQuantityException();
+
+        // Add the product to sale
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null) {
+            return transaction.removeProductFromSale(getProductTypeImplByBarCode(productCode), amount);
+        }
+
         return false;
     }
 
+    /**
+     * This method applies a discount rate to all units of a product type with given type in a sale transaction. The
+     * discount rate should be greater than or equal to 0 and less than 1.
+     * The sale transaction should be started and open.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param productCode the barcode of the product to be discounted
+     * @param discountRate the discount rate of the product
+     *
+     * @return  true if the operation is successful
+     *          false   if the product code does not exist,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidProductCodeException if the product code is empty, null or invalid
+     * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check discount rate
+        if(discountRate < 0.0 || discountRate > 1.0) throw new InvalidDiscountRateException();
+
+        // Set discount rate to product on sale
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null) {
+            return transaction.applyDiscountRateToProduct(getProductTypeByBarCode(productCode), discountRate);
+        }
         return false;
     }
 
+    /**
+     * This method applies a discount rate to the whole sale transaction.
+     * The discount rate should be greater than or equal to 0 and less than 1.
+     * The sale transaction can be either started or closed but not already payed.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param discountRate the discount rate of the sale
+     *
+     * @return  true if the operation is successful
+     *          false if the transaction does not exists
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check discount rate
+        if(discountRate < 0.0 || discountRate > 1.0) throw new InvalidDiscountRateException();
+
+        // Set discount rate to sale
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null) {
+            transaction.setDiscountRate(discountRate);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method returns the number of points granted by a specific sale transaction.
+     * Every 10€ the number of points is increased by 1 (i.e. 19.99€ returns 1 point, 20.00€ returns 2 points).
+     * If the transaction with given id does not exist then the number of points returned should be -1.
+     * The transaction may be in any state (open, closed, payed).
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     *
+     * @return the points of the sale (1 point for each 10€) or -1 if the transaction does not exists
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        return 0;
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Get points
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null) {
+            return transaction.computePointsForSale();
+        }
+        return -1;
     }
 
+    /**
+     * This method closes an opened transaction. After this operation the
+     * transaction is persisted in the system's memory.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     *
+     * @return  true    if the transaction was successfully closed
+     *          false   if the transaction does not exist,
+     *                  if it has already been closed,
+     *                  if there was a problem in registering the data
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Close transaction
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null && transaction.getTransactionStatus().equals("OPENED")) {
+            transaction.setTransactionStatus("CLOSED");
+            transaction.setBalanceId(mAccountBook.getLastId() + 1);
+            // Commit temporary quantities
+            transaction.commitAllTemporaryQuantity();
+            mAccountBook.add(transaction);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method deletes a sale transaction with given unique identifier from the system's data store.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the transaction to be deleted
+     *
+     * @return  true if the transaction has been successfully deleted,
+     *          false   if the transaction doesn't exist,
+     *                  if it has been payed,
+     *                  if there are some problems with the db
+     *
+     * @throws InvalidTransactionIdException if the transaction id number is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
-    public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
+    public boolean deleteSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Delete transaction
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null && !transaction.getStatus().equals("PAID")) {
+            mSaleTransactions.remove(transactionId);
+            mAccountBook.remove(transaction.getBalanceId());
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method returns  a closed sale transaction.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the CLOSED Sale transaction
+     *
+     * @return the transaction if it is available (transaction closed), null otherwise
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        SaleTransactionImpl saleTransaction = mSaleTransactions.get(transactionId);
+        if(saleTransaction != null && saleTransaction.getTransactionStatus().equals("CLOSED")){
+            return saleTransaction;
+        }
         return null;
     }
 
@@ -769,9 +1020,41 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    /**
+     * This method record the payment of a sale transaction with cash and returns the change (if present).
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the transaction that the customer wants to pay
+     * @param cash the cash received by the cashier
+     *
+     * @return the change (cash - sale price)
+     *         -1   if the sale does not exists,
+     *              if the cash is not enough,
+     *              if there is some problemi with the db
+     *
+     * @throws InvalidTransactionIdException if the  number is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidPaymentException if the cash is less than or equal to 0
+     */
     @Override
-    public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
-        return 0;
+    public double receiveCashPayment(Integer transactionId, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check transaction id
+        if (cash <= 0) throw new InvalidPaymentException();
+
+        // Pay transaction
+        SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
+        if (transaction != null && cash - transaction.getMoney() >= 0) {
+            mAccountBook.setAsPaid(transaction.getBalanceId());
+            return cash - transaction.getMoney();
+        }
+        return -1;
     }
 
     @Override
@@ -807,7 +1090,7 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("ShopManager");
 
         // Check if balance would be negative
-        if ( mAccountBook.checkIfEnoughMoney(toBeAdded) ) {
+        if (mAccountBook.checkIfEnoughMoney(toBeAdded)) {
             // Record the balance update
             mAccountBook.recordBalanceUpdate(toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
 
@@ -855,18 +1138,22 @@ public class EZShop implements EZShopInterface {
 
     /**
      * This method check if the user has the minumum right expressed as paramenter for this method.
+     *
      * @param minRight Cashier or ShopManager or Administrator
      * @throws UnauthorizedException if the user is not logged or if the rights are not correct for the
-     * r                             requested operation
+     *                               r                             requested operation
      */
     private void validateLoggedUser(String minRight) throws UnauthorizedException {
-        if (mLoggedUser == null ) throw new UnauthorizedException();
-        else if (mLoggedUser.getRole().equals("ShopManager") && minRight.equals("Administrator")) throw new UnauthorizedException();
-        else if(!mLoggedUser.getRole().equals("Administrator") && minRight.equals("Administrator")) throw new UnauthorizedException();
+        if (mLoggedUser == null) throw new UnauthorizedException();
+        else if (mLoggedUser.getRole().equals("ShopManager") && minRight.equals("Administrator"))
+            throw new UnauthorizedException();
+        else if (!mLoggedUser.getRole().equals("Administrator") && minRight.equals("Administrator"))
+            throw new UnauthorizedException();
     }
 
     /**
      * Method used to validate the barcode, base on 12, 13 and 14 digits
+     *
      * @param productCode 12, 13 or 14 digits that represents the
      * @throws InvalidProductCodeException if the code is not compliant with the standard
      */
@@ -887,5 +1174,16 @@ public class EZShop implements EZShopInterface {
         }
         int check = (10 - (sum % 10)) % 10;
         if (check != Integer.parseInt(String.valueOf(productCode.charAt(13)))) throw new InvalidProductCodeException();
+    }
+
+    private ProductTypeImpl getProductTypeImplByBarCode(String barCode) throws InvalidProductCodeException {
+        // Check barcode
+        validateBarcode(barCode);
+
+        for (ProductTypeImpl p : mProducts.values()) {
+            if (p.getBarCode().equals(barCode))
+                return p;
+        }
+        return null;
     }
 }

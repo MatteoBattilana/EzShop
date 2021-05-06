@@ -18,9 +18,10 @@ public class AccountBook {
     }
 
     public int recordBalanceUpdate(double toBeAdded, String status, String type) {
-        BalanceOperationImpl operation = new BalanceOperationImpl(++mCurrentId, LocalDate.now(), toBeAdded, type, status);
+        int lastId = getLastId() + 1;
+        BalanceOperationImpl operation = new BalanceOperationImpl(lastId, LocalDate.now(), toBeAdded, type, status);
         mBalanceOperations.put(
-                mCurrentId,
+                lastId,
                 operation
         );
 
@@ -69,5 +70,20 @@ public class AccountBook {
 
     public boolean checkIfEnoughMoney(double toBeAdded) {
         return computeBalance() + toBeAdded >= 0;
+    }
+
+    int getLastId() {
+        int newIdBalance = 0;
+        for (Integer id : mBalanceOperations.keySet()) {
+            if (id > newIdBalance) {
+                newIdBalance = id;
+            }
+        }
+        return newIdBalance;
+    }
+
+    public void remove(int balanceId) {
+        if (balanceId > 0)
+            mBalanceOperations.remove(balanceId);
     }
 }

@@ -17,6 +17,10 @@ public class BalanceOperationImpl implements BalanceOperation {
         this.mStatus = status;
     }
 
+    public BalanceOperationImpl(int mBalanceId, LocalDate mDate, String mType, String status) {
+        this(mBalanceId, mDate, 0, mType, status);
+    }
+
     public void setStatus(String status){
         this.mStatus = status;
     }

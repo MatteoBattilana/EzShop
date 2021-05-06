@@ -60,4 +60,13 @@ public class UserImpl implements User {
             mRole = role;
         }
     }
+
+    public User clone(){
+        return new UserImpl(
+                mId,
+                mUsername,
+                mPassword,
+                mRole
+        );
+    }
 }

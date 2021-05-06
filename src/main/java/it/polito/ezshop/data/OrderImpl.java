@@ -76,4 +76,9 @@ public class OrderImpl implements Order {
     public void setOrderId(Integer orderId) {
         mOrderId = orderId;
     }
+
+    public Order clone()
+    {
+        return new OrderImpl(mBalanceId, mProductCode, mPricePerUnit, mQuantity, mStatus, mOrderId);
+    }
 }
