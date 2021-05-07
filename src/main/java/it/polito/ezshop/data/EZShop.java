@@ -4,7 +4,6 @@ import it.polito.ezshop.exceptions.*;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.regex.Pattern;
 
 
 public class EZShop implements EZShopInterface {
@@ -16,6 +15,7 @@ public class EZShop implements EZShopInterface {
     Map<Integer, ProductTypeImpl> mProducts;
     // Keep track of the logged user
     Map<Integer, SaleTransactionImpl> mSaleTransactions;
+    int mSaleReturnId;
     User mLoggedUser;
     AccountBook mAccountBook;
     CreditCardCircuit mCreditCardCircuit;
@@ -26,6 +26,7 @@ public class EZShop implements EZShopInterface {
         mProducts = new HashMap<>();
         mSaleTransactions = new HashMap<>();
         mLoggedUser = null;
+        mSaleReturnId = 0;
         mAccountBook = new AccountBook();
         mCreditCardCircuit = new CreditCardCircuit();
     }
@@ -989,28 +990,160 @@ public class EZShop implements EZShopInterface {
 
         SaleTransactionImpl saleTransaction = mSaleTransactions.get(transactionId);
         if(saleTransaction != null && saleTransaction.getTransactionStatus().equals("CLOSED")){
-            return saleTransaction;
+            return saleTransaction.clone();
         }
         return null;
     }
 
-    @Override
-    public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
-        return 1;
+    /**
+     * This method starts a new return transaction for units of products that have already been sold and payed.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the transaction
+     *
+     * @return the id of the return transaction (>= 0), -1 if the transaction is not available.
+     *
+     * @throws InvalidTransactionIdException if the transactionId  is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
+    public Integer startReturnTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException{
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Start return transaction and add it to AccountBook
+        SaleTransactionImpl saleTransaction = mSaleTransactions.get(transactionId);
+        if(saleTransaction != null) {
+            ReturnTransaction returnTransaction = saleTransaction.startReturnTransaction(++mSaleReturnId, mAccountBook.getLastId() + 1);
+            mAccountBook.add(returnTransaction);
+            return returnTransaction.getId();
+        }
+
+        return -1;
     }
 
+    /**
+     * This method adds a product to the return transaction
+     * The amount of units of product to be returned should not exceed the amount originally sold.
+     * This method DOES NOT update the product quantity
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param returnId the id of the return transaction
+     * @param productCode the bar code of the product to be returned
+     * @param amount the amount of product to be returned
+     *
+     * @return  true if the operation is successful
+     *          false   if the the product to be returned does not exists,
+     *                  if it was not in the transaction,
+     *                  if the amount is higher than the one in the sale transaction,
+     *                  if the transaction does not exist
+     *
+     * @throws InvalidTransactionIdException if the return id is less ther or equal to 0 or if it is null
+     * @throws InvalidProductCodeException if the product code is empty, null or invalid
+     * @throws InvalidQuantityException if the quantity is less than or equal to 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        // Check amount
+        if(amount <= 0) throw new InvalidQuantityException();
+
+        // Check that the sold quantity is less than the returned one
+        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+
+        //
+        ProductTypeImpl prod = getProductTypeImplByBarCode(productCode);
+        if(prod != null && sale != null){
+            return sale.setReturnProduct(returnId, prod, amount);
+        }
         return false;
     }
 
+    /**
+     * This method closes a return transaction. A closed return transaction can be committed (i.e. <commit> = true) thus
+     * it increases the product quantity available on the shelves or not (i.e. <commit> = false) thus the whole trasaction
+     * is undone.
+     * This method updates the transaction status (decreasing the number of units sold by the number of returned one and
+     * decreasing the final price).
+     * If committed, the return transaction must be persisted in the system's memory.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param returnId the id of the transaction
+     * @param commit whether we want to commit (True) or rollback(false) the transaction
+     *
+     * @return  true if the operation is successful
+     *          false   if the returnId does not correspond to an active return transaction,
+     *                  if there is some problem with the db
+     *
+     * @throws InvalidTransactionIdException if returnId is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        // Check that the sold quantity is less than the returned one
+        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+
+        // Commit transaction
+        if(sale != null) {
+            if (commit) {
+                return sale.commitReturnTransaction(returnId);
+            }
+            else {
+                BalanceOperation returnTransaction = sale.deleteReturnTransaction(returnId);
+                mAccountBook.remove(returnTransaction.getBalanceId());
+                return true;
+            }
+        }
+
         return false;
     }
 
+    /**
+     * This method deletes a closed return transaction. It affects the quantity of product sold in the connected sale transaction
+     * (and consequently its price) and the quantity of product available on the shelves.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param returnId the identifier of the return transaction to be deleted
+     *
+     * @return  true if the transaction has been successfully deleted,
+     *          false   if it doesn't exist,
+     *                  if it has been payed,
+     *                  if there are some problems with the db
+     *
+     * @throws InvalidTransactionIdException if the transaction id is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        // Check that the sold quantity is less than the returned one
+        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+
+        // Delete return transaction
+        if(sale != null) {
+            BalanceOperation returnTransaction = sale.deleteReturnTransaction(returnId);
+            mAccountBook.remove(returnTransaction.getBalanceId());
+            return true;
+        }
         return false;
     }
 
@@ -1093,15 +1226,79 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    /**
+     * This method record the payment of a closed return transaction with given id. The return value of this method is the
+     * amount of money to be returned.
+     * This method affects the balance of the application.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param returnId the id of the return transaction
+     *
+     * @return  the money returned to the customer
+     *          -1  if the return transaction is not ended,
+     *              if it does not exist,
+     *              if there is a problem with the db
+     *
+     * @throws InvalidTransactionIdException if the return id is less than or equal to 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return 0;
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        // Check that the sold quantity is less than the returned one
+        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        if(sale != null) {
+            ReturnTransaction returnT = sale.getReturnById(returnId);
+            double ret = sale.getReturnTransactionTotal(returnId);
+            mAccountBook.setAsPaid(returnT.getBalanceId());
+            return ret;
+        }
+        return -1;
     }
 
-
+    /**
+     * This method record the payment of a return transaction to a credit card.
+     * The credit card number validity should be checked. It should follow the luhn algorithm.
+     * The credit card should be registered and its balance will be affected.
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param returnId the id of the return transaction
+     * @param creditCard the credit card number of the customer
+     *
+     * @return  the money returned to the customer
+     *          -1  if the return transaction is not ended,
+     *              if it does not exist,
+     *              if the card is not registered,
+     *              if there is a problem with the db
+     *
+     * @throws InvalidTransactionIdException if the return id is less than or equal to 0
+     * @throws InvalidCreditCardException if the credit card number is empty, null or if luhn algorithm does not
+     *                                      validate the credit card
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return 0;
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        // Check transaction id
+        if(!mCreditCardCircuit.validateCreditCard(creditCard)) throw new InvalidCreditCardException();
+
+        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        if(mCreditCardCircuit.isValid(creditCard) && sale != null) {
+            mAccountBook.setAsPaid(returnId);
+            return sale.getReturnTransactionTotal(returnId);
+        }
+        return -1;
     }
 
     /**
@@ -1215,6 +1412,15 @@ public class EZShop implements EZShopInterface {
         for (ProductTypeImpl p : mProducts.values()) {
             if (p.getBarCode().equals(barCode))
                 return p;
+        }
+        return null;
+    }
+
+    private SaleTransactionImpl getSaleTranasctionByReturnTtransactinoId(int id) {
+        for (SaleTransactionImpl sale : mSaleTransactions.values()){
+            ReturnTransaction ret = sale.getReturnById(id);
+            if(ret != null)
+                return sale;
         }
         return null;
     }

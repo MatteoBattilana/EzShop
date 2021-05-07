@@ -11,6 +11,13 @@ public class TransactionProduct implements TicketEntry {
         this.discount = 0;
     }
 
+    public TransactionProduct clone() {
+        TransactionProduct t = new TransactionProduct(productType.clone(), quantity);
+        t.setDiscountRate(discount);
+        return t;
+    }
+
+
     @Override
     public String getBarCode() {
         return productType.getBarCode();

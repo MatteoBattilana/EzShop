@@ -9,16 +9,54 @@ import java.util.Map;
 public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTransaction {
     private int mTicketNumer;
     private Map<ProductTypeImpl, TransactionProduct> mTicketEntries;
+    private Map<Integer, ReturnTransaction> mReturns;
     private double mDiscountRate;
     private String mTransactionStatus;
+
+    public SaleTransaction clone() {
+        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(mTicketNumer);
+        saleTransaction.setDiscountRate(mDiscountRate);
+        saleTransaction.setTransactionStatus(mTransactionStatus);
+
+        Map<ProductTypeImpl, TransactionProduct> map = new HashMap<>();
+        for (Map.Entry<ProductTypeImpl, TransactionProduct> entry : mTicketEntries.entrySet()) {
+            map.put(entry.getKey().clone(), entry.getValue().clone());
+        }
+        saleTransaction.setTransactionProductMap(map);
+        return saleTransaction;
+    }
+
+    public void setTransactionProductMap (Map<ProductTypeImpl, TransactionProduct> map) {
+        mTicketEntries = map;
+    }
+
 
     public SaleTransactionImpl(int mTicketNumber) {
         super(-1, LocalDate.now(), "SALE", "UNPAID");
         this.mTicketNumer = mTicketNumber;
         mTicketEntries = new HashMap<>();
+        mReturns = new HashMap<>();
         mDiscountRate = 0.0;
         mDate = LocalDate.now();
         mTransactionStatus = "OPENED";
+    }
+
+    public ReturnTransaction startReturnTransaction(int id, int balanceId) {
+        ReturnTransaction returnT = new ReturnTransaction(id, balanceId);
+        mReturns.put(id, returnT);
+        return returnT;
+    }
+
+    public boolean setReturnProduct(Integer returnId, ProductTypeImpl prod, int amount) {
+        TransactionProduct soldP = mTicketEntries.get(prod);
+        if(soldP != null && soldP.getAmount() >= amount) {
+            ReturnTransaction returnTransaction = mReturns.get(returnId);
+            if(returnTransaction != null) {
+                returnTransaction.setProduct(prod, amount);
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getTransactionStatus() {
@@ -155,5 +193,45 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         for (Map.Entry<ProductTypeImpl, TransactionProduct> entry:  mTicketEntries.entrySet()) {
             entry.getKey().setQuantity(entry.getKey().getQuantity() + entry.getValue().getAmount());
         }
+    }
+
+    public ReturnTransaction getReturnById(int id) {
+        return mReturns.get(id);
+    }
+
+    public boolean commitReturnTransaction(Integer returnId) {
+        ReturnTransaction returnTransaction = mReturns.get(returnId);
+        if(returnTransaction != null) {
+            ProductTypeImpl product = returnTransaction.getProduct();
+            TransactionProduct originalSale = mTicketEntries.get(product);
+            if(product != null){
+                product.setQuantity(product.getQuantity() + returnTransaction.getAmount());
+                originalSale.setAmount(originalSale.getAmount() - returnTransaction.getAmount());
+                returnTransaction.setCommited(true);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public BalanceOperation deleteReturnTransaction(Integer returnId) {
+        ReturnTransaction returnTransaction = mReturns.get(returnId);
+        if(returnTransaction != null && !returnTransaction.getStatus().equals("PAID")) {
+            ProductTypeImpl product = returnTransaction.getProduct();
+            if(product != null && returnTransaction.isCommited()){
+                product.setQuantity(product.getQuantity() + returnTransaction.getAmount());
+            }
+        }
+        return returnTransaction;
+    }
+
+    public double getReturnTransactionTotal(Integer returnId) {
+        ReturnTransaction retT = mReturns.get(returnId);
+        if(retT != null && retT.isCommited() && retT.getStatus().equals("UNPAID")){
+            return retT.computeTotal();
+        }
+
+        return -1;
     }
 }

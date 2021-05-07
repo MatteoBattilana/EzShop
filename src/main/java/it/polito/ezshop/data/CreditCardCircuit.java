@@ -27,6 +27,10 @@ public class CreditCardCircuit {
         return (nSum % 10 == 0);
     }
 
+    public boolean isValid(String creditCard){
+        return creditCardMoney.containsKey(creditCard);
+    }
+
     public boolean pay(String creditCard, double money) {
         if (creditCard == null || money < 0 || !creditCardMoney.containsKey(creditCard)) return false;
         double amount = creditCardMoney.get(creditCard);
