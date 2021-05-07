@@ -7,6 +7,7 @@ import java.util.*;
 
 
 public class EZShop implements EZShopInterface {
+    private DatabaseConnection mDatabaseConnection;
     // Map used to store the users, indexed by the user id
     Map<Integer, User> mUsers;
     // Map for the orders
@@ -21,7 +22,6 @@ public class EZShop implements EZShopInterface {
     CreditCardCircuit mCreditCardCircuit;
 
     public EZShop() {
-        mUsers = new HashMap<>();
         mOrders = new HashMap<>();
         mProducts = new HashMap<>();
         mSaleTransactions = new HashMap<>();
@@ -29,6 +29,8 @@ public class EZShop implements EZShopInterface {
         mSaleReturnId = 0;
         mAccountBook = new AccountBook();
         mCreditCardCircuit = new CreditCardCircuit();
+        mDatabaseConnection = new DatabaseConnection();
+        loadFromDb();
     }
 
     /**
@@ -78,10 +80,15 @@ public class EZShop implements EZShopInterface {
                 newId = user.getId();
         }
 
+        // Create user
+        User user = new UserImpl(++newId, username, password, role);
         mUsers.put(
-                ++newId,
-                new UserImpl(newId, username, password, role)
+                newId,
+                user
         );
+
+        // Save into DB
+        mDatabaseConnection.createUser(user);
         return newId;
     }
 
@@ -105,6 +112,10 @@ public class EZShop implements EZShopInterface {
 
         // Try to remove the user
         User user = mUsers.remove(id);
+
+        // Delete from DB
+        mDatabaseConnection.deleteUser(user);
+
         return user != null;
     }
 
@@ -172,6 +183,9 @@ public class EZShop implements EZShopInterface {
         User user = mUsers.get(id);
         if (user != null) {
             user.setRole(role);
+
+            // Update user
+            mDatabaseConnection.updateUser(user);
             return true;
         }
         return false;
@@ -1423,5 +1437,9 @@ public class EZShop implements EZShopInterface {
                 return sale;
         }
         return null;
+    }
+
+    private void loadFromDb() {
+        mUsers = mDatabaseConnection.getAllUsers();
     }
 }
