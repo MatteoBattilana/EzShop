@@ -269,11 +269,13 @@ public class EZShop implements EZShopInterface {
             if (id > newId)
                 newId = id;
 
-        mProducts.put(
-                ++newId,
-                new ProductTypeImpl(0, null, note == null ? "" : note, description, productCode, pricePerUnit, newId)
-        );
-        return newId;
+        ProductTypeImpl newProduct = new ProductTypeImpl(0, null, note == null ? "" : note, description, productCode, pricePerUnit, ++newId);
+        if(mDatabaseConnection.createProductType(newProduct)) {
+            mProducts.put(newProduct.getId(), newProduct);
+            return newProduct.getId();
+        }
+
+        return -1;
     }
 
     /**
@@ -312,13 +314,13 @@ public class EZShop implements EZShopInterface {
         if (newPrice <= 0) throw new InvalidPricePerUnitException();
 
         // Update product information
-        ProductType product = mProducts.get(id);
+        ProductTypeImpl product = mProducts.get(id);
         if (product != null) {
             product.setProductDescription(newDescription);
             product.setBarCode(newCode);
             product.setPricePerUnit(newPrice);
             product.setNote(newNote);
-            return true;
+            return mDatabaseConnection.updateProductType(product);
         }
         return false;
     }
@@ -340,8 +342,12 @@ public class EZShop implements EZShopInterface {
         // Check product id
         if (id == null || id <= 0) throw new InvalidProductIdException();
 
-        ProductType removed = mProducts.remove(id);
-        return removed != null;
+        ProductTypeImpl productType = mProducts.get(id);
+        if(productType != null && mDatabaseConnection.deleteProductType(productType)) {
+            mProducts.remove(id);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -429,13 +435,13 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId <= 0) throw new InvalidProductIdException();
 
         // Set the new quantity only if the product exists
-        ProductType productType = mProducts.get(productId);
+        ProductTypeImpl productType = mProducts.get(productId);
         if (productType != null) {
             if (productType.getLocation() == null || (toBeAdded < 0 && toBeAdded > productType.getQuantity()))
                 return false;
 
             productType.setQuantity(productType.getQuantity() + toBeAdded);
-            return true;
+            return mDatabaseConnection.updateProductType(productType);
         }
         return false;
     }
@@ -473,10 +479,10 @@ public class EZShop implements EZShopInterface {
         }
 
         // Set the new position only if the product exists
-        ProductType productType = mProducts.get(productId);
+        ProductTypeImpl productType = mProducts.get(productId);
         if (productType != null) {
             productType.setLocation(newPos);
-            return true;
+            return mDatabaseConnection.updateProductType(productType);
         }
         return false;
     }
@@ -1441,5 +1447,6 @@ public class EZShop implements EZShopInterface {
 
     private void loadFromDb() {
         mUsers = mDatabaseConnection.getAllUsers();
+        mProducts = mDatabaseConnection.getAllProducts();
     }
 }

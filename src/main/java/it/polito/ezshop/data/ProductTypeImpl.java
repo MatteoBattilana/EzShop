@@ -17,7 +17,6 @@ public class ProductTypeImpl implements ProductType {
         this.mBarcode = mBarcode;
         this.mPricePerUnit = mPricePerUnit;
         this.mId = mId;
-
     }
 
     @Override
