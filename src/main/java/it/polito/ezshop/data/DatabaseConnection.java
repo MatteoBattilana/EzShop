@@ -309,4 +309,154 @@ public class DatabaseConnection {
         }
         return false;
     }
+
+    public boolean createSaleTransaction(SaleTransactionImpl saleT) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("INSERT INTO sale_transaction(id, discount, transaction_status, date_op, money, type, status) VALUES(?,?,?,?,?,?,?)");
+                ps.setInt(1, saleT.getTicketNumber());
+                ps.setDouble(2, saleT.getDiscountRate());
+                ps.setString(3, saleT.getTransactionStatus());
+                ps.setDate(4, Date.valueOf(saleT.getDate()));
+                ps.setDouble(5, saleT.getMoney());
+                ps.setString(6, saleT.getType());
+                ps.setString(7, saleT.getStatus());
+                return ps.executeUpdate()>0;
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return false;
+        }
+
+    public Map<Integer, SaleTransactionImpl> getAllSaleTransaction(Map<Integer, ProductTypeImpl> mProducts) {
+        Map<Integer, SaleTransactionImpl> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM sale_transaction");
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                int saleId = resultSet.getInt("id");
+                all.put(
+                        resultSet.getInt("id"),
+                        new SaleTransactionImpl(
+                                resultSet.getInt("id"),
+                                new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
+                                resultSet.getString("type"),
+                                resultSet.getString("status"),
+                                getAllBySaleId(saleId, mProducts),
+                                getAllReturnTransaction(saleId, mProducts),
+                                resultSet.getDouble("discount"),
+                                resultSet.getString("transaction_status")
+                        )
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
+    }
+
+    private Map<ProductTypeImpl, TransactionProduct> getAllBySaleId(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
+        Map<ProductTypeImpl, TransactionProduct> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM transaction_product WHERE id_sale = ?");
+            ps.setInt(1, saleTransactionId);
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
+                all.put(
+                        product,
+                        new TransactionProduct(
+                                product,
+                                resultSet.getDouble("discount"),
+                                resultSet.getInt("quantity")
+                        )
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
+    }
+
+    private Map<Integer, ReturnTransaction> getAllReturnTransaction(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
+        Map<Integer, ReturnTransaction> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM return_transaction WHERE id_sale = ?");
+            ps.setInt(1, saleTransactionId);
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
+                all.put(
+                        resultSet.getInt("id"),
+                        new ReturnTransaction(
+                            resultSet.getInt("id"),
+                                new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
+                                resultSet.getString("type"),
+                                resultSet.getString("status"),
+                                resultSet.getBoolean("committed"),
+                                resultSet.getInt("amount"),
+                                product
+                                )
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
+    }
+
+    public boolean addProductToSale(SaleTransactionImpl transaction, ProductTypeImpl product, int amount) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO transaction_product(id_sale, id_product, discount, quantity) VALUES(?,?,?,?)");
+            ps.setInt(1, transaction.getTicketNumber());
+            ps.setInt(2, product.getId());
+            ps.setDouble(3, 0.0);
+            ps.setInt(4, amount);
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private int getCurrentAmountInSale(SaleTransactionImpl transaction, ProductTypeImpl product) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT quantity FROM return_transaction WHERE id_sale = ? AND id_product = ?");
+            ps.setInt(1, transaction.getTicketNumber());
+            ps.setInt(2, product.getId());
+
+            ResultSet resultSet = ps.executeQuery();
+            if(resultSet.next())
+                return resultSet.getInt("quantity");
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean deleteProductToSale(SaleTransactionImpl transaction, ProductTypeImpl product, int amount) {
+        int currentAmountInSale = getCurrentAmountInSale(transaction, product);
+        if (currentAmountInSale != -1 && currentAmountInSale >= amount) {
+            PreparedStatement ps;
+            if(currentAmountInSale - amount == 0){
+                ps = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
+                ps.setInt(1, transaction.getTicketNumber());
+                ps.setInt(2, product.getId());
+            }
+            else {
+                ps = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
+                ps.setInt(1, transaction.getTicketNumber());
+                ps.setInt(2, product.getId());
+            }
+        }
+
+    }
 }

@@ -5,14 +5,14 @@ public class TransactionProduct implements TicketEntry {
     int quantity;
     double discount;
 
-    public TransactionProduct(ProductTypeImpl productType, int quantity) {
+    public TransactionProduct(ProductTypeImpl productType, double discount, int quantity) {
         this.productType = productType;
         this.quantity = quantity;
-        this.discount = 0;
+        this.discount = discount;
     }
 
     public TransactionProduct clone() {
-        TransactionProduct t = new TransactionProduct(productType.clone(), quantity);
+        TransactionProduct t = new TransactionProduct(productType.clone(), discount, quantity);
         t.setDiscountRate(discount);
         return t;
     }

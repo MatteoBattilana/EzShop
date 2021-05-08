@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTransaction {
-    private int mTicketNumer;
     private Map<ProductTypeImpl, TransactionProduct> mTicketEntries;
     private Map<Integer, ReturnTransaction> mReturns;
     private double mDiscountRate;
     private String mTransactionStatus;
 
     public SaleTransaction clone() {
-        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(mTicketNumer);
+        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(getBalanceId());
         saleTransaction.setDiscountRate(mDiscountRate);
         saleTransaction.setTransactionStatus(mTransactionStatus);
 
@@ -30,20 +29,21 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         mTicketEntries = map;
     }
 
-
-    public SaleTransactionImpl(int mTicketNumber) {
-        super(-1, LocalDate.now(), "SALE", "UNPAID");
-        this.mTicketNumer = mTicketNumber;
-        mTicketEntries = new HashMap<>();
-        mReturns = new HashMap<>();
-        mDiscountRate = 0.0;
-        mDate = LocalDate.now();
-        mTransactionStatus = "OPENED";
+    public SaleTransactionImpl(int id, LocalDate date, String type, String status, Map<ProductTypeImpl, TransactionProduct> tickets, Map<Integer, ReturnTransaction> returns, double discount, String transactionStatus) {
+        super(id, date, type, status);
+        mTicketEntries = tickets;
+        mReturns = returns;
+        mDiscountRate = discount;
+        mTransactionStatus = transactionStatus;
     }
 
-    public ReturnTransaction startReturnTransaction(int id, int balanceId) {
-        ReturnTransaction returnT = new ReturnTransaction(id, balanceId);
-        mReturns.put(id, returnT);
+    public SaleTransactionImpl(int id) {
+        this(id, LocalDate.now(), "SALE", "UNPAID", new HashMap<>(), new HashMap<>(), 0.0, "OPENED");
+    }
+
+    public ReturnTransaction startReturnTransaction(int balanceId) {
+        ReturnTransaction returnT = new ReturnTransaction(balanceId);
+        mReturns.put(balanceId, returnT);
         return returnT;
     }
 
@@ -69,12 +69,12 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
 
     @Override
     public Integer getTicketNumber() {
-        return mTicketNumer;
+        return getBalanceId();
     }
 
     @Override
     public void setTicketNumber(Integer ticketNumber) {
-        mTicketNumer = ticketNumber;
+        setBalanceId(ticketNumber);
     }
 
     @Override
@@ -130,11 +130,12 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             TransactionProduct transactionProduct = mTicketEntries.get(product);
             if(transactionProduct != null) {
                 transactionProduct.setAmount(transactionProduct.getAmount() + amount);
+
             }
             else {
                 mTicketEntries.put(
                         product,
-                        new TransactionProduct(product, amount)
+                        new TransactionProduct(product, 0, amount)
                 );
             }
             product.setQuantity(product.getQuantity() - amount);

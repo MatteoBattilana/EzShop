@@ -3,21 +3,19 @@ package it.polito.ezshop.data;
 import java.time.LocalDate;
 
 public class ReturnTransaction extends BalanceOperationImpl {
-    private final int mId;
     private ProductTypeImpl mProduct;
     private int mAmount;
     private boolean mCommited;
 
-    public ReturnTransaction(int id, int balanceId) {
-        super(balanceId, LocalDate.now(), "RETURN", "UNPAID");
-        mId = id;
-        mCommited = false;
-        mAmount = 0;
-        mProduct = null;
+    public ReturnTransaction(int balanceId, LocalDate date, String type, String status, boolean commited, int amount, ProductTypeImpl product){
+        super(balanceId, date, type, status);
+        mCommited = commited;
+        mAmount = amount;
+        mProduct = product;
     }
 
-    public Integer getId() {
-        return mId;
+    public ReturnTransaction(int balanceId) {
+        this(balanceId, LocalDate.now(), "RETURN", "UNPAID", false, 0, null);
     }
 
     public void setCommited(boolean commited) {
@@ -41,13 +39,13 @@ public class ReturnTransaction extends BalanceOperationImpl {
         return mCommited;
     }
 
-    public double computeTotal(){
+    public double computeTotal() {
         return Math.abs(getMoney());
     }
 
     @Override
     public double getMoney() {
-        if(mProduct != null)
+        if (mProduct != null)
             return -mProduct.getPricePerUnit() * mAmount;
         else
             return 0;
