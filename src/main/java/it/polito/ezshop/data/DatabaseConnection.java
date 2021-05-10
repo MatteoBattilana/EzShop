@@ -183,7 +183,7 @@ public class DatabaseConnection {
     public boolean deleteOrder(OrderImpl order) {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM orders WHERE id = ?");
-            ps.setInt(0, order.getBalanceId());
+            ps.setInt(1, order.getBalanceId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -284,22 +284,22 @@ public class DatabaseConnection {
     }
 
     public boolean createSaleTransaction(SaleTransactionImpl saleT) {
-            try {
-                PreparedStatement ps = CON.prepareStatement("INSERT INTO sale_transaction(id, discount, transaction_status, date_op, money, type, status) VALUES(?,?,?,?,?,?,?)");
-                ps.setInt(1, saleT.getTicketNumber());
-                ps.setDouble(2, saleT.getDiscountRate());
-                ps.setString(3, saleT.getTransactionStatus());
-                ps.setDate(4, Date.valueOf(saleT.getDate()));
-                ps.setDouble(5, saleT.getMoney());
-                ps.setString(6, saleT.getType());
-                ps.setString(7, saleT.getStatus());
-                return ps.executeUpdate()>0;
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return false;
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO sale_transaction(id, discount, transaction_status, date_op, money, type, status) VALUES(?,?,?,?,?,?,?)");
+            ps.setInt(1, saleT.getTicketNumber());
+            ps.setDouble(2, saleT.getDiscountRate());
+            ps.setString(3, saleT.getTransactionStatus());
+            ps.setDate(4, Date.valueOf(saleT.getDate()));
+            ps.setDouble(5, saleT.getMoney());
+            ps.setString(6, saleT.getType());
+            ps.setString(7, saleT.getStatus());
+            return ps.executeUpdate()>0;
         }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 
     public Map<Integer, SaleTransactionImpl> getAllSaleTransaction(Map<Integer, ProductTypeImpl> mProducts) {
         Map<Integer, SaleTransactionImpl> all = new HashMap<>();
@@ -367,14 +367,14 @@ public class DatabaseConnection {
                 all.put(
                         resultSet.getInt("id"),
                         new ReturnTransaction(
-                            resultSet.getInt("id"),
+                                resultSet.getInt("id"),
                                 new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
                                 resultSet.getString("type"),
                                 resultSet.getString("status"),
                                 resultSet.getBoolean("committed"),
                                 resultSet.getInt("amount"),
                                 product
-                                )
+                        )
                 );
             }
         }
@@ -402,8 +402,8 @@ public class DatabaseConnection {
     public boolean saveSaleTransaction(SaleTransactionImpl saleT) {
         if(createSaleTransaction(saleT)) {
             for(TransactionProduct ticket: saleT.getTicketEntries()) {
-                    addProductToSale(saleT, ticket, ticket.getProductType().getId());
-                    updateProductType(ticket.getProductType());
+                addProductToSale(saleT, ticket, ticket.getProductType().getId());
+                updateProductType(ticket.getProductType());
             }
         }
         return true;
@@ -412,15 +412,14 @@ public class DatabaseConnection {
     public boolean deleteSaleTransaction(SaleTransactionImpl transaction) {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
-            ps.setInt(0, transaction.getTicketNumber());
+            ps.setInt(1, transaction.getTicketNumber());
             if(ps.executeUpdate()>0){
                 // Rollback product quantities
                 for (TransactionProduct tp: transaction.getTicketEntries()) {
-                    ProductTypeImpl productType = tp.getProductType();
-                    productType.setQuantity(productType.getQuantity() + tp.getAmount());
-                    updateProductType(productType);
+                    updateProductType(tp.getProductType());
                 }
             }
+            return true;
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -502,7 +501,7 @@ public class DatabaseConnection {
     public boolean deleteBalanceOperation(BalanceOperation op) {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM balance_operations WHERE id = ?");
-            ps.setInt(0, op.getBalanceId());
+            ps.setInt(1, op.getBalanceId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -537,7 +536,7 @@ public class DatabaseConnection {
     public boolean deleteReturnTransaction(ReturnTransaction transaction) {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM return_transaction WHERE id = ?");
-            ps.setInt(0, transaction.getBalanceId());
+            ps.setInt(1, transaction.getBalanceId());
             if(ps.executeUpdate()>0){
                 // Rollback product quantities
                 updateProductType(transaction.getProduct());
@@ -556,10 +555,11 @@ public class DatabaseConnection {
             ps.setDouble(2, returnT.getMoney());
             ps.setString(3, returnT.getType());
             ps.setString(4, returnT.getStatus());
-            ps.setInt(5, returnT.getAmount());
-            ps.setBoolean(6, returnT.isCommited());
-            ps.setInt(7, saleId);
-            ps.setInt(8, returnT.getBalanceId());
+            ps.setInt(5, returnT.getProduct().getId());
+            ps.setInt(6, returnT.getAmount());
+            ps.setBoolean(7, returnT.isCommited());
+            ps.setInt(8, saleId);
+            ps.setInt(9, returnT.getBalanceId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
