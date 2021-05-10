@@ -40,6 +40,8 @@ public class EZShop implements EZShopInterface {
         for (ProductTypeImpl product : mProducts.values()) {
             mDatabaseConnection.deleteProductType(product);
         }
+        mSaleTransactions.clear();
+        mOrders.clear();
         mProducts.clear();
     }
 

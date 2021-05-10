@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
  role text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE IF NOT EXISTS order_operation (
  id INTEGER,
  date_op DATE,
  status text NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS orders (
  price_per_unit DOUBLE
 );
 
-CREATE TABLE IF NOT EXISTS balance_operations (
+CREATE TABLE IF NOT EXISTS balance_operation (
  id INTEGER,
  date_op DATE,
  money DOUBLE,

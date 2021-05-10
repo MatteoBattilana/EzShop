@@ -75,6 +75,9 @@ public class AccountBook {
             else if(op instanceof BalanceOperationImpl) {
                 databaseConnection.deleteBalanceOperation(op);
             }
+            else if (op instanceof OrderImpl) {
+                databaseConnection.deleteOrder((OrderImpl) op);
+            }
         }
         mBalanceOperations = new HashMap<>();
         mBalance = 0.0;

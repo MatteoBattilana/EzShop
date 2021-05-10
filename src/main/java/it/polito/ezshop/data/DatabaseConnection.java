@@ -141,7 +141,7 @@ public class DatabaseConnection {
 
     public boolean createOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO orders(id, date_op, status, quantity, product_code, order_status, price_per_unit) VALUES(?,?,?,?,?,?,?)");
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO order_operation(id, date_op, status, quantity, product_code, order_status, price_per_unit) VALUES(?,?,?,?,?,?,?)");
             ps.setInt(1, o.getBalanceId());
             ps.setDate(2, Date.valueOf(o.getDate()));
             ps.setString(3, o.getStatus());
@@ -421,7 +421,7 @@ public class DatabaseConnection {
 
     public boolean saveBalanceOperation(BalanceOperationImpl operation) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance_operations(id, date_op, money, type, status) VALUES(?,?,?,?,?)");
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance_operation(id, date_op, money, type, status) VALUES(?,?,?,?,?)");
             ps.setInt(1, operation.getBalanceId());
             ps.setDate(2, Date.valueOf(operation.getDate()));
             ps.setDouble(3, operation.getMoney());
@@ -450,7 +450,7 @@ public class DatabaseConnection {
     public Map<Integer, BalanceOperationImpl> getAllBalanceOperations() {
         Map<Integer, BalanceOperationImpl> all = new HashMap<>();
         try {
-            PreparedStatement ps = CON.prepareStatement("SELECT * FROM balance_operations");
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM balance_operation");
 
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -474,7 +474,7 @@ public class DatabaseConnection {
 
     public boolean deleteBalanceOperation(BalanceOperation op) {
         try {
-            PreparedStatement ps = CON.prepareStatement("DELETE FROM balance_operations WHERE id = ?");
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM balance_operation WHERE id = ?");
             ps.setInt(1, op.getBalanceId());
             return ps.executeUpdate()>0;
         }
@@ -544,7 +544,7 @@ public class DatabaseConnection {
 
     public boolean updateOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE orders SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ? WHERE id = ?");
+            PreparedStatement ps = CON.prepareStatement("UPDATE order_operation SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ? WHERE id = ?");
             ps.setDate(1, Date.valueOf(o.getDate()));
             ps.setString(2, o.getStatus());
             ps.setInt(3, o.getQuantity());
@@ -563,7 +563,7 @@ public class DatabaseConnection {
     public Map<Integer, OrderImpl> getAllOrders() {
         Map<Integer, OrderImpl> all = new HashMap<>();
         try {
-            PreparedStatement ps = CON.prepareStatement("SELECT * FROM orders");
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM order_operation");
 
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -585,5 +585,18 @@ public class DatabaseConnection {
             ex.printStackTrace();
         }
         return all;
+    }
+
+    public boolean deleteOrder(OrderImpl op) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM order_operation WHERE id = ?");
+            ps.setInt(1, op.getBalanceId());
+
+            return ps.executeUpdate() > 0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 }
