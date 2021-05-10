@@ -1,77 +1,64 @@
 package it.polito.ezshop.data;
 
-public class OrderImpl implements Order {
+import java.time.LocalDate;
+
+public class OrderImpl extends BalanceOperationImpl {
     private int mBalanceId;
     private String mProductCode;
     private double mPricePerUnit;
     private int mQuantity;
-    private String mStatus;
+    private String mOrderStatus;
 
-    public OrderImpl(int mBalanceId, String mProductCode, double mPricePerUnit, int mQuantity, String status) {
-        this.mBalanceId = mBalanceId;
+    public OrderImpl(int mBalanceId, LocalDate date, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus) {
+        super(mBalanceId, date, "ORDER", status);
         this.mProductCode = mProductCode;
         this.mPricePerUnit = mPricePerUnit;
         this.mQuantity = mQuantity;
-        this.mStatus = status;
+        this.mOrderStatus = orderStatus;
+    }
+
+    public OrderImpl(int id, LocalDate date_op, String status, int quantity, String product_code, String order_status, double price_per_unit) {
+        super(id, date_op, "ORDER", status);
+        mQuantity = quantity;
+        mProductCode = product_code;
+        mOrderStatus = order_status;
+        mPricePerUnit = price_per_unit;
     }
 
     @Override
-    public Integer getBalanceId() {
-        return mBalanceId;
+    public double getMoney() {
+        return -mQuantity * mPricePerUnit;
     }
 
-    @Override
-    public void setBalanceId(Integer balanceId) {
-        mBalanceId = balanceId;
+    public int getQuantity(){
+        return mQuantity;
     }
 
-    @Override
     public String getProductCode() {
         return mProductCode;
     }
 
-    @Override
     public void setProductCode(String productCode) {
         mProductCode = productCode;
     }
 
-    @Override
     public double getPricePerUnit() {
         return mPricePerUnit;
     }
 
-    @Override
     public void setPricePerUnit(double pricePerUnit) {
         mPricePerUnit = pricePerUnit;
     }
 
-    @Override
-    public int getQuantity() {
-        return mQuantity;
+    public String getOrderStatus() {
+        return mOrderStatus;
     }
 
-    @Override
+    public void setOrderStatus(String status) {
+        mOrderStatus = status;
+    }
+
     public void setQuantity(int quantity) {
         mQuantity = quantity;
-    }
-
-    @Override
-    public String getStatus() {
-        return mStatus;
-    }
-
-    @Override
-    public void setStatus(String status) {
-        mStatus = status;
-    }
-
-    @Override
-    public Integer getOrderId() {
-        return mBalanceId;
-    }
-
-    @Override
-    public void setOrderId(Integer orderId) {
-        mBalanceId = orderId;
     }
 }

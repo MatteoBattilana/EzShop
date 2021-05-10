@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS version (
  rev text NOT NULL
 );
+DELETE FROM version;
+INSERT INTO version (rev) VALUES ('1.0');
 
 CREATE TABLE IF NOT EXISTS users (
  id INTEGER,
@@ -11,10 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS orders (
  id INTEGER,
- quantity INTEGER,
- balance_id INTEGER,
- product_code text NOT NULL,
+ date_op DATE,
  status text NOT NULL,
+ quantity INTEGER,
+ product_code text NOT NULL,
+ order_status text NOT NULL,
  price_per_unit DOUBLE
 );
 

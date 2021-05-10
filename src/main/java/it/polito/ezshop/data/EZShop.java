@@ -525,13 +525,18 @@ public class EZShop implements EZShopInterface {
         if (product == null)
             return -1;
 
-        int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "UNPAID", "ORDER");
         // Add the order to the system
-        mOrders.put(
-                balanceId,
-                new OrderImpl(balanceId, productCode, pricePerUnit, quantity, "ISSUED"));
+        OrderImpl operation = new OrderImpl(mAccountBook.getLastId() + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "UNPAID", "ISSUED");
+        if(mDatabaseConnection.createOrder(operation)) {
+            mOrders.put(
+                    operation.getBalanceId(),
+                    operation
+            );
+            mAccountBook.add(operation);
+            return operation.getBalanceId();
+        }
 
-        return balanceId;
+        return -1;
     }
 
     /**
@@ -571,13 +576,17 @@ public class EZShop implements EZShopInterface {
 
         if (mAccountBook.checkIfEnoughMoney(-quantity * pricePerUnit)) {
             // Add a balance as paid for ORDER type
-            int balanceId = mAccountBook.recordBalanceUpdate(-quantity * pricePerUnit, "PAID", "ORDER");
             // Add the order to the system
-            mOrders.put(
-                    balanceId,
-                    new OrderImpl(balanceId, productCode, pricePerUnit, quantity, "PAYED"));
-
-            return balanceId;
+            OrderImpl operation = new OrderImpl(mAccountBook.getLastId() + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "UNPAID", "PAYED");
+            if(mDatabaseConnection.createOrder(operation)) {
+                mOrders.put(
+                        operation.getBalanceId(),
+                        operation
+                );
+                mAccountBook.add(operation);
+                mAccountBook.setAsPaid(operation.getBalanceId());
+                return operation.getBalanceId();
+            }
         }
         return -1;
     }
@@ -602,13 +611,13 @@ public class EZShop implements EZShopInterface {
         if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
 
         // Get order by id
-        Order order = mOrders.get(orderId);
-        if (order != null && order.getStatus().equals("ISSUED")) {
+        OrderImpl order = mOrders.get(orderId);
+        if (order != null && order.getOrderStatus().equals("ISSUED")) {
             // Check if balance would be negative
-            if (mAccountBook.checkIfEnoughMoney(-order.getQuantity() * order.getPricePerUnit())) {
+            if (mAccountBook.checkIfEnoughMoney(-order.getMoney())) {
                 mAccountBook.setAsPaid(order.getBalanceId());
-                order.setStatus("PAYED");
-                return true;
+                order.setOrderStatus("PAYED");
+                return mDatabaseConnection.updateOrder(order);
             }
         }
 
@@ -636,18 +645,18 @@ public class EZShop implements EZShopInterface {
         // Check order id
         if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
 
-        Order order = mOrders.get(orderId);
-        if (order != null && order.getStatus().equals("PAYED")) {
+        OrderImpl order = mOrders.get(orderId);
+        if (order != null && order.getOrderStatus().equals("PAYED")) {
             try {
                 // Update product quantity
-                ProductType productType = getProductTypeByBarCode(order.getProductCode());
+                ProductTypeImpl productType = getProductTypeImplByBarCode(order.getProductCode());
                 // Check if the product has a location
                 if (productType.getLocation() == null || productType.getLocation().isEmpty())
                     throw new InvalidLocationException();
 
                 productType.setQuantity(productType.getQuantity() + order.getQuantity());
-                order.setStatus("COMPLETED");
-                return true;
+                order.setOrderStatus("COMPLETED");
+                return mDatabaseConnection.updateOrder(order) && mDatabaseConnection.updateProductType(productType);
             } catch (InvalidProductCodeException e) {
                 return false;
             }
@@ -658,7 +667,11 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        return new ArrayList<>(mOrders.values());
+        List<Order> orders = new ArrayList<>();
+        for (OrderImpl order : mOrders.values()){
+            orders.add(new OrderImplAdapter(order));
+        }
+        return orders;
     }
 
     @Override
@@ -1448,5 +1461,7 @@ public class EZShop implements EZShopInterface {
             }
         }
         mAccountBook.loadFromFromDb();
+
+        mOrders = mDatabaseConnection.getAllOrders();
     }
 }

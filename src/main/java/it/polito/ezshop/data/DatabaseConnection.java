@@ -9,6 +9,7 @@ package it.polito.ezshop.data;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -138,15 +139,16 @@ public class DatabaseConnection {
         return all;
     }
 
-    public boolean createOrder(Order o) {
+    public boolean createOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO orders(id, quantity, balance_id, product_code, status, price_per_unit) VALUES(?,?,?,?,?,?)");
-            ps.setInt(1, o.getOrderId());
-            ps.setInt(2, o.getQuantity());
-            ps.setInt(3, o.getBalanceId());
-            ps.setString(4, o.getProductCode());
-            ps.setString(5, o.getStatus());
-            ps.setDouble(6, o.getPricePerUnit());
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO orders(id, date_op, status, quantity, product_code, order_status, price_per_unit) VALUES(?,?,?,?,?,?,?)");
+            ps.setInt(1, o.getBalanceId());
+            ps.setDate(2, Date.valueOf(o.getDate()));
+            ps.setString(3, o.getStatus());
+            ps.setInt(4, o.getQuantity());
+            ps.setString(5, o.getProductCode());
+            ps.setString(6, o.getOrderStatus());
+            ps.setDouble(7, o.getPricePerUnit());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -172,34 +174,6 @@ public class DatabaseConnection {
     private boolean deleteBalance() {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM account_book");
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean deleteOrder(OrderImpl order) {
-        try {
-            PreparedStatement ps = CON.prepareStatement("DELETE FROM orders WHERE id = ?");
-            ps.setInt(1, order.getBalanceId());
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    private boolean updateBalanceOperation(BalanceOperationImpl balanceOperation) {
-        try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE balance_operations SET date_op = ?, money = ?, type = ?, status = ?) WHERE id = ?");
-            ps.setDate(1, Date.valueOf(balanceOperation.getDate()));
-            ps.setDouble(2, balanceOperation.getMoney());
-            ps.setString(3, balanceOperation.getType());
-            ps.setString(4, balanceOperation.getStatus());
-            ps.setInt(5, balanceOperation.getBalanceId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -566,5 +540,50 @@ public class DatabaseConnection {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    public boolean updateOrder(OrderImpl o) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("UPDATE orders SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ? WHERE id = ?");
+            ps.setDate(1, Date.valueOf(o.getDate()));
+            ps.setString(2, o.getStatus());
+            ps.setInt(3, o.getQuantity());
+            ps.setString(4, o.getProductCode());
+            ps.setString(5, o.getOrderStatus());
+            ps.setDouble(6, o.getPricePerUnit());
+            ps.setInt(7, o.getBalanceId());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public Map<Integer, OrderImpl> getAllOrders() {
+        Map<Integer, OrderImpl> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM orders");
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(
+                        resultSet.getInt("id"),
+                        new OrderImpl(
+                                resultSet.getInt("id"),
+                                new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
+                                resultSet.getString("status"),
+                                resultSet.getInt("quantity"),
+                                resultSet.getString("product_code"),
+                                resultSet.getString("order_status"),
+                                resultSet.getDouble("price_per_unit")
+                        )
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
     }
 }

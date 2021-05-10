@@ -27,9 +27,9 @@ public class AccountBook {
 
         if(operation.getStatus().equals("PAID")) {
             mBalance += toBeAdded;
-            databaseConnection.updateBalance(mBalance);
             databaseConnection.saveBalanceOperation(operation);
         }
+        databaseConnection.updateBalance(mBalance);
 
         return operation.getBalanceId();
     }
