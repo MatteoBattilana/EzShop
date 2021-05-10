@@ -17,6 +17,9 @@ public class TransactionProduct implements TicketEntry {
         return t;
     }
 
+    public ProductTypeImpl getProductType(){
+        return productType;
+    }
 
     @Override
     public String getBarCode() {

@@ -9,12 +9,12 @@ import java.util.Map;
 public class AccountBook {
     Map<Integer, BalanceOperationImpl> mBalanceOperations;
     double mBalance;
-    int mCurrentId;
+    private DatabaseConnection databaseConnection;
 
-    public AccountBook() {
+    public AccountBook(DatabaseConnection databaseConnection) {
+        this.databaseConnection = databaseConnection;
         mBalanceOperations = new HashMap<>();
         mBalance = 0.0;
-        mCurrentId = 0;
     }
 
     public int recordBalanceUpdate(double toBeAdded, String status, String type) {
@@ -25,8 +25,11 @@ public class AccountBook {
                 operation
         );
 
-        if(operation.getStatus().equals("PAID"))
+        if(operation.getStatus().equals("PAID")) {
             mBalance += toBeAdded;
+            databaseConnection.updateBalance(mBalance);
+            databaseConnection.saveBalanceOperation(operation);
+        }
 
         return operation.getBalanceId();
     }
@@ -55,6 +58,7 @@ public class AccountBook {
         if (balanceOperation != null) {
             mBalance += balanceOperation.getMoney();
             balanceOperation.setStatus("PAID");
+            databaseConnection.updateBalance(mBalance);
         }
     }
 
@@ -63,9 +67,17 @@ public class AccountBook {
     }
 
     public void reset() {
+        databaseConnection.updateBalance(0.0);
+        for(BalanceOperation op : mBalanceOperations.values()){
+            if(op instanceof SaleTransactionImpl) {
+                databaseConnection.deleteSaleTransaction((SaleTransactionImpl) op);
+            }
+            else if(op instanceof BalanceOperationImpl) {
+                databaseConnection.deleteBalanceOperation(op);
+            }
+        }
         mBalanceOperations = new HashMap<>();
         mBalance = 0.0;
-        mCurrentId = 0;
     }
 
     public boolean checkIfEnoughMoney(double toBeAdded) {
@@ -85,5 +97,10 @@ public class AccountBook {
     public void remove(int balanceId) {
         if (balanceId > 0)
             mBalanceOperations.remove(balanceId);
+    }
+
+    void loadFromFromDb(){
+        mBalanceOperations.putAll(databaseConnection.getAllBalanceOperations());
+        mBalance = databaseConnection.getBalance();
     }
 }

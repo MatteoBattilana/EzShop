@@ -89,7 +89,7 @@ public class DatabaseConnection {
 
     public boolean updateUser(User user) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE users SET username = ?, password = ?, role = ?) WHERE id = ?");
+            PreparedStatement ps = CON.prepareStatement("UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?");
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getRole());
@@ -105,7 +105,7 @@ public class DatabaseConnection {
     public boolean deleteUser(User user) {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM users WHERE id = ?");
-            ps.setInt(0, user.getId());
+            ps.setInt(1, user.getId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -155,21 +155,6 @@ public class DatabaseConnection {
         return false;
     }
 
-    public boolean createBalanceOperation(BalanceOperationImpl op) {
-        try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance_operations(id, date_op, money, type, status) VALUES(?,?,?,?,?)");
-            ps.setInt(1, op.getBalanceId());
-            ps.setDate(2, Date.valueOf(op.getDate()));
-            ps.setDouble(3, op.getMoney());
-            ps.setString(4, op.getType());
-            ps.setString(5, op.getStatus());
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
 
     public boolean updateBalance(double v) {
         deleteBalance();
@@ -187,18 +172,6 @@ public class DatabaseConnection {
     private boolean deleteBalance() {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM account_book");
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean deleteBalanceOperation(BalanceOperationImpl operation) {
-        try {
-            PreparedStatement ps = CON.prepareStatement("DELETE FROM balance_operations WHERE id = ?");
-            ps.setInt(0, operation.getBalanceId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -301,7 +274,7 @@ public class DatabaseConnection {
     public boolean deleteProductType(ProductTypeImpl productType) {
         try {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM product_type WHERE id = ?");
-            ps.setInt(0, productType.getId());
+            ps.setInt(1, productType.getId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -411,13 +384,13 @@ public class DatabaseConnection {
         return all;
     }
 
-    public boolean addProductToSale(SaleTransactionImpl transaction, ProductTypeImpl product, int amount) {
+    public boolean addProductToSale(SaleTransactionImpl transaction, TicketEntry ticket, int productId) {
         try {
             PreparedStatement ps = CON.prepareStatement("INSERT INTO transaction_product(id_sale, id_product, discount, quantity) VALUES(?,?,?,?)");
             ps.setInt(1, transaction.getTicketNumber());
-            ps.setInt(2, product.getId());
-            ps.setDouble(3, 0.0);
-            ps.setInt(4, amount);
+            ps.setInt(2, productId);
+            ps.setDouble(3, ticket.getDiscountRate());
+            ps.setInt(4, ticket.getAmount());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -426,37 +399,172 @@ public class DatabaseConnection {
         return false;
     }
 
-    private int getCurrentAmountInSale(SaleTransactionImpl transaction, ProductTypeImpl product) {
-        try {
-            PreparedStatement ps = CON.prepareStatement("SELECT quantity FROM return_transaction WHERE id_sale = ? AND id_product = ?");
-            ps.setInt(1, transaction.getTicketNumber());
-            ps.setInt(2, product.getId());
+    public boolean saveSaleTransaction(SaleTransactionImpl saleT) {
+        if(createSaleTransaction(saleT)) {
+            for(TransactionProduct ticket: saleT.getTicketEntries()) {
+                    addProductToSale(saleT, ticket, ticket.getProductType().getId());
+                    updateProductType(ticket.getProductType());
+            }
+        }
+        return true;
+    }
 
-            ResultSet resultSet = ps.executeQuery();
-            if(resultSet.next())
-                return resultSet.getInt("quantity");
+    public boolean deleteSaleTransaction(SaleTransactionImpl transaction) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
+            ps.setInt(0, transaction.getTicketNumber());
+            if(ps.executeUpdate()>0){
+                // Rollback product quantities
+                for (TransactionProduct tp: transaction.getTicketEntries()) {
+                    ProductTypeImpl productType = tp.getProductType();
+                    productType.setQuantity(productType.getQuantity() + tp.getAmount());
+                    updateProductType(productType);
+                }
+            }
         }
         catch (Exception ex) {
             ex.printStackTrace();
         }
-        return -1;
+        return false;
     }
 
-    public boolean deleteProductToSale(SaleTransactionImpl transaction, ProductTypeImpl product, int amount) {
-        int currentAmountInSale = getCurrentAmountInSale(transaction, product);
-        if (currentAmountInSale != -1 && currentAmountInSale >= amount) {
-            PreparedStatement ps;
-            if(currentAmountInSale - amount == 0){
-                ps = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
-                ps.setInt(1, transaction.getTicketNumber());
-                ps.setInt(2, product.getId());
-            }
-            else {
-                ps = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
-                ps.setInt(1, transaction.getTicketNumber());
-                ps.setInt(2, product.getId());
+    public boolean updateSaleTransaction(SaleTransactionImpl transaction) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("UPDATE sale_transaction SET discount = ?, transaction_status = ?, date_op = ?, money = ?, type = ?, status = ? WHERE id = ?");
+            ps.setDouble(1, transaction.getDiscountRate());
+            ps.setString(2, transaction.getTransactionStatus());
+            ps.setDate(3, Date.valueOf(transaction.getDate()));
+            ps.setDouble(4, transaction.getMoney());
+            ps.setString(5, transaction.getType());
+            ps.setString(6, transaction.getStatus());
+            ps.setInt(7, transaction.getTicketNumber());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean saveBalanceOperation(BalanceOperationImpl operation) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance_operations(id, date_op, money, type, status) VALUES(?,?,?,?,?)");
+            ps.setInt(1, operation.getBalanceId());
+            ps.setDate(2, Date.valueOf(operation.getDate()));
+            ps.setDouble(3, operation.getMoney());
+            ps.setString(4, operation.getType());
+            ps.setString(5, operation.getStatus());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public double getBalance() {
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT balance FROM account_book");
+            ResultSet resultSet = ps.executeQuery();
+            if(resultSet.next()) return resultSet.getDouble("balance");
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    public Map<Integer, BalanceOperationImpl> getAllBalanceOperations() {
+        Map<Integer, BalanceOperationImpl> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM balance_operations");
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(
+                        resultSet.getInt("id"),
+                        new BalanceOperationImpl(
+                                resultSet.getInt("id"),
+                                new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
+                                resultSet.getDouble("money"),
+                                resultSet.getString("type"),
+                                resultSet.getString("status")
+                        )
+                );
             }
         }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
+    }
 
+    public boolean deleteBalanceOperation(BalanceOperation op) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM balance_operations WHERE id = ?");
+            ps.setInt(0, op.getBalanceId());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+
+    public boolean saveReturnTransaction(ReturnTransaction returnTransaction, Integer saleId) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, money, type, status, id_product, amount, committed, id_sale) VALUES(?,?,?,?,?,?,?,?,?)");
+            ps.setInt(1, returnTransaction.getBalanceId());
+            ps.setDate(2, Date.valueOf(returnTransaction.getDate()));
+            ps.setDouble(3, returnTransaction.getMoney());
+            ps.setString(4, returnTransaction.getType());
+            ps.setString(5, returnTransaction.getStatus());
+            ps.setInt(6, returnTransaction.getProduct().getId());
+            ps.setInt(7, returnTransaction.getAmount());
+            ps.setBoolean(8, returnTransaction.isCommited());
+            ps.setInt(9, saleId);
+            if(ps.executeUpdate() > 0) {
+                return updateProductType(returnTransaction.getProduct());
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteReturnTransaction(ReturnTransaction transaction) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM return_transaction WHERE id = ?");
+            ps.setInt(0, transaction.getBalanceId());
+            if(ps.executeUpdate()>0){
+                // Rollback product quantities
+                updateProductType(transaction.getProduct());
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateReturnTransaction(ReturnTransaction returnT, Integer saleId) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("UPDATE return_transaction SET date_op = ?, money = ?, type = ?, status = ?, id_product = ?, amount = ?, committed = ?, id_sale = ? WHERE id = ?");
+            ps.setDate(1, Date.valueOf(returnT.getDate()));
+            ps.setDouble(2, returnT.getMoney());
+            ps.setString(3, returnT.getType());
+            ps.setString(4, returnT.getStatus());
+            ps.setInt(5, returnT.getAmount());
+            ps.setBoolean(6, returnT.isCommited());
+            ps.setInt(7, saleId);
+            ps.setInt(8, returnT.getBalanceId());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 }

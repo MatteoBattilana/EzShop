@@ -25,9 +25,9 @@ public class EZShop implements EZShopInterface {
         mProducts = new HashMap<>();
         mSaleTransactions = new HashMap<>();
         mLoggedUser = null;
-        mAccountBook = new AccountBook();
-        mCreditCardCircuit = new CreditCardCircuit();
         mDatabaseConnection = new DatabaseConnection();
+        mCreditCardCircuit = new CreditCardCircuit();
+        mAccountBook = new AccountBook(mDatabaseConnection);
         loadFromDb();
     }
 
@@ -37,6 +37,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public void reset() {
         mAccountBook.reset();
+        for (ProductTypeImpl product : mProducts.values()) {
+            mDatabaseConnection.deleteProductType(product);
+        }
         mProducts.clear();
     }
 
@@ -793,7 +796,7 @@ public class EZShop implements EZShopInterface {
         // Add the product to sale
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         ProductTypeImpl product = getProductTypeImplByBarCode(productCode);
-        if (transaction != null && product != null && mDatabaseConnection.deleteProductToSale(transaction, product, amount)) {
+        if (transaction != null && product != null) {
             return transaction.removeProductFromSale(product, amount);
         }
 
@@ -931,7 +934,7 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null && transaction.getTransactionStatus().equals("OPENED")) {
             transaction.setTransactionStatus("CLOSED");
-            transaction.setBalanceId(mAccountBook.getLastId() + 1);
+            mDatabaseConnection.saveSaleTransaction(transaction);
             mAccountBook.add(transaction);
             return true;
         }
@@ -966,7 +969,7 @@ public class EZShop implements EZShopInterface {
             mSaleTransactions.remove(transactionId);
             mAccountBook.remove(transaction.getBalanceId());
             transaction.rollbackQuantity();
-            return true;
+            return mDatabaseConnection.deleteSaleTransaction(transaction);
         }
         return false;
     }
@@ -1101,8 +1104,8 @@ public class EZShop implements EZShopInterface {
 
         // Commit transaction
         if(sale != null) {
-            if (commit) {
-                return sale.commitReturnTransaction(returnId);
+            if (commit && sale.commitReturnTransaction(returnId)) {
+                return mDatabaseConnection.saveReturnTransaction(sale.getReturnById(returnId), sale.getTicketNumber());
             }
             else {
                 BalanceOperation returnTransaction = sale.deleteReturnTransaction(returnId);
@@ -1142,9 +1145,9 @@ public class EZShop implements EZShopInterface {
 
         // Delete return transaction
         if(sale != null) {
-            BalanceOperation returnTransaction = sale.deleteReturnTransaction(returnId);
+            ReturnTransaction returnTransaction = sale.deleteReturnTransaction(returnId);
             mAccountBook.remove(returnTransaction.getBalanceId());
-            return true;
+            return mDatabaseConnection.deleteReturnTransaction(returnTransaction);
         }
         return false;
     }
@@ -1181,8 +1184,9 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null && cash - transaction.getMoney() >= 0) {
             mAccountBook.setAsPaid(transaction.getBalanceId());
-
-            return cash - transaction.getMoney();
+            if (mDatabaseConnection.updateSaleTransaction(transaction)) {
+                return cash - transaction.getMoney();
+            }
         }
         return -1;
     }
@@ -1223,7 +1227,10 @@ public class EZShop implements EZShopInterface {
         // Pay transaction
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null) {
-            return mCreditCardCircuit.pay(creditCard, transaction.getMoney());
+            if(mCreditCardCircuit.pay(creditCard, transaction.getMoney())) {
+                mAccountBook.setAsPaid(transaction.getBalanceId());
+                return mDatabaseConnection.updateSaleTransaction(transaction);
+            }
         }
         return false;
     }
@@ -1258,7 +1265,8 @@ public class EZShop implements EZShopInterface {
             ReturnTransaction returnT = sale.getReturnById(returnId);
             double ret = sale.getReturnTransactionTotal(returnId);
             mAccountBook.setAsPaid(returnT.getBalanceId());
-            return ret;
+            if(mDatabaseConnection.updateReturnTransaction(returnT, sale.getTicketNumber()))
+                return ret;
         }
         return -1;
     }
@@ -1298,7 +1306,9 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
         if(mCreditCardCircuit.isValid(creditCard) && sale != null) {
             mAccountBook.setAsPaid(returnId);
-            return sale.getReturnTransactionTotal(returnId);
+            ReturnTransaction returnT = sale.getReturnById(returnId);
+            if(returnT != null && mDatabaseConnection.updateReturnTransaction(returnT, sale.getTicketNumber()))
+                return sale.getReturnTransactionTotal(returnId);
         }
         return -1;
     }
@@ -1431,5 +1441,12 @@ public class EZShop implements EZShopInterface {
         mUsers = mDatabaseConnection.getAllUsers();
         mProducts = mDatabaseConnection.getAllProducts();
         mSaleTransactions = mDatabaseConnection.getAllSaleTransaction(mProducts);
+        for (SaleTransactionImpl sale : mSaleTransactions.values()){
+            mAccountBook.add(sale);
+            for (ReturnTransaction returnTransaction : sale.getReturnTransactions()){
+                mAccountBook.add(returnTransaction);
+            }
+        }
+        mAccountBook.loadFromFromDb();
     }
 }

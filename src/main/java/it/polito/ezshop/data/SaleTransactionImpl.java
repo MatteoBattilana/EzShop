@@ -41,6 +41,10 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         this(id, LocalDate.now(), "SALE", "UNPAID", new HashMap<>(), new HashMap<>(), 0.0, "OPENED");
     }
 
+    public List<ReturnTransaction> getReturnTransactions(){
+        return new ArrayList<>(mReturns.values());
+    }
+
     public ReturnTransaction startReturnTransaction(int balanceId) {
         ReturnTransaction returnT = new ReturnTransaction(balanceId);
         mReturns.put(balanceId, returnT);
@@ -57,6 +61,10 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             }
         }
         return false;
+    }
+
+    public List<TransactionProduct> getTicketEntries() {
+        return new ArrayList<>(mTicketEntries.values());
     }
 
     public String getTransactionStatus() {
@@ -216,7 +224,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         return false;
     }
 
-    public BalanceOperation deleteReturnTransaction(Integer returnId) {
+    public ReturnTransaction deleteReturnTransaction(Integer returnId) {
         ReturnTransaction returnTransaction = mReturns.get(returnId);
         if(returnTransaction != null && !returnTransaction.getStatus().equals("PAID")) {
             ProductTypeImpl product = returnTransaction.getProduct();
