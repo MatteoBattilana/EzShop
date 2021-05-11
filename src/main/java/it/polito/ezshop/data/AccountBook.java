@@ -17,25 +17,16 @@ public class AccountBook {
         mBalance = 0.0;
     }
 
-    public int recordBalanceUpdate(double toBeAdded, String status, String type) {
-        int lastId = getLastId() + 1;
-        BalanceOperationImpl operation = new BalanceOperationImpl(lastId, LocalDate.now(), toBeAdded, type, status);
-        mBalanceOperations.put(
-                lastId,
-                operation
-        );
-
-        if(operation.getStatus().equals("PAID")) {
-            mBalance += toBeAdded;
-            databaseConnection.saveBalanceOperation(operation);
-        }
-        databaseConnection.updateBalance(mBalance);
-
-        return operation.getBalanceId();
-    }
-
-    public void add(BalanceOperationImpl operation) {
+    public boolean add(BalanceOperationImpl operation) {
         mBalanceOperations.put(operation.getBalanceId(), operation);
+        if (operation.getStatus().equals("PAID")) {
+            if (databaseConnection.updateBalance(mBalance + operation.getMoney())) {
+                mBalance += operation.getMoney();
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     List<BalanceOperation> getCreditAndDebits(LocalDate from, LocalDate to) {
@@ -51,15 +42,19 @@ public class AccountBook {
 
     /**
      * Mark a balance as paid
+     *
      * @param id of the balance operation
      */
-    public void setAsPaid(Integer id) {
+    public boolean setAsPaid(Integer id) {
         BalanceOperationImpl balanceOperation = mBalanceOperations.get(id);
         if (balanceOperation != null) {
             mBalance += balanceOperation.getMoney();
-            balanceOperation.setStatus("PAID");
-            databaseConnection.updateBalance(mBalance);
+            if(databaseConnection.updateBalance(mBalance)){
+                balanceOperation.setStatus("PAID");
+                return true;
+            }
         }
+        return false;
     }
 
     public double computeBalance() {
@@ -68,14 +63,12 @@ public class AccountBook {
 
     public void reset() {
         databaseConnection.updateBalance(0.0);
-        for(BalanceOperation op : mBalanceOperations.values()){
-            if(op instanceof SaleTransactionImpl) {
+        for (BalanceOperation op : mBalanceOperations.values()) {
+            if (op instanceof SaleTransactionImpl) {
                 databaseConnection.deleteSaleTransaction((SaleTransactionImpl) op);
-            }
-            else if(op instanceof BalanceOperationImpl) {
+            } else if (op instanceof BalanceOperationImpl) {
                 databaseConnection.deleteBalanceOperation(op);
-            }
-            else if (op instanceof OrderImpl) {
+            } else if (op instanceof OrderImpl) {
                 databaseConnection.deleteOrder((OrderImpl) op);
             }
         }
@@ -102,7 +95,7 @@ public class AccountBook {
             mBalanceOperations.remove(balanceId);
     }
 
-    void loadFromFromDb(){
+    void loadFromFromDb() {
         mBalanceOperations.putAll(databaseConnection.getAllBalanceOperations());
         mBalance = databaseConnection.getBalance();
     }

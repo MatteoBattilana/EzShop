@@ -9,16 +9,16 @@ import java.util.*;
 public class EZShop implements EZShopInterface {
     private DatabaseConnection mDatabaseConnection;
     // Map used to store the users, indexed by the user id
-    Map<Integer, User> mUsers;
+    private Map<Integer, User> mUsers;
     // Map for the orders
-    Map<Integer, OrderImpl> mOrders;
+    private Map<Integer, OrderImpl> mOrders;
     // Keep track of the logged user
-    Map<Integer, ProductTypeImpl> mProducts;
+    private Map<Integer, ProductTypeImpl> mProducts;
     // Keep track of the logged user
-    Map<Integer, SaleTransactionImpl> mSaleTransactions;
-    User mLoggedUser;
-    AccountBook mAccountBook;
-    CreditCardCircuit mCreditCardCircuit;
+    private Map<Integer, SaleTransactionImpl> mSaleTransactions;
+    private User mLoggedUser;
+    private AccountBook mAccountBook;
+    private CreditCardCircuit mCreditCardCircuit;
 
     public EZShop() {
         mOrders = new HashMap<>();
@@ -188,10 +188,10 @@ public class EZShop implements EZShopInterface {
         }
 
         User user = mUsers.get(id);
-        if (user != null) {
+        if (user != null && mDatabaseConnection.setUserRole(user, role)) {
             user.setRole(role);
             // Update user
-            return mDatabaseConnection.updateUser(user);
+            return true;
         }
         return false;
     }
@@ -325,7 +325,14 @@ public class EZShop implements EZShopInterface {
             product.setBarCode(newCode);
             product.setPricePerUnit(newPrice);
             product.setNote(newNote);
-            return mDatabaseConnection.updateProductType(product);
+
+            // Try to save into the DB
+            if(mDatabaseConnection.updateProductType(product))
+                return true;
+            else {
+                // Reload from database in order to avoid inconsistency
+                loadProductsFromDb();
+            }
         }
         return false;
     }
@@ -442,13 +449,17 @@ public class EZShop implements EZShopInterface {
         // Set the new quantity only if the product exists
         ProductTypeImpl productType = mProducts.get(productId);
         if (productType != null) {
-            if (productType.getLocation() == null || (toBeAdded < 0 && toBeAdded > productType.getQuantity()))
-                return false;
-
+            if (productType.getLocation() != null && toBeAdded >= 0) {
                 // Database saved, update local object
-            productType.setQuantity(productType.getQuantity() + toBeAdded);
-            return mDatabaseConnection.updateProductType(productType);
-
+                productType.setQuantity(productType.getQuantity() + toBeAdded);
+                // Try to save into the DB
+                if(mDatabaseConnection.updateProductType(productType))
+                    return true;
+                else {
+                    // Reload from database in order to avoid inconsistency
+                    loadProductsFromDb();
+                }
+            }
         }
         return false;
     }
@@ -489,7 +500,13 @@ public class EZShop implements EZShopInterface {
         ProductTypeImpl productType = mProducts.get(productId);
         if (productType != null) {
             productType.setLocation(newPos);
-            return mDatabaseConnection.updateProductType(productType);
+            // Try to save into the DB
+            if(mDatabaseConnection.updateProductType(productType))
+                return true;
+            else {
+                // Reload from database in order to avoid inconsistency
+                loadProductsFromDb();
+            }
         }
         return false;
     }
@@ -529,12 +546,11 @@ public class EZShop implements EZShopInterface {
 
         // Add the order to the system
         OrderImpl operation = new OrderImpl(mAccountBook.getLastId() + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "UNPAID", "ISSUED");
-        if(mDatabaseConnection.createOrder(operation)) {
+        if(mDatabaseConnection.createOrder(operation) && mAccountBook.add(operation)) {
             mOrders.put(
                     operation.getBalanceId(),
                     operation
             );
-            mAccountBook.add(operation);
             return operation.getBalanceId();
         }
 
@@ -579,15 +595,18 @@ public class EZShop implements EZShopInterface {
         if (mAccountBook.checkIfEnoughMoney(-quantity * pricePerUnit)) {
             // Add a balance as paid for ORDER type
             // Add the order to the system
-            OrderImpl operation = new OrderImpl(mAccountBook.getLastId() + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "UNPAID", "PAYED");
+            OrderImpl operation = new OrderImpl(mAccountBook.getLastId() + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "PAID", "PAYED");
             if(mDatabaseConnection.createOrder(operation)) {
-                mOrders.put(
-                        operation.getBalanceId(),
-                        operation
-                );
-                mAccountBook.add(operation);
-                mAccountBook.setAsPaid(operation.getBalanceId());
-                return operation.getBalanceId();
+                if(mAccountBook.add(operation)) {
+                    mOrders.put(
+                            operation.getBalanceId(),
+                            operation
+                    );
+                    return operation.getBalanceId();
+                }
+                else {
+                    mDatabaseConnection.deleteOrder(operation);
+                }
             }
         }
         return -1;
@@ -613,11 +632,11 @@ public class EZShop implements EZShopInterface {
         if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
 
         // Get order by id
+        // TODO: check database inconsistency
         OrderImpl order = mOrders.get(orderId);
         if (order != null && order.getOrderStatus().equals("ISSUED")) {
             // Check if balance would be negative
-            if (mAccountBook.checkIfEnoughMoney(-order.getMoney())) {
-                mAccountBook.setAsPaid(order.getBalanceId());
+            if (mAccountBook.checkIfEnoughMoney(-order.getMoney()) && mAccountBook.setAsPaid(order.getBalanceId())) {
                 order.setOrderStatus("PAYED");
                 return mDatabaseConnection.updateOrder(order);
             }
@@ -653,15 +672,16 @@ public class EZShop implements EZShopInterface {
                 // Update product quantity
                 ProductTypeImpl productType = getProductTypeImplByBarCode(order.getProductCode());
                 // Check if the product has a location
-                if (productType.getLocation() == null || productType.getLocation().isEmpty())
-                    throw new InvalidLocationException();
+                if(productType != null) {
+                    if (productType.getLocation() == null || productType.getLocation().isEmpty())
+                        throw new InvalidLocationException();
 
-                productType.setQuantity(productType.getQuantity() + order.getQuantity());
-                order.setOrderStatus("COMPLETED");
-                return mDatabaseConnection.updateOrder(order) && mDatabaseConnection.updateProductType(productType);
-            } catch (InvalidProductCodeException e) {
-                return false;
-            }
+                    productType.setQuantity(productType.getQuantity() + order.getQuantity());
+                    order.setOrderStatus("COMPLETED");
+                    // TODO: check database inconsistency
+                    return mDatabaseConnection.updateOrder(order) && mDatabaseConnection.updateProductType(productType);
+                }
+            } catch (InvalidProductCodeException ignore) { }
         }
 
         return false;
@@ -728,16 +748,13 @@ public class EZShop implements EZShopInterface {
         validateLoggedUser("Cashier");
 
         // Create the new sale
+        // TODO: problem with  mAccountBook.getLastId()  because never put in accountbook
         SaleTransactionImpl operation = new SaleTransactionImpl(mAccountBook.getLastId() + 1);
-        if(mDatabaseConnection.createSaleTransaction(operation)) {
-            mSaleTransactions.put(
-                    operation.getTicketNumber(),
-                    operation
-            );
-            return operation.getTicketNumber();
-        }
-
-        return -1;
+        mSaleTransactions.put(
+                operation.getTicketNumber(),
+                operation
+        );
+        return operation.getTicketNumber();
     }
 
     /**
@@ -946,6 +963,7 @@ public class EZShop implements EZShopInterface {
         if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
 
         // Close transaction
+        // TODO: check database inconsistency
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null && transaction.getTransactionStatus().equals("OPENED")) {
             transaction.setTransactionStatus("CLOSED");
@@ -979,6 +997,7 @@ public class EZShop implements EZShopInterface {
         if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
 
         // Delete transaction
+        // TODO: check database inconsistency
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null && !transaction.getStatus().equals("PAID")) {
             mSaleTransactions.remove(transactionId);
@@ -1077,7 +1096,7 @@ public class EZShop implements EZShopInterface {
         if(amount <= 0) throw new InvalidQuantityException();
 
         // Check that the sold quantity is less than the returned one
-        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
 
         //
         ProductTypeImpl prod = getProductTypeImplByBarCode(productCode);
@@ -1115,9 +1134,10 @@ public class EZShop implements EZShopInterface {
         if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
         // Check that the sold quantity is less than the returned one
-        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
 
         // Commit transaction
+        // TODO: check database inconsistency
         if(sale != null) {
             if (commit && sale.commitReturnTransaction(returnId)) {
                 return mDatabaseConnection.saveReturnTransaction(sale.getReturnById(returnId), sale.getTicketNumber());
@@ -1156,9 +1176,10 @@ public class EZShop implements EZShopInterface {
         if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
         // Check that the sold quantity is less than the returned one
-        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
 
         // Delete return transaction
+        // TODO: check database inconsistency
         if(sale != null) {
             ReturnTransaction returnTransaction = sale.deleteReturnTransaction(returnId);
             mAccountBook.remove(returnTransaction.getBalanceId());
@@ -1196,6 +1217,7 @@ public class EZShop implements EZShopInterface {
         if (cash <= 0) throw new InvalidPaymentException();
 
         // Pay transaction
+        // TODO: check database inconsistency
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null && cash - transaction.getMoney() >= 0) {
             mAccountBook.setAsPaid(transaction.getBalanceId());
@@ -1240,6 +1262,7 @@ public class EZShop implements EZShopInterface {
         if(!mCreditCardCircuit.validateCreditCard(creditCard)) throw new InvalidCreditCardException();
 
         // Pay transaction
+        // TODO: check database inconsistency
         SaleTransactionImpl transaction = mSaleTransactions.get(transactionId);
         if (transaction != null) {
             if(mCreditCardCircuit.pay(creditCard, transaction.getMoney())) {
@@ -1275,7 +1298,8 @@ public class EZShop implements EZShopInterface {
         if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
         // Check that the sold quantity is less than the returned one
-        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        // TODO: check database inconsistency
+        SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(sale != null) {
             ReturnTransaction returnT = sale.getReturnById(returnId);
             double ret = sale.getReturnTransactionTotal(returnId);
@@ -1317,8 +1341,8 @@ public class EZShop implements EZShopInterface {
 
         // Check transaction id
         if(!mCreditCardCircuit.validateCreditCard(creditCard)) throw new InvalidCreditCardException();
-
-        SaleTransactionImpl sale = getSaleTranasctionByReturnTtransactinoId(returnId);
+        // TODO: check database inconsistency
+        SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(mCreditCardCircuit.isValid(creditCard) && sale != null) {
             mAccountBook.setAsPaid(returnId);
             ReturnTransaction returnT = sale.getReturnById(returnId);
@@ -1348,9 +1372,15 @@ public class EZShop implements EZShopInterface {
         // Check if balance would be negative
         if (mAccountBook.checkIfEnoughMoney(toBeAdded)) {
             // Record the balance update
-            mAccountBook.recordBalanceUpdate(toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
-
-            return true;
+            BalanceOperationImpl operation = new BalanceOperationImpl(mAccountBook.getLastId() + 1, LocalDate.now(), toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
+            if(mDatabaseConnection.saveBalanceOperation(operation)){
+                if(mAccountBook.add(operation))
+                    return true;
+                else {
+                    // Avoid inconsistance
+                    mDatabaseConnection.deleteBalanceOperation(operation);
+                }
+            }
         }
         return false;
     }
@@ -1443,7 +1473,7 @@ public class EZShop implements EZShopInterface {
         return null;
     }
 
-    private SaleTransactionImpl getSaleTranasctionByReturnTtransactinoId(int id) {
+    private SaleTransactionImpl getSaleTransactionByReturnTransactionId(int id) {
         for (SaleTransactionImpl sale : mSaleTransactions.values()){
             ReturnTransaction ret = sale.getReturnById(id);
             if(ret != null)
@@ -1454,7 +1484,7 @@ public class EZShop implements EZShopInterface {
 
     private void loadFromDb() {
         mUsers = mDatabaseConnection.getAllUsers();
-        mProducts = mDatabaseConnection.getAllProducts();
+        loadProductsFromDb();
         mSaleTransactions = mDatabaseConnection.getAllSaleTransaction(mProducts);
         for (SaleTransactionImpl sale : mSaleTransactions.values()){
             mAccountBook.add(sale);
@@ -1465,5 +1495,9 @@ public class EZShop implements EZShopInterface {
         mAccountBook.loadFromFromDb();
 
         mOrders = mDatabaseConnection.getAllOrders();
+    }
+
+    private void loadProductsFromDb(){
+        mProducts = mDatabaseConnection.getAllProducts();
     }
 }

@@ -1,15 +1,8 @@
-/*
- * AA 2016-2017
- * Introduction to Web Programming
- * Common - DAO
- * UniTN
- */
 package it.polito.ezshop.data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -88,13 +81,11 @@ public class DatabaseConnection {
         return false;
     }
 
-    public boolean updateUser(User user) {
+    public boolean setUserRole(User user, String role) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?");
-            ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPassword());
-            ps.setString(3, user.getRole());
-            ps.setInt(4, user.getId());
+            PreparedStatement ps = CON.prepareStatement("UPDATE users SET role = ? WHERE id = ?");
+            ps.setString(1, role);
+            ps.setInt(2, user.getId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
