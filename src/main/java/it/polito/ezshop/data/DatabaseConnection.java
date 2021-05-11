@@ -376,17 +376,29 @@ public class DatabaseConnection {
 
     public boolean deleteSaleTransaction(SaleTransactionImpl transaction) {
         try {
+            CON.setAutoCommit(false);
             PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
             ps.setInt(1, transaction.getTicketNumber());
             if(ps.executeUpdate()>0){
                 // Rollback product quantities
                 for (TransactionProduct tp: transaction.getTicketEntries()) {
-                    updateProductType(tp.getProductType());
+                    ProductTypeImpl product = tp.getProductType();
+                    product.setQuantity(product.getQuantity() + tp.getAmount());
+                    if(updateProductType(tp.getProductType())){
+                        product.setQuantity(product.getQuantity() - tp.getAmount());
+                    }
                 }
             }
+            CON.commit();
+            CON.setAutoCommit(true);
             return true;
         }
         catch (Exception ex) {
+            try {
+                CON.rollback();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             ex.printStackTrace();
         }
         return false;
@@ -478,6 +490,7 @@ public class DatabaseConnection {
 
     public boolean saveReturnTransaction(ReturnTransaction returnTransaction, Integer saleId) {
         try {
+            CON.setAutoCommit(false);
             PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, money, type, status, id_product, amount, committed, id_sale) VALUES(?,?,?,?,?,?,?,?,?)");
             ps.setInt(1, returnTransaction.getBalanceId());
             ps.setDate(2, Date.valueOf(returnTransaction.getDate()));
@@ -491,8 +504,15 @@ public class DatabaseConnection {
             if(ps.executeUpdate() > 0) {
                 return updateProductType(returnTransaction.getProduct());
             }
+            CON.commit();
+            CON.setAutoCommit(true);
         }
         catch (Exception ex) {
+            try {
+                CON.rollback();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             ex.printStackTrace();
         }
         return false;

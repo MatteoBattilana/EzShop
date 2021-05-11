@@ -40,23 +40,6 @@ public class AccountBook {
         return filtered;
     }
 
-    /**
-     * Mark a balance as paid
-     *
-     * @param id of the balance operation
-     */
-    public boolean setAsPaid(Integer id) {
-        BalanceOperationImpl balanceOperation = mBalanceOperations.get(id);
-        if (balanceOperation != null) {
-            mBalance += balanceOperation.getMoney();
-            if(databaseConnection.updateBalance(mBalance)){
-                balanceOperation.setStatus("PAID");
-                return true;
-            }
-        }
-        return false;
-    }
-
     public double computeBalance() {
         return mBalance;
     }
