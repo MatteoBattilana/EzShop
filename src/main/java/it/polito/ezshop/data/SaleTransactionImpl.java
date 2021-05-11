@@ -138,7 +138,6 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             TransactionProduct transactionProduct = mTicketEntries.get(product);
             if(transactionProduct != null) {
                 transactionProduct.setAmount(transactionProduct.getAmount() + amount);
-
             }
             else {
                 mTicketEntries.put(
@@ -198,31 +197,10 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         return (int) Math.floor(getMoney()/10.0);
     }
 
-    public void rollbackQuantity() {
-        for (Map.Entry<ProductTypeImpl, TransactionProduct> entry:  mTicketEntries.entrySet()) {
-            entry.getKey().setQuantity(entry.getKey().getQuantity() + entry.getValue().getAmount());
-        }
-    }
-
     public ReturnTransaction getReturnById(int id) {
         return mReturns.get(id);
     }
 
-    public boolean commitReturnTransaction(Integer returnId) {
-        ReturnTransaction returnTransaction = mReturns.get(returnId);
-        if(returnTransaction != null) {
-            ProductTypeImpl product = returnTransaction.getProduct();
-            TransactionProduct originalSale = mTicketEntries.get(product);
-            if(product != null){
-                product.setQuantity(product.getQuantity() + returnTransaction.getAmount());
-                originalSale.setAmount(originalSale.getAmount() - returnTransaction.getAmount());
-                returnTransaction.setCommited(true);
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public ReturnTransaction deleteReturnTransaction(Integer returnId) {
         ReturnTransaction returnTransaction = mReturns.get(returnId);

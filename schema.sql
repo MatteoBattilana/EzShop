@@ -21,6 +21,17 @@ CREATE TABLE IF NOT EXISTS order_operation (
  price_per_unit DOUBLE
 );
 
+CREATE TABLE IF NOT EXISTS customer (
+ id INTEGER,
+ name text NOT NULL,
+ card text
+);
+
+CREATE TABLE IF NOT EXISTS customer_card (
+ id text NOT NULL,
+ points integer NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS balance_operation (
  id INTEGER,
  date_op DATE,

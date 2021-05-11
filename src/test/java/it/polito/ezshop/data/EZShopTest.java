@@ -3,9 +3,7 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.data.User;
-import it.polito.ezshop.exceptions.InvalidPasswordException;
-import it.polito.ezshop.exceptions.InvalidRoleException;
-import it.polito.ezshop.exceptions.InvalidUsernameException;
+import it.polito.ezshop.exceptions.*;
 import org.junit.After;
 import org.junit.Test;
 
@@ -13,7 +11,7 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-public class LoginTest {
+public class EZShopTest {
     EZShop ezShop = new EZShop();
 
     @After
@@ -61,5 +59,16 @@ public class LoginTest {
         ezShop.createUser("username", "password", "Cashier");
         Integer userId = ezShop.createUser("username", "password", "Cashier");
         assertEquals(-1, userId.intValue());
+    }
+
+    @Test
+    public void deleteUser() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, InvalidUserIdException, UnauthorizedException {
+        ezShop.createUser("username", "password", "Administrator");
+        Integer userId = ezShop.createUser("username2", "password", "Cashier");
+        ezShop.login("username", "password");
+        assertNotNull(ezShop.getUser(userId));
+        assertTrue(ezShop.deleteUser(userId));
+
+        assertNull(ezShop.getUser(userId));
     }
 }

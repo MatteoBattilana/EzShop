@@ -78,8 +78,14 @@ public class AccountBook {
             mBalanceOperations.remove(balanceId);
     }
 
-    void loadFromFromDb() {
+    void loadFromFromDb(Map<Integer, ProductTypeImpl> mProducts) {
         mBalanceOperations.putAll(databaseConnection.getAllBalanceOperations());
         mBalance = databaseConnection.getBalance();
+        for (SaleTransactionImpl sale : databaseConnection.getAllSaleTransaction(mProducts).values()){
+            mBalanceOperations.put(sale.getBalanceId(), sale);
+            for (ReturnTransaction returnTransaction : sale.getReturnTransactions()){
+                mBalanceOperations.put(returnTransaction.getBalanceId(), returnTransaction);
+            }
+        }
     }
 }

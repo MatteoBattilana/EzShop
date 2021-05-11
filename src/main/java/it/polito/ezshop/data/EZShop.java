@@ -4,26 +4,30 @@ import it.polito.ezshop.exceptions.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 public class EZShop implements EZShopInterface {
-    private DatabaseConnection mDatabaseConnection;
+    private final AccountBook mAccountBook;
+    private final CreditCardCircuit mCreditCardCircuit;
+    private final DatabaseConnection mDatabaseConnection;
+
     // Map used to store the users, indexed by the user id
     private Map<Integer, User> mUsers;
     // Map for the orders
     private Map<Integer, OrderImpl> mOrders;
     // Keep track of the logged user
     private Map<Integer, ProductTypeImpl> mProducts;
+    // Keep track of the customers
+    private Map<Integer, CustomerImpl> mCustomers;
+    // Keep track of the customers
+    private Map<String, CustomerCardImpl> mCustomerCards;
     // Keep track of the logged user
     private Map<Integer, SaleTransactionImpl> mSaleTransactions;
+    // Logged user
     private User mLoggedUser;
-    private AccountBook mAccountBook;
-    private CreditCardCircuit mCreditCardCircuit;
 
     public EZShop() {
-        mOrders = new HashMap<>();
-        mProducts = new HashMap<>();
-        mSaleTransactions = new HashMap<>();
         mLoggedUser = null;
         mDatabaseConnection = new DatabaseConnection();
         mCreditCardCircuit = new CreditCardCircuit();
@@ -725,43 +729,287 @@ public class EZShop implements EZShopInterface {
         return orders;
     }
 
+    /**
+     * This method saves a new customer into the system. The customer's name should be unique.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param customerName the name of the customer to be registered
+     *
+     * @return the id (>0) of the new customer if successful, -1 otherwise
+     *
+     * @throws InvalidCustomerNameException if the customer name is empty or null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
+
     @Override
     public Integer defineCustomer(String customerName) throws InvalidCustomerNameException, UnauthorizedException {
-        return null;
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        if (customerName== null || customerName.isEmpty())
+            throw new InvalidCustomerNameException("Customer Name is not valid");
+
+        // Get new user id
+        int newId = 0;
+        for (CustomerImpl customer: mCustomers.values()) {
+            if (customer.getCustomerName().equals(customerName))
+                return -1;
+            else if (customer.getId() > newId)
+                newId = customer.getId();
+        }
+
+        CustomerImpl customer = new CustomerImpl(++newId, customerName);
+        if(mDatabaseConnection.createCustomer(customer)) {
+            mCustomers.put(customer.getId(), customer);
+            return customer.getId();
+        }
+
+        return -1;
     }
+
+    /**
+     * This method updates the data of a customer with given <id>. This method can be used to assign/delete a card to a
+     * customer. If <newCustomerCard> has a numeric value than this value will be assigned as new card code, if it is an
+     * empty string then any existing card code connected to the customer will be removed and, finally, it it assumes the
+     * null value then the card code related to the customer should not be affected from the update. The card code should
+     * be unique and should be a string of 10 digits.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param id the id of the customer to be updated
+     * @param newCustomerName the new name to be assigned
+     * @param newCustomerCard the new card code to be assigned. If it is empty it means that the card must be deleted,
+     *                        if it is null then we don't want to update the cardNumber
+     *
+     * @return true if the update is successful
+     *          false if the update fails ( cardCode assigned to another user, db unreacheable)
+     *
+     * @throws InvalidCustomerNameException if the customer name is empty or null
+     * @throws InvalidCustomerCardException if the customer card is empty, null or if it is not in a valid format (string with 10 digits)
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
 
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        if (id == null || id <= 0) {
+            throw new InvalidCustomerIdException("id is not valid");
+        }
+        if ( newCustomerName== null || newCustomerName.isEmpty()){
+            throw new InvalidCustomerNameException("Customer Name is not valid");
+        }
+
+        if ( newCustomerCard== null || (!newCustomerCard.isEmpty() && !Pattern.compile("[0-9]{10}").matcher(newCustomerCard).matches())){
+            throw new InvalidCustomerCardException("Customer Card is not valid");
+        }
+
+        CustomerImpl customer = mCustomers.get(id);
+        CustomerCardImpl card = mCustomerCards.get(newCustomerCard);
+        if (customer != null) {
+            customer.setCustomerName(newCustomerName);
+            if(newCustomerCard.isEmpty())
+                customer.unlinkCustomerCard();
+            else if (card != null)
+                customer.setCustomerCard(card);
+
+            if(mDatabaseConnection.updateCustomer(customer)) {
+                return true;
+            } else {
+                // Rollback
+                loadCustomersFromDb();
+            }
+
+        }
         return false;
     }
 
+    /**
+     * This method deletes a customer with given id from the system.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param id the id of the customer to be deleted
+     * @return true if the customer was successfully deleted
+     *          false if the user does not exists or if we have problems to reach the db
+     *
+     * @throws InvalidCustomerIdException if the id is null, less than or equal to 0.
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        if (id == null || id <= 0) {
+            throw new InvalidCustomerIdException("id is not valid");
+        }
+
+        CustomerImpl customer = mCustomers.get(id);
+        if(mDatabaseConnection.deleteCustomer(customer)) {
+            mCustomers.remove(id);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * This method returns a customer with given id.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param id the id of the customer
+     *
+     * @return the customer with given id
+     *          null if that user does not exists
+     *
+     * @throws InvalidCustomerIdException if the id is null, less than or equal to 0.
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        return null;
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        if (id == null || id <= 0) {
+            throw new InvalidCustomerIdException("id is not valid");
+        }
+
+        return mCustomers.get(id);
     }
 
+    /**
+     * This method returns a list containing all registered users.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @return the list of all the customers registered
+     *
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        return Collections.emptyList();
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        return new ArrayList<>(mCustomers.values());
     }
 
+    /**
+     * This method returns a string containing the code of a new assignable card.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @return the code of a new available card. An empty string if the db is unreachable
+     *
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public String createCard() throws UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Get last customer card in the map
+        int last = 0;
+        for (String code : mCustomerCards.keySet()){
+            if (last < Integer.parseInt(code)) last = Integer.parseInt(code);
+        }
+
+        // Save the card
+        CustomerCardImpl customerCard = new CustomerCardImpl(String.format("%010d", ++last), 0);
+        if(mDatabaseConnection.createCustomerCard(customerCard)) {
+            mCustomerCards.put(
+                    customerCard.getCardId(),
+                    customerCard
+            );
+            return customerCard.getCardId();
+        }
+
         return "";
     }
 
+    /**
+     * This method assigns a card with given card code to a customer with given identifier. A card with given card code
+     * can be assigned to one customer only.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param customerCard the number of the card to be attached to a customer
+     * @param customerId the id of the customer the card should be assigned to
+     *
+     * @return true if the operation was successful
+     *          false if the card is already assigned to another user, if there is no customer with given id, if the db is unreachable
+     *
+     * @throws InvalidCustomerIdException if the id is null, less than or equal to 0.
+     * @throws InvalidCustomerCardException if the card is null, empty or in an invalid format
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        if (customerId == null ||customerId  <= 0) {
+            throw new InvalidCustomerIdException("id is not valid");
+        }
+        if ( customerCard== null || customerCard.isEmpty() || !Pattern.compile("[0-9]{10}").matcher(customerCard).matches()){
+            throw new InvalidCustomerCardException("Customer Card is not valid");
+        }
+
+        // Check that no other customer has the same card
+        for (CustomerImpl customer : mCustomers.values()){
+            if (customer.getCustomerCard().equals(customerCard))
+                return false;
+        }
+
+        // Check if the card exists
+        CustomerCardImpl card = mCustomerCards.get(customerCard);
+
+        // Link card to user
+        CustomerImpl customer = mCustomers.get(customerId);
+        if (card != null && customer != null && customer.getCustomerCard() == null)
+            customer.setCustomerCard(card);
+            if(mDatabaseConnection.updateCustomer(customer)){
+                return true;
+            } else {
+                customer.setCustomerCard((CustomerCardImpl) null);
+            }
+
         return false;
     }
 
+    /**
+     * This method updates the points on a card adding to the number of points available on the card the value assumed by
+     * <pointsToBeAdded>. The points on a card should always be greater than or equal to 0.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param customerCard the card the points should be added to
+     * @param pointsToBeAdded the points to be added or subtracted ( this could assume a negative value)
+     *
+     * @return true if the operation is successful
+     *          false   if there is no card with given code,
+     *                  if pointsToBeAdded is negative and there were not enough points on that card before this operation,
+     *                  if we cannot reach the db.
+     *
+     * @throws InvalidCustomerCardException if the card is null, empty or in an invalid format
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        if ( customerCard== null || customerCard.isEmpty()){
+            throw new InvalidCustomerCardException("Customer Card is not valid");
+        }
+
+        CustomerCardImpl card = mCustomerCards.get(customerCard);
+        if (card != null && card.getCardPoints() + pointsToBeAdded > 0){
+            card.setCardPoints(card.getCardPoints() + pointsToBeAdded);
+            if(mDatabaseConnection.updateCustomerCard(card)){
+                return true;
+            }
+            else {
+                // Rollback
+                card.setCardPoints(card.getCardPoints() - pointsToBeAdded);
+            }
+        }
+
         return false;
     }
 
@@ -1092,7 +1340,9 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl saleTransaction = mSaleTransactions.get(transactionId);
         if(saleTransaction != null) {
             ReturnTransaction returnTransaction = saleTransaction.startReturnTransaction(mAccountBook.getLastId() + 1);
-            //TODO: check if needed: mAccountBook.add(returnTransaction);
+
+            // Simply add to the list and not save into the DB
+            mAccountBook.add(returnTransaction);
             return returnTransaction.getBalanceId();
         }
 
@@ -1173,14 +1423,16 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
 
         // Commit transaction
-        // TODO: check database inconsistency due to the fact that the number of product are updated in commitReturnTransaction
         if(sale != null) {
-            if (commit && sale.commitReturnTransaction(returnId)) {
-                return mDatabaseConnection.saveReturnTransaction(sale.getReturnById(returnId), sale.getTicketNumber());
+            if (commit) {
+
+                ReturnTransaction returnTransaction = sale.getReturnById(returnId);
+                // TODO: remove quantity from original sale, also update its price
+                return mDatabaseConnection.saveReturnTransaction(returnTransaction, sale.getTicketNumber());
             }
             else {
-                BalanceOperation returnTransaction = sale.deleteReturnTransaction(returnId);
-                mAccountBook.remove(returnTransaction.getBalanceId());
+                sale.deleteReturnTransaction(returnId);
+                mAccountBook.remove(returnId);
                 return true;
             }
         }
@@ -1215,11 +1467,14 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
 
         // Delete return transaction
-        // TODO: check database inconsistency due to the fact that the number of product are updated in commitReturnTransaction
         if(sale != null) {
-            ReturnTransaction returnTransaction = sale.deleteReturnTransaction(returnId);
-            mAccountBook.remove(returnTransaction.getBalanceId());
-            return mDatabaseConnection.deleteReturnTransaction(returnTransaction);
+            ReturnTransaction returnTransaction = sale.getReturnById(returnId);
+            // TODO: check
+            if(returnTransaction != null && mDatabaseConnection.deleteReturnTransaction(returnTransaction)){
+                mAccountBook.remove(returnTransaction.getBalanceId());
+                sale.deleteReturnTransaction(returnId);
+                return true;
+            }
         }
         return false;
     }
@@ -1320,7 +1575,6 @@ public class EZShop implements EZShopInterface {
         }
         return false;
     }
-
     /**
      * This method record the payment of a closed return transaction with given id. The return value of this method is the
      * amount of money to be returned.
@@ -1346,14 +1600,20 @@ public class EZShop implements EZShopInterface {
         if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
         // Check that the sold quantity is less than the returned one
-        // TODO: check database inconsistency
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(sale != null) {
             ReturnTransaction returnT = sale.getReturnById(returnId);
             double ret = sale.getReturnTransactionTotal(returnId);
-            //TODO mAccountBook.updateBalance(returnT.getBalanceId());
-            if(mDatabaseConnection.updateReturnTransaction(returnT, sale.getTicketNumber()))
-                return ret;
+            returnT.setStatus("PAID");
+            if(mDatabaseConnection.updateReturnTransaction(returnT, sale.getTicketNumber())) {
+                if(mAccountBook.add(returnT)){
+                    return ret;
+                }
+            }
+
+            // Rollback in case of DB fail
+            returnT.setStatus("UNPAID");
+            mDatabaseConnection.updateReturnTransaction(returnT, sale.getTicketNumber());
         }
         return -1;
     }
@@ -1389,6 +1649,7 @@ public class EZShop implements EZShopInterface {
 
         // Check transaction id
         if(!mCreditCardCircuit.validateCreditCard(creditCard)) throw new InvalidCreditCardException();
+
         // TODO: check database inconsistency
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(mCreditCardCircuit.isValid(creditCard) && sale != null) {
@@ -1420,7 +1681,7 @@ public class EZShop implements EZShopInterface {
         // Check if balance would be negative
         if (mAccountBook.checkIfEnoughMoney(toBeAdded)) {
             // Record the balance update
-            BalanceOperationImpl operation = new BalanceOperationImpl(mAccountBook.getLastId() + 1, LocalDate.now(), toBeAdded, "PAID", toBeAdded >= 0 ? "CREDIT" : "DEBIT");
+            BalanceOperationImpl operation = new BalanceOperationImpl(mAccountBook.getLastId() + 1, LocalDate.now(), toBeAdded, toBeAdded >= 0 ? "CREDIT" : "DEBIT", "PAID");
             if(mDatabaseConnection.saveBalanceOperation(operation)){
                 if(mAccountBook.add(operation))
                     return true;
@@ -1531,21 +1792,21 @@ public class EZShop implements EZShopInterface {
     }
 
     private void loadFromDb() {
+        mOrders = mDatabaseConnection.getAllOrders();
         mUsers = mDatabaseConnection.getAllUsers();
         loadProductsFromDb();
         mSaleTransactions = mDatabaseConnection.getAllSaleTransaction(mProducts);
-        for (SaleTransactionImpl sale : mSaleTransactions.values()){
-            //TODO mAccountBook.add(sale);
-            for (ReturnTransaction returnTransaction : sale.getReturnTransactions()){
-                //TODO mAccountBook.add(returnTransaction);
-            }
-        }
-        mAccountBook.loadFromFromDb();
+        mAccountBook.loadFromFromDb(mProducts);
 
-        mOrders = mDatabaseConnection.getAllOrders();
+        mCustomerCards = mDatabaseConnection.getAllCustomerCards();
+        loadCustomersFromDb();
     }
 
     private void loadProductsFromDb(){
         mProducts = mDatabaseConnection.getAllProducts();
+    }
+
+    private void loadCustomersFromDb() {
+        mCustomers = mDatabaseConnection.getAllCustomers(mCustomerCards);
     }
 }

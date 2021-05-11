@@ -384,7 +384,7 @@ public class DatabaseConnection {
                 for (TransactionProduct tp: transaction.getTicketEntries()) {
                     ProductTypeImpl product = tp.getProductType();
                     product.setQuantity(product.getQuantity() + tp.getAmount());
-                    if(updateProductType(tp.getProductType())){
+                    if(!updateProductType(tp.getProductType())){
                         product.setQuantity(product.getQuantity() - tp.getAmount());
                     }
                 }
@@ -502,10 +502,24 @@ public class DatabaseConnection {
             ps.setBoolean(8, returnTransaction.isCommited());
             ps.setInt(9, saleId);
             if(ps.executeUpdate() > 0) {
-                return updateProductType(returnTransaction.getProduct());
+                ProductTypeImpl prod = returnTransaction.getProduct();
+                PreparedStatement ps2 = CON.prepareStatement("UPDATE product_type SET location = ?, quantity = ?, note = ?, description = ?, barcode = ?, price = ? WHERE id = ?");
+                ps2.setString(1, prod.getLocation());
+                ps2.setInt(2, prod.getQuantity() + returnTransaction.getAmount());
+                ps2.setString(3, prod.getNote());
+                ps2.setString(4, prod.getProductDescription());
+                ps2.setString(5, prod.getBarCode());
+                ps2.setDouble(6, prod.getPricePerUnit());
+                ps2.setInt(7, prod.getId());
+
+                if(ps2.executeUpdate()>0){
+                    prod.setQuantity(prod.getQuantity() + returnTransaction.getAmount());
+                    returnTransaction.setCommited(true);
+                }
             }
             CON.commit();
             CON.setAutoCommit(true);
+            return true;
         }
         catch (Exception ex) {
             try {
@@ -515,6 +529,7 @@ public class DatabaseConnection {
             }
             ex.printStackTrace();
         }
+
         return false;
     }
 
@@ -604,6 +619,120 @@ public class DatabaseConnection {
             ps.setInt(1, op.getBalanceId());
 
             return ps.executeUpdate() > 0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean createCustomer(CustomerImpl customer) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO customer(id, name, card) VALUES(?,?,?)");
+            ps.setInt(1, customer.getId());
+            ps.setString(2, customer.getCustomerName());
+            ps.setString(3, customer.getCustomerCard());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateCustomer(CustomerImpl customer) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("UPDATE customer SET name = ?, card = ? WHERE id = ?");
+            ps.setString(1, customer.getCustomerName());
+            ps.setString(2, customer.getCustomerCard());
+            ps.setInt(3, customer.getId());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public Map<Integer, CustomerImpl> getAllCustomers(Map<String, CustomerCardImpl> mCustomerCards) {
+        Map<Integer, CustomerImpl> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM customer");
+
+            ResultSet resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                CustomerImpl customer = new CustomerImpl(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name")
+                );
+                customer.setCustomerCard(mCustomerCards.get(resultSet.getString("card")));
+                all.put(
+                        customer.getId(),
+                        customer
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
+    }
+
+    public Map<String, CustomerCardImpl> getAllCustomerCards() {
+        Map<String, CustomerCardImpl> all = new HashMap<>();
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM customer_card");
+
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(
+                        resultSet.getString("id"),
+                        new CustomerCardImpl(
+                                resultSet.getString("id"),
+                                resultSet.getInt("points")
+                        )
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return all;
+    }
+
+    public boolean deleteCustomer(CustomerImpl customer) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM customer WHERE id = ?");
+            ps.setInt(1, customer.getId());
+
+            return ps.executeUpdate() > 0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean createCustomerCard(CustomerCardImpl customerCard) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO customer_card(id, points) VALUES(?,?)");
+            ps.setString(1, customerCard.getCardId());
+            ps.setInt(2, customerCard.getCardPoints());
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateCustomerCard(CustomerCardImpl card) {
+        try {
+            PreparedStatement ps = CON.prepareStatement("UPDATE customer_card SET points = ? WHERE id = ?");
+            ps.setInt(1, card.getCardPoints());
+            ps.setString(2, card.getCardId());
+            return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
             ex.printStackTrace();
