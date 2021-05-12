@@ -166,7 +166,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     }
 
     public boolean applyDiscountRateToProduct(ProductType product, double discountRate) {
-        if (mStatus.equals("OPENED") && product != null) {
+        if (mTransactionStatus.equals("OPENED") && product != null) {
             TransactionProduct transactionProduct = mTicketEntries.get(product);
             if(transactionProduct != null) {
                 transactionProduct.setDiscountRate(discountRate);
