@@ -1333,7 +1333,7 @@ public class EZShop implements EZShopInterface {
 
         SaleTransactionImpl saleTransaction = mSaleTransactions.get(transactionId);
         if(saleTransaction != null && saleTransaction.getTransactionStatus().equals("CLOSED")){
-            return saleTransaction.clone();
+            return saleTransaction;
         }
         return null;
     }

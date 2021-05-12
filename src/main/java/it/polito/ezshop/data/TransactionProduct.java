@@ -11,12 +11,6 @@ public class TransactionProduct implements TicketEntry {
         this.discount = discount;
     }
 
-    public TransactionProduct clone() {
-        TransactionProduct t = new TransactionProduct(productType.clone(), discount, quantity);
-        t.setDiscountRate(discount);
-        return t;
-    }
-
     public ProductTypeImpl getProductType(){
         return productType;
     }

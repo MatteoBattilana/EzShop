@@ -13,23 +13,6 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     private double mDiscountRate;
     private String mTransactionStatus;
 
-    public SaleTransaction clone() {
-        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(mDatabaseConnection, getBalanceId());
-        saleTransaction.setDiscountRate(mDiscountRate);
-        saleTransaction.setTransactionStatus(mTransactionStatus);
-
-        Map<ProductTypeImpl, TransactionProduct> map = new HashMap<>();
-        for (Map.Entry<ProductTypeImpl, TransactionProduct> entry : mTicketEntries.entrySet()) {
-            map.put(entry.getKey().clone(), entry.getValue().clone());
-        }
-        saleTransaction.setTransactionProductMap(map);
-        return saleTransaction;
-    }
-
-    public void setTransactionProductMap (Map<ProductTypeImpl, TransactionProduct> map) {
-        mTicketEntries = map;
-    }
-
     public SaleTransactionImpl(DatabaseConnection databaseConnection, int id, LocalDate date, String type, String status, Map<ProductTypeImpl, TransactionProduct> tickets, Map<Integer, ReturnTransaction> returns, double discount, String transactionStatus) {
         super(id, date, type, status);
         mTicketEntries = tickets;
