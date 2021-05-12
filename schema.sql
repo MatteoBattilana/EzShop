@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS return_transaction (
  status text NOT NULL,
  id_product INTEGER NOT NULL,
  amount INTEGER NOT NULL,
- committed BOOLEAN NOT NULL,
  id_sale INTEGER NOT NULL
 );
 

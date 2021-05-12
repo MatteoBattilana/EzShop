@@ -30,7 +30,7 @@ public class CreditCardCircuit {
             }
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return ret;
     }
@@ -73,14 +73,15 @@ public class CreditCardCircuit {
      * @return true if the payment has been successful
      */
     public boolean pay(String creditCard, double money) {
-        if (creditCard == null || money < 0 || !mCreditCardMoney.containsKey(creditCard)) return false;
-        double amount = mCreditCardMoney.get(creditCard);
-        if (amount < money) return false;
-        else {
-            mCreditCardMoney.put(creditCard, amount - money);
-            updateFile();
-            return true;
+        if (isValid(creditCard) && money >= 0) {
+            double amount = mCreditCardMoney.get(creditCard);
+            if (amount >= money) {
+                mCreditCardMoney.put(creditCard, amount - money);
+                updateFile();
+                return true;
+            }
         }
+        return false;
     }
 
     /**

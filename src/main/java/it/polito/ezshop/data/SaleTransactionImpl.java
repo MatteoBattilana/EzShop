@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTransaction {
+    private final DatabaseConnection mDatabaseConnection;
     private Map<ProductTypeImpl, TransactionProduct> mTicketEntries;
     private Map<Integer, ReturnTransaction> mReturns;
     private double mDiscountRate;
     private String mTransactionStatus;
 
     public SaleTransaction clone() {
-        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(getBalanceId());
+        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(mDatabaseConnection, getBalanceId());
         saleTransaction.setDiscountRate(mDiscountRate);
         saleTransaction.setTransactionStatus(mTransactionStatus);
 
@@ -29,25 +30,26 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         mTicketEntries = map;
     }
 
-    public SaleTransactionImpl(int id, LocalDate date, String type, String status, Map<ProductTypeImpl, TransactionProduct> tickets, Map<Integer, ReturnTransaction> returns, double discount, String transactionStatus) {
+    public SaleTransactionImpl(DatabaseConnection databaseConnection, int id, LocalDate date, String type, String status, Map<ProductTypeImpl, TransactionProduct> tickets, Map<Integer, ReturnTransaction> returns, double discount, String transactionStatus) {
         super(id, date, type, status);
         mTicketEntries = tickets;
         mReturns = returns;
         mDiscountRate = discount;
         mTransactionStatus = transactionStatus;
+        mDatabaseConnection = databaseConnection;
     }
 
-    public SaleTransactionImpl(int id) {
-        this(id, LocalDate.now(), "SALE", "UNPAID", new HashMap<>(), new HashMap<>(), 0.0, "OPENED");
+    public SaleTransactionImpl(DatabaseConnection databaseConnection, int id) {
+        this(databaseConnection, id, LocalDate.now(), "SALE", "UNPAID", new HashMap<>(), new HashMap<>(), 0.0, "OPENED");
     }
 
     public List<ReturnTransaction> getReturnTransactions(){
         return new ArrayList<>(mReturns.values());
     }
 
-    public ReturnTransaction startReturnTransaction(int balanceId) {
-        ReturnTransaction returnT = new ReturnTransaction(balanceId);
-        mReturns.put(balanceId, returnT);
+    public ReturnTransaction startReturnTransaction(int newId) {
+        ReturnTransaction returnT = new ReturnTransaction(newId);
+        mReturns.put(returnT.getBalanceId(), returnT);
         return returnT;
     }
 
@@ -120,6 +122,10 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     @Override
     public double getMoney() {
         return getPrice();
+    }
+
+    public double computeTotal(){
+        return getMoney();
     }
 
     @Override
@@ -197,28 +203,75 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         return (int) Math.floor(getMoney()/10.0);
     }
 
-    public ReturnTransaction getReturnById(int id) {
+    public ReturnTransaction getReturnTransaction(int id) {
         return mReturns.get(id);
     }
 
 
-    public ReturnTransaction deleteReturnTransaction(Integer returnId) {
+    public boolean deleteReturnTransaction(Integer returnId) {
         ReturnTransaction returnTransaction = mReturns.get(returnId);
         if(returnTransaction != null && !returnTransaction.getStatus().equals("PAID")) {
-            ProductTypeImpl product = returnTransaction.getProduct();
-            if(product != null && returnTransaction.isCommited()){
-                product.setQuantity(product.getQuantity() + returnTransaction.getAmount());
-            }
+            mReturns.remove(returnId);
+            return true;
         }
-        return returnTransaction;
+        return false;
     }
 
     public double getReturnTransactionTotal(Integer returnId) {
         ReturnTransaction retT = mReturns.get(returnId);
-        if(retT != null && retT.isCommited() && retT.getStatus().equals("UNPAID")){
+        if(retT != null && retT.getStatus().equals("UNPAID")){
             return retT.computeTotal();
         }
 
         return -1;
+    }
+
+    public boolean endReturnTransaction(Integer returnId, boolean commit) {
+        if(!commit) {
+            return deleteReturnTransaction(returnId);
+        }
+        else {
+            ReturnTransaction returnTransaction = mReturns.get(returnId);
+            if(returnTransaction != null) {
+                ProductTypeImpl product = returnTransaction.getProduct();
+                TransactionProduct origTrans = mTicketEntries.get(product);
+                origTrans.setAmount(origTrans.getAmount() - returnTransaction.getAmount());
+                product.setQuantity(product.getQuantity() + returnTransaction.getAmount());
+                if(mDatabaseConnection.saveReturnTransaction(returnTransaction, getBalanceId())){
+                    if(mDatabaseConnection.updateProductType(product)){
+                        return true;
+                    }
+                    // Rollback
+                    mDatabaseConnection.deleteReturnTransaction(returnTransaction, getBalanceId());
+                }
+                else {
+                    // Rollback
+                    origTrans.setAmount(origTrans.getAmount() + returnTransaction.getAmount());
+                    product.setQuantity(product.getQuantity() - returnTransaction.getAmount());
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean setPaidReturnTransaction(Integer returnId) {
+        ReturnTransaction returnTransaction = mReturns.get(returnId);
+        if(returnTransaction != null) {
+            returnTransaction.setStatus("PAID");
+            if(mDatabaseConnection.updateReturnTransaction(returnTransaction, mBalanceId)){
+                return true;
+            } else {
+                returnTransaction.setStatus("UNPAID");
+            }
+        }
+        return false;
+    }
+
+    public void reset() {
+        for (ReturnTransaction ret : mReturns.values()){
+            mDatabaseConnection.deleteReturnTransaction(ret, mBalanceId);
+        }
+        mDatabaseConnection.deleteAllTransactionProducts(mBalanceId);
     }
 }

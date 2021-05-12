@@ -61,4 +61,8 @@ public class OrderImpl extends BalanceOperationImpl {
     public void setQuantity(int quantity) {
         mQuantity = quantity;
     }
+
+    public void recordOrderArrival() {
+        mOrderStatus = "COMPLETED";
+    }
 }
