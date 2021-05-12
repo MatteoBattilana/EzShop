@@ -1,14 +1,16 @@
 package it.polito.ezshop.data;
 
 public class TransactionProduct implements TicketEntry {
+    private double pricePerUnit;
     private ProductTypeImpl productType;
     int quantity;
     double discount;
 
-    public TransactionProduct(ProductTypeImpl productType, double discount, int quantity) {
+    public TransactionProduct(ProductTypeImpl productType, double discount, int quantity, double pricePerUnit) {
         this.productType = productType;
         this.quantity = quantity;
         this.discount = discount;
+        this.pricePerUnit = pricePerUnit;
     }
 
     public ProductTypeImpl getProductType(){
@@ -42,17 +44,18 @@ public class TransactionProduct implements TicketEntry {
 
     @Override
     public void setAmount(int amount) {
-        this.quantity = amount;
+        if(amount >= 0)
+            this.quantity = amount;
     }
 
     @Override
     public double getPricePerUnit() {
-        return productType.getPricePerUnit();
+        return pricePerUnit;
     }
 
     @Override
     public void setPricePerUnit(double pricePerUnit) {
-        productType.setPricePerUnit(pricePerUnit);
+        this.pricePerUnit = pricePerUnit;
     }
 
     @Override

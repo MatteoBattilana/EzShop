@@ -22,7 +22,8 @@ public class BalanceOperationImpl implements BalanceOperation {
     }
 
     public void setStatus(String status){
-        this.mStatus = status;
+        if(status != null && (status.equals("PAID") || status.equals("UNPAID")))
+            this.mStatus = status;
     }
 
     @Override
@@ -34,8 +35,6 @@ public class BalanceOperationImpl implements BalanceOperation {
     public void setBalanceId(int balanceId) {
         if (balanceId > 0)
             mBalanceId = balanceId;
-        else
-            mBalanceId = -1;
     }
 
     @Override
@@ -66,7 +65,8 @@ public class BalanceOperationImpl implements BalanceOperation {
 
     @Override
     public void setType(String type) {
-        mType = type;
+        if(type != null && (type.equals("SALE") || type.equals("ORDER") || type.equals("RETURN") || type.equals("DEBIT") || type.equals("CREDIT")))
+            mType = type;
     }
 
     public String getStatus() {

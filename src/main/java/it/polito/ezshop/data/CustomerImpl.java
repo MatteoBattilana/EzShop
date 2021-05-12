@@ -33,7 +33,7 @@ public class CustomerImpl implements Customer {
 
     @Override
     public void setCustomerCard(String customerCard) {
-        if (customerCard != null && customerCard.length() > 0) {
+        if (customerCard != null && !customerCard.isEmpty()) {
             if(ccard != null)
                 ccard.setId(customerCard);
             else

@@ -40,10 +40,6 @@ CREATE TABLE IF NOT EXISTS balance_operation (
  status text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS account_book (
-    balance DOUBLE
-);
-
 CREATE TABLE IF NOT EXISTS product_type (
     id INTEGER,
     location text,
@@ -59,7 +55,6 @@ CREATE TABLE IF NOT EXISTS sale_transaction (
     discount DOUBLE NOT NULL,
     transaction_status text NOT NULL,
     date_op DATE,
-    money DOUBLE,
     type text NOT NULL,
     status text NOT NULL
 );
@@ -80,5 +75,6 @@ CREATE TABLE IF NOT EXISTS transaction_product (
     id_sale INTEGER NOT NULL,
     id_product INTEGER NOT NULL,
     discount DOUBLE NOT NULL,
+    price DOUBLE NOT NULL,
     quantity INTEGER NOT NULL
 );

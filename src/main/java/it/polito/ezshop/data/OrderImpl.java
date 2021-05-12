@@ -3,7 +3,6 @@ package it.polito.ezshop.data;
 import java.time.LocalDate;
 
 public class OrderImpl extends BalanceOperationImpl {
-    private int mBalanceId;
     private String mProductCode;
     private double mPricePerUnit;
     private int mQuantity;
