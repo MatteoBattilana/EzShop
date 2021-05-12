@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class CreditCardCircuit {
     Map<String, Double> mCreditCardMoney;
-    private static final String sFILE = "cards.txt";
+    private static final String sFILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
 
     public CreditCardCircuit() {
         mCreditCardMoney = loadFromFile();
@@ -22,7 +22,7 @@ public class CreditCardCircuit {
         try {
             reader = new BufferedReader(new FileReader(sFILE));
             String line = reader.readLine();
-            while (line != null) {
+            while (line != null && line.charAt(0) != '#') {
                 line = reader.readLine();
                 String[] card = line.split(";");
                 if(card.length == 2)
@@ -30,7 +30,7 @@ public class CreditCardCircuit {
             }
             reader.close();
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         return ret;
     }
