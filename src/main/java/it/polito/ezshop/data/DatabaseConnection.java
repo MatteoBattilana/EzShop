@@ -7,8 +7,8 @@ import java.sql.Date;
 import java.util.*;
 
 public class DatabaseConnection {
-    private final String databaseFileName = "database.db";
-    private final String schemaFileName = "schema.sql";
+    private final String databaseFileName = "src/main/java/it/polito/ezshop/utils/database.db";
+    private final String schemaFileName = "src/main/java/it/polito/ezshop/utils/schema.sql";
     private final transient Connection CON;
 
 

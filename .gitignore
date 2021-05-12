@@ -15,7 +15,7 @@ local.properties
 .loadpath
 .recommenders
 data/*
-database.db
+src/main/java/it/polito/ezshop/utils/database.db
 ezshop.iml
 
 # External tool builders

@@ -16,7 +16,7 @@ public class EZShopTest {
 
     @After
     public void teardown() {
-        File f = new File("database.db");
+        File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
     }
 
