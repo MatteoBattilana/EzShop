@@ -1,10 +1,10 @@
-package it.polito.ezshop.data;
+package it.polito.ezshop.acceptanceTests;
 
 
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.data.User;
 import it.polito.ezshop.exceptions.*;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -12,12 +12,20 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 public class EZShopTest {
-    EZShop ezShop = new EZShop();
+    EZShop ezShop;
 
-    @After
-    public void teardown() {
+    @Before
+    public void setup(){
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
+        ezShop = new EZShop();
+    }
+
+    @Test
+    public void addManyProduct() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
+        for(int i = 0; i<1; i++){
+            ezShop.createUser("username"+i, "pass"+i, "Administrator");
+        }
     }
 
     @Test
@@ -38,12 +46,14 @@ public class EZShopTest {
 
 
         //Start return transaction
+        double initalBalance = ezShop.computeBalance();
         Integer returnId = ezShop.startReturnTransaction(saleId);
         ezShop.returnProduct(returnId, "1234567890128", 2);
         ezShop.endReturnTransaction(returnId, true);
         double ritorno = ezShop.returnCashPayment(returnId);
         assertEquals(2.0, ritorno, 0.1);
         assertEquals(7, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
+        assertEquals(initalBalance - ritorno, ezShop.computeBalance(), 0.1);
 
 
         //Start return transaction
@@ -59,9 +69,6 @@ public class EZShopTest {
         assertNotEquals(-1, returnId3.intValue());
         assertTrue(ezShop.returnProduct(returnId3, "1234567890128", 1));
         assertTrue(ezShop.endReturnTransaction(returnId3, false));
-
-
-
 
         // Sale
         Integer saleId2 = ezShop.startSaleTransaction();
@@ -89,7 +96,6 @@ public class EZShopTest {
         assertTrue(ezShop.endReturnTransaction(returnId23, false));
 
         assertEquals(initialQ, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
-
     }
 
         @Test (expected = InvalidUsernameException.class)

@@ -51,6 +51,10 @@ public class EZShop implements EZShopInterface {
         mOrders.clear();
         mSaleTransactions.clear();
         mOrders.clear();
+
+        for(ProductTypeImpl productType : mProducts.values()){
+            mDatabaseConnection.deleteProductType(productType);
+        }
         mProducts.clear();
     }
 
@@ -313,7 +317,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
         // Check logged user
-        validateLoggedUser("ShopManager");
+        validateLoggedUser("Administrator");
 
         // Check product id
         if (id == null || id <= 0) throw new InvalidProductIdException();
@@ -383,11 +387,7 @@ public class EZShop implements EZShopInterface {
         // Check logged user
         validateLoggedUser("Cashier");
 
-        List<ProductType> ret = new ArrayList<>();
-        for(ProductTypeImpl p : mProducts.values())
-            ret.add(p.clone());
-
-        return ret;
+        return new ArrayList<>(mProducts.values());
     }
 
     /**
@@ -619,15 +619,9 @@ public class EZShop implements EZShopInterface {
             // Add the order to the system
             OrderImpl operation = new OrderImpl(newIdOrder + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "PAID", "PAYED");
             if(mDatabaseConnection.createOrder(operation)) {
-                if(mAccountBook.recordBalanceUpdate(operation.getMoney())) {
-                    mAccountBook.add(operation);
-                    mOrders.put(operation.getBalanceId(), operation);
-                    return operation.getBalanceId();
-                }
-                else {
-                    // Rollback
-                    mDatabaseConnection.deleteOrder(operation);
-                }
+                mAccountBook.add(operation);
+                mOrders.put(operation.getBalanceId(), operation);
+                return operation.getBalanceId();
             }
         }
         return -1;
@@ -659,16 +653,14 @@ public class EZShop implements EZShopInterface {
             order.setOrderStatus("PAYED");
             order.setStatus("PAID");
             if (mAccountBook.computeBalance() - order.getMoney() >= 0) {
-                if(mDatabaseConnection.updateOrder(order)) {
-                    if (mAccountBook.recordBalanceUpdate(order.getMoney())) {
-                        return true;
-                    }
+                if (mDatabaseConnection.updateOrder(order)) {
+                    mAccountBook.add(order);
+                    return true;
                 }
 
                 // Rollback order to previous state
                 order.setOrderStatus("ISSUED");
                 order.setStatus("UNPAID");
-                mDatabaseConnection.updateOrder(order);
             }
         }
 
@@ -980,13 +972,10 @@ public class EZShop implements EZShopInterface {
 
         // Link card to user
         CustomerImpl customer = mCustomers.get(customerId);
-        if (card != null && customer != null && customer.getCustomerCard() == null)
+        if (card != null && customer != null && customer.getCustomerCard() == null) {
             customer.setCustomerCard(card);
-            if(mDatabaseConnection.updateCustomer(customer)){
-                return true;
-            } else {
-                customer.setCustomerCard((CustomerCardImpl) null);
-            }
+            return mDatabaseConnection.updateCustomer(customer);
+        }
 
         return false;
     }
@@ -1056,6 +1045,7 @@ public class EZShop implements EZShopInterface {
                 operation.getTicketNumber(),
                 operation
         );
+        mAccountBook.add(operation);
         return operation.getTicketNumber();
     }
 
@@ -1413,7 +1403,7 @@ public class EZShop implements EZShopInterface {
         // Add te product to the return transaction
         ProductTypeImpl prod = getProductByBarcode(productCode);
         if(prod != null && sale != null){
-            return sale.setReturnProduct(returnId, prod, amount);
+            return sale.addReturnProduct(returnId, prod, amount);
         }
         return false;
     }
@@ -1535,14 +1525,11 @@ public class EZShop implements EZShopInterface {
             // set as paid
             transaction.setStatus("PAID");
             if (mDatabaseConnection.updateSaleTransaction(transaction)) {
-                if(mAccountBook.recordBalanceUpdate(transaction.getMoney())){
-                    return cash - transaction.getMoney();
-                }
+                return cash - transaction.getMoney();
             }
 
             // Rollback
             transaction.setStatus("UNPAID");
-            mDatabaseConnection.updateSaleTransaction(transaction);
         }
         return -1;
     }
@@ -1585,14 +1572,8 @@ public class EZShop implements EZShopInterface {
         if (transaction != null) {
             transaction.setStatus("PAID");
             if(mDatabaseConnection.updateSaleTransaction(transaction)) {
-                if(mAccountBook.recordBalanceUpdate(transaction.getMoney())) {
-                    if(mCreditCardCircuit.pay(creditCard, transaction.getMoney())){
-                        return true;
-                    }
-                    else {
-                        // Revert balance in case of payment failure
-                        mAccountBook.recordBalanceUpdate(-transaction.getMoney());
-                    }
+                if (mCreditCardCircuit.pay(creditCard, transaction.getMoney())) {
+                    return true;
                 }
             }
 
@@ -1631,7 +1612,6 @@ public class EZShop implements EZShopInterface {
         if(sale != null) {
             double returnTotal = sale.getReturnTransactionTotal(returnId);
             if (sale.setPaidReturnTransaction(returnId)) {
-                mAccountBook.recordBalanceUpdate(-returnTotal);
                 return returnTotal;
             }
         }
@@ -1674,18 +1654,13 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(sale != null) {
             double returnTotal = sale.getReturnTransactionTotal(returnId);
-            if (mAccountBook.recordBalanceUpdate(-returnTotal)) {
-                if (mCreditCardCircuit.pay(creditCard, -returnTotal)) {
-                    if (sale.setPaidReturnTransaction(returnId)) {
-                        return returnTotal;
-                    }
-
-                    //Rollback
-                    mCreditCardCircuit.pay(creditCard, returnTotal);
+            if (mCreditCardCircuit.pay(creditCard, -returnTotal)) {
+                if (sale.setPaidReturnTransaction(returnId)) {
+                    return returnTotal;
                 }
 
-                // Revert balance in case of payment failure
-                mAccountBook.recordBalanceUpdate(returnTotal);
+                //Rollback
+                mCreditCardCircuit.pay(creditCard, returnTotal);
             }
         }
 
@@ -1716,15 +1691,14 @@ public class EZShop implements EZShopInterface {
                 newId = id;
         }
 
-        // Create a new operation and put it in the AccountBook
-        BalanceOperationImpl operation = new BalanceOperationImpl(newId + 1, LocalDate.now(), toBeAdded, toBeAdded >= 0 ? "CREDIT" : "DEBIT", "PAID");
-        if (mDatabaseConnection.saveBalanceOperation(operation)) {
-            if (mAccountBook.recordBalanceUpdate(toBeAdded)) {
+        // Check if the new balance is positive
+        if(mAccountBook.computeBalance() + toBeAdded >= 0) {
+            // Create a new operation and put it in the AccountBook
+            BalanceOperationImpl operation = new BalanceOperationImpl(newId + 1, LocalDate.now(), toBeAdded, toBeAdded >= 0 ? "CREDIT" : "DEBIT", "PAID");
+            // Save into the DB
+            if (mDatabaseConnection.saveBalanceOperation(operation)) {
                 mAccountBook.add(operation);
                 return true;
-            } else {
-                // Rollback
-                mDatabaseConnection.deleteBalanceOperation(operation);
             }
         }
 

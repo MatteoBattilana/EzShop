@@ -7,32 +7,32 @@ import java.sql.Date;
 import java.util.*;
 
 public class DatabaseConnection {
-    private final String databaseFileName = "src/main/java/it/polito/ezshop/utils/database.db";
-    private final String schemaFileName = "src/main/java/it/polito/ezshop/utils/schema.sql";
+    private final static String databaseFileName = "src/main/java/it/polito/ezshop/utils/database.db";
+    private final static String schemaFileName = "src/main/java/it/polito/ezshop/utils/schema.sql";
     private final transient Connection CON;
-
 
     public DatabaseConnection() {
         try {
             CON = DriverManager.getConnection("jdbc:sqlite:" + databaseFileName);
             if (CON != null) {
-                DatabaseMetaData meta = CON.getMetaData();
-                executeSqlScript(schemaFileName);
-
+                executeSqlScript();
             }
         } catch (SQLException cnfe) {
             throw new RuntimeException(cnfe.getMessage(), cnfe.getCause());
         }
     }
 
-    private void executeSqlScript(String filename) {
+    /**
+     * Method use to create the database at the startup if not present
+     */
+    private void executeSqlScript() {
         // Delimiter
         String delimiter = ";";
 
         // Create scanner
         Scanner scanner;
         try {
-            scanner = new Scanner(new File(filename)).useDelimiter(delimiter);
+            scanner = new Scanner(new File(schemaFileName)).useDelimiter(delimiter);
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
             return;
@@ -65,6 +65,12 @@ public class DatabaseConnection {
         scanner.close();
     }
 
+    /**
+     * Method used to save the user into the DB
+     *
+     * @param user the user that need to be saved into the DB
+     * @return true if the user has been saved into the DB
+     */
     public boolean createUser(User user) {
         try {
             PreparedStatement ps = CON.prepareStatement("INSERT INTO users(id, username, password, role) VALUES(?,?,?,?)");
@@ -139,31 +145,6 @@ public class DatabaseConnection {
             ps.setString(5, o.getProductCode());
             ps.setString(6, o.getOrderStatus());
             ps.setDouble(7, o.getPricePerUnit());
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-
-    public boolean updateBalance(double v) {
-        deleteBalance();
-        try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO account_book(balance) VALUES(?)");
-            ps.setDouble(1, v);
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    private boolean deleteBalance() {
-        try {
-            PreparedStatement ps = CON.prepareStatement("DELETE FROM account_book");
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -249,14 +230,13 @@ public class DatabaseConnection {
 
     public boolean createSaleTransaction(SaleTransactionImpl saleT) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO sale_transaction(id, discount, transaction_status, date_op, money, type, status) VALUES(?,?,?,?,?,?,?)");
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO sale_transaction(id, discount, transaction_status, date_op, type, status) VALUES(?,?,?,?,?,?)");
             ps.setInt(1, saleT.getTicketNumber());
             ps.setDouble(2, saleT.getDiscountRate());
             ps.setString(3, saleT.getTransactionStatus());
             ps.setDate(4, Date.valueOf(saleT.getDate()));
-            ps.setDouble(5, saleT.getMoney());
-            ps.setString(6, saleT.getType());
-            ps.setString(7, saleT.getStatus());
+            ps.setString(5, saleT.getType());
+            ps.setString(6, saleT.getStatus());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -273,6 +253,7 @@ public class DatabaseConnection {
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 int saleId = resultSet.getInt("id");
+                Map<ProductTypeImpl, TransactionProduct> soldProducts = getAllBySaleId(saleId, mProducts);
                 all.put(
                         resultSet.getInt("id"),
                         new SaleTransactionImpl(
@@ -281,8 +262,8 @@ public class DatabaseConnection {
                                 new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
                                 resultSet.getString("type"),
                                 resultSet.getString("status"),
-                                getAllBySaleId(saleId, mProducts),
-                                getAllReturnTransaction(saleId, mProducts),
+                                soldProducts,
+                                getAllReturnTransaction(saleId, mProducts, resultSet.getDouble("discount"), soldProducts),
                                 resultSet.getDouble("discount"),
                                 resultSet.getString("transaction_status")
                         )
@@ -309,7 +290,8 @@ public class DatabaseConnection {
                         new TransactionProduct(
                                 product,
                                 resultSet.getDouble("discount"),
-                                resultSet.getInt("quantity")
+                                resultSet.getInt("quantity"),
+                                resultSet.getDouble("price")
                         )
                 );
             }
@@ -320,7 +302,7 @@ public class DatabaseConnection {
         return all;
     }
 
-    private Map<Integer, ReturnTransaction> getAllReturnTransaction(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
+    private Map<Integer, ReturnTransaction> getAllReturnTransaction(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts, double saleDiscount, Map<ProductTypeImpl, TransactionProduct> soldProducts) {
         Map<Integer, ReturnTransaction> all = new HashMap<>();
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM return_transaction WHERE id_sale = ?");
@@ -328,18 +310,24 @@ public class DatabaseConnection {
 
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
+                ReturnTransaction retT = all.get(resultSet.getInt("id"));
+                if(retT == null) {
+                    retT = new ReturnTransaction(
+                            resultSet.getInt("id"),
+                            new Date(resultSet.getDate("date_op").getTime()).toLocalDate(),
+                            resultSet.getString("type"),
+                            resultSet.getString("status"),
+                            saleDiscount
+                    );
+                    all.put(
+                            resultSet.getInt("id"),
+                            retT
+                    );
+                }
+
+                // Add product returned used to decrement the one in the sale transaction
                 ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
-                all.put(
-                        resultSet.getInt("id"),
-                        new ReturnTransaction(
-                                resultSet.getInt("id"),
-                                new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
-                                resultSet.getString("type"),
-                                resultSet.getString("status"),
-                                resultSet.getInt("amount"),
-                                product
-                        )
-                );
+                retT.addProduct(soldProducts.get(product), resultSet.getInt("amount"));
             }
         }
         catch (Exception ex) {
@@ -350,11 +338,12 @@ public class DatabaseConnection {
 
     public boolean addProductToSale(SaleTransactionImpl transaction, TicketEntry ticket, int productId) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO transaction_product(id_sale, id_product, discount, quantity) VALUES(?,?,?,?)");
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO transaction_product(id_sale, id_product, discount, quantity, price) VALUES(?,?,?,?,?)");
             ps.setInt(1, transaction.getTicketNumber());
             ps.setInt(2, productId);
             ps.setDouble(3, ticket.getDiscountRate());
             ps.setInt(4, ticket.getAmount());
+            ps.setDouble(5, ticket.getPricePerUnit());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -392,28 +381,37 @@ public class DatabaseConnection {
             CON.setAutoCommit(true);
             return true;
         }
-        catch (Exception ex) {
-            try {
-                CON.rollback();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-            ex.printStackTrace();
-        }
+        catch (Exception ex) {ex.printStackTrace();}
         return false;
     }
 
     public boolean updateSaleTransaction(SaleTransactionImpl transaction) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE sale_transaction SET discount = ?, transaction_status = ?, date_op = ?, money = ?, type = ?, status = ? WHERE id = ?");
+            CON.setAutoCommit(false);
+            PreparedStatement ps = CON.prepareStatement("UPDATE sale_transaction SET discount = ?, transaction_status = ?, date_op = ?,  type = ?, status = ? WHERE id = ?");
             ps.setDouble(1, transaction.getDiscountRate());
             ps.setString(2, transaction.getTransactionStatus());
             ps.setDate(3, Date.valueOf(transaction.getDate()));
-            ps.setDouble(4, transaction.getMoney());
-            ps.setString(5, transaction.getType());
-            ps.setString(6, transaction.getStatus());
-            ps.setInt(7, transaction.getTicketNumber());
-            return ps.executeUpdate()>0;
+            ps.setString(4, transaction.getType());
+            ps.setString(5, transaction.getStatus());
+            ps.setInt(6, transaction.getTicketNumber());
+            if (ps.executeUpdate()>0){
+                for(TransactionProduct tp : transaction.getTicketEntries()) {
+                    PreparedStatement ps1 = CON.prepareStatement("UPDATE transaction_product SET discount = ?, price = ?, quantity = ? WHERE id_sale = ? AND id_product = ?");
+                    ps1.setDouble(1, tp.getDiscountRate());
+                    ps1.setDouble(2, tp.getPricePerUnit());
+                    ps1.setInt(3, tp.getAmount());
+                    ps1.setInt(4, transaction.getBalanceId());
+                    ps1.setInt(5, tp.getProductType().getId());
+                    if(ps1.executeUpdate() <= 0){
+                        CON.rollback();
+                        return false;
+                    }
+                }
+            }
+            CON.commit();
+            CON.setAutoCommit(true);
+            return true;
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -437,17 +435,6 @@ public class DatabaseConnection {
         return false;
     }
 
-    public double getBalance() {
-        try {
-            PreparedStatement ps = CON.prepareStatement("SELECT balance FROM account_book");
-            ResultSet resultSet = ps.executeQuery();
-            if(resultSet.next()) return resultSet.getDouble("balance");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return 0;
-    }
 
     public List<BalanceOperationImpl> getAllBalanceOperations() {
         List<BalanceOperationImpl> all = new ArrayList<>();
@@ -489,25 +476,16 @@ public class DatabaseConnection {
     public boolean saveReturnTransaction(ReturnTransaction returnTransaction, Integer saleId) {
         try {
             CON.setAutoCommit(false);
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, money, type, status, id_product, amount,  id_sale) VALUES(?,?,?,?,?,?,?,?)");
-            ps.setInt(1, returnTransaction.getBalanceId());
-            ps.setDate(2, Date.valueOf(returnTransaction.getDate()));
-            ps.setDouble(3, returnTransaction.getMoney());
-            ps.setString(4, returnTransaction.getType());
-            ps.setString(5, returnTransaction.getStatus());
-            ps.setInt(6, returnTransaction.getProduct().getId());
-            ps.setInt(7, returnTransaction.getAmount());
-            ps.setInt(8, saleId);
-            if(ps.executeUpdate() > 0) {
-                ProductTypeImpl prod = returnTransaction.getProduct();
-                PreparedStatement ps2 = CON.prepareStatement("UPDATE product_type SET location = ?, quantity = ?, note = ?, description = ?, barcode = ?, price = ? WHERE id = ?");
-                ps2.setString(1, prod.getLocation());
-                ps2.setInt(2, prod.getQuantity());
-                ps2.setString(3, prod.getNote());
-                ps2.setString(4, prod.getProductDescription());
-                ps2.setString(5, prod.getBarCode());
-                ps2.setDouble(6, prod.getPricePerUnit());
-                ps2.setInt(7, prod.getId());
+            for(Map.Entry<TransactionProduct, Integer> entry : returnTransaction.getReturns().entrySet()) {
+                PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, type, status, id_product, amount,  id_sale) VALUES(?,?,?,?,?,?,?)");
+                ps.setInt(1, returnTransaction.getBalanceId());
+                ps.setDate(2, Date.valueOf(returnTransaction.getDate()));
+                ps.setString(3, returnTransaction.getType());
+                ps.setString(4, returnTransaction.getStatus());
+                ps.setInt(5, entry.getKey().getProductType().getId());
+                ps.setInt(6, entry.getValue());
+                ps.setInt(7, saleId);
+                ps.executeUpdate();
             }
             CON.commit();
             CON.setAutoCommit(true);
@@ -525,17 +503,11 @@ public class DatabaseConnection {
         return false;
     }
 
-    public boolean updateReturnTransaction(ReturnTransaction returnT, Integer saleId) {
+    public boolean setStatusReturnTransaction(ReturnTransaction returnT) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE return_transaction SET date_op = ?, money = ?, type = ?, status = ?, id_product = ?, amount = ?, id_sale = ? WHERE id = ?");
-            ps.setDate(1, Date.valueOf(returnT.getDate()));
-            ps.setDouble(2, returnT.getMoney());
-            ps.setString(3, returnT.getType());
-            ps.setString(4, returnT.getStatus());
-            ps.setInt(5, returnT.getProduct().getId());
-            ps.setInt(6, returnT.getAmount());
-            ps.setInt(7, saleId);
-            ps.setInt(8, returnT.getBalanceId());
+            PreparedStatement ps = CON.prepareStatement("UPDATE return_transaction SET status = ? WHERE id = ?");
+            ps.setString(1, returnT.getStatus());
+            ps.setInt(2, returnT.getBalanceId());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -716,7 +688,7 @@ public class DatabaseConnection {
         return false;
     }
 
-    public boolean deleteReturnTransaction(ReturnTransaction ret, int saleId) {
+    public boolean deleteReturnTransaction(ReturnTransaction ret) {
             try {
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM return_transaction WHERE id = ?");
                 ps.setInt(1, ret.getBalanceId());
