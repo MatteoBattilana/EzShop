@@ -10,14 +10,16 @@ import it.polito.ezshop.data.EZShop;
 
 
 import static org.junit.Assert.*;
-public class CustomerTest {
+public class CustomerImplTest {
 
 
     @Test
     public void InvalidSetCustomerName(){
 
-        CustomerImpl customer= new CustomerImpl(34,"sara");
-        assertThrows(NullPointerException.class, () -> {customer.setCustomerName(""); } );
+        CustomerImpl customer= new CustomerImpl(34,"Sara");
+        String CustomerName = customer.getCustomerName();
+        customer.setCustomerName("");
+        assertEquals(CustomerName, customer.getCustomerName());
 
     }
 
@@ -32,20 +34,22 @@ public class CustomerTest {
 
     @Test
     public void NullSetCustomerName(){
-
         CustomerImpl customer= new CustomerImpl(34,"Sara");
-        assertThrows(java.time.DateTimeException.class, () -> {customer.setCustomerName(null); } );
+        String CustomerName = customer.getCustomerName();
+        customer.setCustomerName(null);
+        assertEquals(CustomerName, customer.getCustomerName());
 
 
     }
     @Test
     public void NegativeSetCustomerId(){
         CustomerImpl customer= new CustomerImpl(34,"Sara");
+       Integer id = customer.getId();
         customer.setId(-5);
-        assertEquals(-1,customer.getId());
+        assertEquals(id,customer.getId());
         // boundary
-        customer.setId(-5);
-        assertEquals(-1,customer.getId());
+        customer.setId(0);
+        assertEquals(id,customer.getId());
 
     }
 
@@ -53,8 +57,9 @@ public class CustomerTest {
     public void PositiveSetCustomerId(){
 
         CustomerImpl customer= new CustomerImpl(34,"Sara");
+        Integer id = 15;
         customer.setId(15);
-        assertEquals(15,customer.getId());
+        assertEquals(id,customer.getId());
 
     }
 

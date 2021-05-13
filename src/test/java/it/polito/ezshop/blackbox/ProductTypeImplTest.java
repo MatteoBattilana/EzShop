@@ -12,7 +12,7 @@ import it.polito.ezshop.data.EZShop;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-public class ProductTypeTest {
+public class ProductTypeImplTest {
 
 
     @Test
@@ -23,7 +23,7 @@ public class ProductTypeTest {
         product.setId(-5);
         assertEquals(mId, product.getId());
         // boundary
-        product.setId(-1);
+        product.setId(0);
         assertEquals(mId,product.getId());
 
     }
@@ -34,6 +34,17 @@ public class ProductTypeTest {
         ProductTypeImpl product = new ProductTypeImpl(5,"shelves", "good", "red","010003004",0.50 ,50);
         Integer id= 5;
         product.setId(5);
+        assertEquals(id, product.getId());
+
+
+
+    }
+    @Test
+    public void NullSetId(){
+
+        ProductTypeImpl product = new ProductTypeImpl(5,"shelves", "good", "red","010003004",0.50 ,50);
+        Integer id= product.getId();
+        product.setId(null);
         assertEquals(id, product.getId());
 
 
@@ -87,7 +98,14 @@ public class ProductTypeTest {
         assertEquals(price,product.getPricePerUnit());
 
     }
+    @Test
+    public void InvalidSetPricePerUnit(){
 
+        ProductTypeImpl product = new ProductTypeImpl(5,"shelves", "good", "red","010003004",0.50 ,50);
+        Double price = product.getPricePerUnit();
+        product.setPricePerUnit(null);
+        assertEquals(price, product.getPricePerUnit());
+    }
     @Test
     public void PositiveSetPricePerUnit(){
 
@@ -95,6 +113,10 @@ public class ProductTypeTest {
         product.setPricePerUnit(0.60);
         Double price = 0.60;
         assertEquals(price, product.getPricePerUnit());
+        //boundary
+        product.setPricePerUnit(0.0001);
+        Double priceunit = 0.0001;
+        assertEquals(priceunit, product.getPricePerUnit());
 
 
     }

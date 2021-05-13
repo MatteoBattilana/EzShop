@@ -12,7 +12,7 @@ import it.polito.ezshop.data.EZShop;
 
 import static org.junit.Assert.*;
 
-public class UserTest {
+public class UserImplTest {
 
 
     @Test
