@@ -56,6 +56,15 @@ public class UserImpl implements User {
 
     @Override
     public void setRole(String role) {
+        updateUserRights(role);
+    }
+
+    /**
+     * Use to update the role of the user
+     *
+     * @param role the new role of the user
+     */
+    public void updateUserRights(String role){
         if (role != null && role.length() > 0 && (role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
             mRole = role;
         }

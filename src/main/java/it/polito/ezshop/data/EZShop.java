@@ -562,7 +562,7 @@ public class EZShop implements EZShopInterface {
         }
 
         // Add the order to the system
-        OrderImpl order = new OrderImpl(newIdOrder + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "UNPAID", "ISSUED");
+        OrderImpl order = new OrderImpl(newIdOrder + 1, productCode, pricePerUnit, quantity, "UNPAID", "ISSUED");
         if(mDatabaseConnection.createOrder(order)) {
             mAccountBook.add(order);
             mOrders.put(order.getBalanceId(), order);
@@ -617,7 +617,7 @@ public class EZShop implements EZShopInterface {
             }
 
             // Add the order to the system
-            OrderImpl operation = new OrderImpl(newIdOrder + 1, LocalDate.now(), productCode, pricePerUnit, quantity, "PAID", "PAYED");
+            OrderImpl operation = new OrderImpl(newIdOrder + 1, productCode, pricePerUnit, quantity, "PAID", "PAYED");
             if(mDatabaseConnection.createOrder(operation)) {
                 mAccountBook.add(operation);
                 mOrders.put(operation.getBalanceId(), operation);
