@@ -236,7 +236,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                 // Rollback quantities
                 returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
                     // Remove from the sale the products
-                    transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() + amount);
+                    transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() - amount);
                     mDatabaseConnection.updateProductType(transactionProduct.getProductType());
                     transactionProduct.setAmount(transactionProduct.getAmount() + amount);
                 });
@@ -259,7 +259,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      */
     public double getReturnTransactionTotal(Integer returnId) {
         ReturnTransaction retT = mReturns.get(returnId);
-        if(retT != null && retT.getStatus().equals("UNPAID")){
+        if(retT != null && retT.getStatus().equals("CLOSED")){
             return retT.computeTotal();
         }
 
@@ -289,11 +289,9 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                     transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() + amount);
                     // Remove from the sale the products
                     transactionProduct.setAmount(transactionProduct.getAmount() - amount);
-
-                    //Update database
-                    mDatabaseConnection.saveReturnTransaction(returnTransaction, getBalanceId());
-                    mDatabaseConnection.updateProductType(transactionProduct.getProductType());
                 });
+                mDatabaseConnection.saveSaleTransaction(this);
+                mDatabaseConnection.saveReturnTransaction(returnTransaction, getBalanceId());
                 return true;
             }
         }
