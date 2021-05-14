@@ -60,7 +60,7 @@ public class AccountBook {
         double sum = 0.0;
         for(BalanceOperationImpl op: mBalanceOperations) {
             // Skip return transaction
-            if(!(op instanceof ReturnTransaction))
+            if(!(op instanceof ReturnTransaction) && op.getStatus().equals("PAID"))
                 sum += op.getMoney();
         }
 
