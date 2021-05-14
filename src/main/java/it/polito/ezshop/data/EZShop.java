@@ -810,18 +810,20 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerNameException("Customer Name is not valid");
         }
 
-        if ( newCustomerCard== null || (!newCustomerCard.isEmpty() && !Pattern.compile("[0-9]{10}").matcher(newCustomerCard).matches())){
+        if ( newCustomerCard != null && !newCustomerCard.isEmpty() && !Pattern.compile("[0-9]{10}").matcher(newCustomerCard).matches()){
             throw new InvalidCustomerCardException("Customer Card is not valid");
         }
 
         CustomerImpl customer = mCustomers.get(id);
-        CustomerCardImpl card = mCustomerCards.get(newCustomerCard);
         if (customer != null) {
             customer.setCustomerName(newCustomerName);
-            if(newCustomerCard.isEmpty())
-                customer.unlinkCustomerCard();
-            else if (card != null)
-                customer.setCustomerCard(card);
+            if(newCustomerCard != null){
+                CustomerCardImpl card = mCustomerCards.get(newCustomerCard);
+                if(newCustomerCard.isEmpty())
+                    customer.unlinkCustomerCard();
+                else if (card != null)
+                    customer.setCustomerCard(card);
+            }
 
             if(mDatabaseConnection.updateCustomer(customer)) {
                 return true;
@@ -829,9 +831,9 @@ public class EZShop implements EZShopInterface {
                 // Rollback
                 loadCustomersFromDb();
             }
-
         }
         return false;
+
     }
 
     /**
@@ -1764,7 +1766,7 @@ public class EZShop implements EZShopInterface {
      * @throws InvalidProductCodeException if the code is not compliant with the standard
      */
     private void validateBarcode(String productCode) throws InvalidProductCodeException {
-        if (productCode == null || !productCode.matches("[0-9]+") || productCode.length() < 12)
+        if (productCode == null || !productCode.matches("[0-9]{12,14}") || productCode.length() < 12)
             throw new InvalidProductCodeException();
 
         // Adding zero pattern at start
