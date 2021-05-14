@@ -227,12 +227,27 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      */
     public boolean deleteReturnTransaction(Integer returnId) {
         ReturnTransaction returnTransaction = mReturns.get(returnId);
-        if(returnTransaction != null && !returnTransaction.getStatus().equals("PAID")) {
-            mReturns.remove(returnId);
-            return true;
+        if(returnTransaction != null) {
+            if(returnTransaction.getStatus().equals("OPENED")) {
+                mReturns.remove(returnId);
+                return true;
+            }
+            else if(returnTransaction.getStatus().equals("CLOSED")){
+                // Rollback quantities
+                returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
+                    // Remove from the sale the products
+                    transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() + amount);
+                    mDatabaseConnection.updateProductType(transactionProduct.getProductType());
+                    transactionProduct.setAmount(transactionProduct.getAmount() + amount);
+                });
+                mReturns.remove(returnId);
+                return true;
+            }
         }
         return false;
     }
+
+
 
     /**
      * Return the total to be returned to the customer in absolute value. This
@@ -267,6 +282,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         else {
             ReturnTransaction returnTransaction = mReturns.get(returnId);
             if(returnTransaction != null) {
+                returnTransaction.setStatus("CLOSED");
                 // Update quantity of all products
                 returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
                     // Add to inventory the returned products
@@ -294,12 +310,12 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      */
     public boolean setPaidReturnTransaction(Integer returnId) {
         ReturnTransaction returnTransaction = mReturns.get(returnId);
-        if(returnTransaction != null) {
+        if(returnTransaction != null && returnTransaction.getStatus().equals("CLOSED")) {
             returnTransaction.setStatus("PAID");
             if(mDatabaseConnection.setStatusReturnTransaction(returnTransaction)){
                 return true;
             } else {
-                returnTransaction.setStatus("UNPAID");
+                returnTransaction.setStatus("CLOSED");
             }
         }
         return false;

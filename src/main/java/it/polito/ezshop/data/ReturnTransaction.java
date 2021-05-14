@@ -18,7 +18,7 @@ public class ReturnTransaction extends BalanceOperationImpl {
     }
 
     public ReturnTransaction(int balanceId, double discountRate) {
-        this(balanceId, LocalDate.now(), "RETURN", "UNPAID", discountRate);
+        this(balanceId, LocalDate.now(), "RETURN", "OPENED", discountRate);
     }
 
     /**
