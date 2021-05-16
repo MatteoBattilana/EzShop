@@ -1,25 +1,15 @@
-package it.polito.ezshop.blackbox;
-
-
-
+package it.polito.ezshop.unitBBTest;
 
 import it.polito.ezshop.data.BalanceOperationImpl;
-import it.polito.ezshop.exceptions.*;
 import org.junit.Test;
-import it.polito.ezshop.data.EZShop;
 import java.time.LocalDate;
-
-
-
 
 import static org.junit.Assert.*;
 
 public class BalanceOperationImplTest {
 
-
     @Test
     public void NegativeSetBalanceId(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
 
         balance.setBalanceId(-5);
@@ -32,20 +22,19 @@ public class BalanceOperationImplTest {
 
     @Test
     public void PositiveSetBalanceId(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
 
         balance.setBalanceId(15);
         assertEquals(15,balance.getBalanceId());
 
     }
+
     @Test
     public void NullSetDate(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         LocalDate date= balance.getDate();
         balance.setDate(null);
         assertEquals(date,balance.getDate());
-
     }
 
     @Test
@@ -59,26 +48,22 @@ public class BalanceOperationImplTest {
 
     @Test
     public void NullSetType(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String type= balance.getType();
         balance.setType(null);
         assertEquals(type, balance.getType());
-
     }
 
     @Test
     public void InvalidSetType(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String type= balance.getType();
         balance.setType(" ");
         assertEquals(type, balance.getType());
-
     }
+
     @Test
     public void PositiveSetType(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         balance.setType("SALE");
         assertEquals("SALE", balance.getType());
@@ -90,28 +75,38 @@ public class BalanceOperationImplTest {
         assertEquals("ORDER", balance.getType());
         balance.setType("RETURN");
         assertEquals("RETURN", balance.getType());
-
     }
+
     @Test
     public void NullSetStatus(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String status= balance.getStatus();
         balance.setType(null);
         assertEquals(status, balance.getStatus());
-
     }
 
     @Test
     public void InvalidSetStatus(){
-
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String status= balance.getStatus();
         balance.setType(" ");
         assertEquals(status, balance.getStatus());
-
-
     }
+
+    @Test
+    public void setStatus(){
+        BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
+        balanceOperation.setStatus("UNPAID");
+        assertEquals("UNPAID", balanceOperation.getStatus());
+        balanceOperation.setStatus("PAID");
+        assertEquals("PAID", balanceOperation.getStatus());
+
+        balanceOperation.setStatus("");
+        assertEquals("PAID", balanceOperation.getStatus());
+        balanceOperation.setStatus(null);
+        assertEquals("PAID", balanceOperation.getStatus());
+    }
+
     @Test
     public void PositiveSetStatus(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
@@ -119,9 +114,8 @@ public class BalanceOperationImplTest {
         assertEquals("UNPAID", balance.getStatus());
         balance.setStatus("PAID");
         assertEquals("PAID", balance.getStatus());
-
-
     }
+
     @Test
     public void setMoney(){
         BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
@@ -132,6 +126,5 @@ public class BalanceOperationImplTest {
         balanceOperation.setMoney(Double.MAX_VALUE);
         assertEquals(Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
     }
-
 }
 

@@ -78,9 +78,8 @@ public class CreditCardCircuit {
                 try {
                     FileWriter myWriter = new FileWriter(sFILE, false);
                     for (Map.Entry<String, Double> card: mCreditCardMoney.entrySet()) {
-                        myWriter.write(card.getKey() + ";" + card.getValue());
+                        myWriter.write(card.getKey() + ";" + card.getValue() + "\n");
                     }
-                    myWriter.write("Files in Java might be tricky, but it is fun enough!");
                     myWriter.close();
                 } catch (IOException e) {
                     e.printStackTrace();

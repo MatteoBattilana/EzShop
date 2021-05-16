@@ -1,13 +1,7 @@
-package it.polito.ezshop.blackbox;
+package it.polito.ezshop.unitBBTest;
 
-import it.polito.ezshop.data.ProductTypeImpl;
 import it.polito.ezshop.data.UserImpl;
-import it.polito.ezshop.exceptions.*;
 import org.junit.Test;
-import it.polito.ezshop.data.EZShop;
-
-
-
 
 
 import static org.junit.Assert.*;
