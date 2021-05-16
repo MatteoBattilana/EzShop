@@ -40,14 +40,14 @@ Version:
 | Criteria | Predicate |
 | -------- | --------- |
 | Validity of the id         |  (minint, 1)   |
-|                             | [1, maxint)  ) |
+|                             | [1, maxint)   |
 
 
 **Boundaries**:
 
 | Criteria | Boundary values |
 | -------- | --------------- |
-| Validity of the id           |   0,1              |
+| Validity of the id           |   0,1,maxint             |
 |          |                 |
 
 
@@ -146,14 +146,14 @@ Version:
 | Criteria | Predicate |
 | -------- | --------- |
 | Validity of the id         |  (minint, 0)   |
-|                             | [0, maxint)  ) |
+|                             | [0, maxint)   |
 
 
 **Boundaries**:
 
 | Criteria | Boundary values |
 | -------- | --------------- |
-| Validity of the id           |   -1,0 |
+| Validity of the id           |   -1,0,maxint  |
 |          |                 |
 
 
@@ -273,7 +273,7 @@ Version:
 
 | Criteria | Boundary values |
 | -------- | --------------- |
-| Size of the Parameter of the id          |   0,1 |
+| Size of the Parameter of the id          |   0,1 ,maxint |
 |          |                 |
 
 
@@ -306,7 +306,7 @@ Version:
 
 | Criteria | Boundary values |
 | -------- | --------------- |
-|Size of the Parameter of the quantity	 |   -1,0 |
+|Size of the Parameter of the quantity	 |   -1,0,maxint  |
 |          |                 |
 
 
@@ -509,8 +509,7 @@ Version:
 
 ### Code coverage report
 
-    <Add here the screenshot report of the statement and branch coverage obtained using
-    the Eclemma tool. >
+ ![](image/coverage.png)
 
 
 ### Loop coverage analysis
