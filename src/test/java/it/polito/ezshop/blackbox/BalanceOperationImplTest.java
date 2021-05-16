@@ -23,10 +23,10 @@ public class BalanceOperationImplTest {
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
 
         balance.setBalanceId(-5);
-        assertEquals(-1,balance.getBalanceId());
+        assertEquals(5,balance.getBalanceId());
         // boundary
         balance.setBalanceId(0);
-        assertEquals(-1,balance.getBalanceId());
+        assertEquals(5,balance.getBalanceId());
 
     }
 
@@ -121,5 +121,17 @@ public class BalanceOperationImplTest {
         assertEquals("PAID", balance.getStatus());
 
 
-    }}
+    }
+    @Test
+    public void setMoney(){
+        BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
+        balanceOperation.setMoney(-Double.MAX_VALUE);
+        assertEquals(-Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
+        balanceOperation.setMoney(0);
+        assertEquals(0, balanceOperation.getMoney(), 0.1);
+        balanceOperation.setMoney(Double.MAX_VALUE);
+        assertEquals(Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
+    }
+
+}
 
