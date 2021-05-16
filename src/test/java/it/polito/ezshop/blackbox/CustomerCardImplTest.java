@@ -18,25 +18,34 @@ public class CustomerCardImplTest {
 
 
     @Test
-    public void setCardId(){
+    public void setCustomer(){
         CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
-        card.setId("Cliente002");
-        assertEquals("Cliente002",card.getCardId());
-        card.setId(null);
-        assertEquals(null,card.getCardId());
-        card.setId("");
-        assertEquals("",card.getCardId());
+        card.setCustomer("Cliente002");
+        assertEquals("Cliente002",card.getCustomer());
+        card.setCustomer(null);
+        assertEquals(null,card.getCustomer());
+        card.setCustomer("");
+        assertEquals("",card.getCustomer());
 
     }
     public void setCardPoint(){
         CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
-        card.setCardPoints(Integer.MIN_VALUE);
-        assertEquals(Integer.MIN_VALUE,card.getCardPoints(),1);
-        card.setCardPoints(0);
-        assertEquals(0,card.getCardPoints(),1);
-        card.setCardPoints(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE,card.getCardPoints(),1);
+        card.setPoints(Integer.MIN_VALUE);
+        assertEquals(Integer.MIN_VALUE,card.getPoints(),1);
+        card.setPoints(0);
+        assertEquals(0,card.getPoints(),1);
+        card.setPoints(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE,card.getPoints(),1);
 
     }
+    public void modifyPointsOnCard(){
+        CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
+
+        assertTrue(card.modifyPointsOnCard(Integer.MIN_VALUE));
+        assertTrue(card.modifyPointsOnCard(0));
+        assertTrue(card.modifyPointsOnCard(Integer.MAX_VALUE));
+
+    }
+
 }
 

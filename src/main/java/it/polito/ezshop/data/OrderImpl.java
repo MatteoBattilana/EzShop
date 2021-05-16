@@ -9,13 +9,12 @@ public class OrderImpl extends BalanceOperationImpl {
     private String mOrderStatus;
     private LocalDate mArrival;
 
-    public OrderImpl(int mBalanceId, LocalDate date, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus, LocalDate arrival) {
+    public OrderImpl(int mBalanceId, LocalDate date, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus) {
         super(mBalanceId, date, "ORDER", status);
         this.mProductCode = mProductCode;
         this.mPricePerUnit = mPricePerUnit;
         this.mQuantity = mQuantity;
         this.mOrderStatus = orderStatus;
-        this.mArrival = arrival;
     }
 
     public OrderImpl(int mBalanceId, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus) {
@@ -24,7 +23,6 @@ public class OrderImpl extends BalanceOperationImpl {
         this.mPricePerUnit = mPricePerUnit;
         this.mQuantity = mQuantity;
         this.mOrderStatus = orderStatus;
-        this.mArrival = null;
     }
 
     @Override
