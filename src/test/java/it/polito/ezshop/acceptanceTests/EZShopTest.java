@@ -4,6 +4,7 @@ package it.polito.ezshop.acceptanceTests;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class EZShopTest {
     EZShop ezShop;
 

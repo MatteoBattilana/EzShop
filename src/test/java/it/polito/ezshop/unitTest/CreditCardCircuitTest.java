@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitBBTest;
+package it.polito.ezshop.unitTest;
 
 import it.polito.ezshop.data.CreditCardCircuit;
 import org.junit.After;
@@ -33,56 +33,61 @@ public class CreditCardCircuitTest {
     }
 
     @Test
-    public void negativeValidity() {
+    public void testNegativeValidity() {
         CreditCardCircuit card = new CreditCardCircuit(sFILE);
         assertFalse(card.isValid("4485370086510890"));
     }
 
     @Test
-    public void positiveValidity() {
+    public void testPositiveValidity() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertTrue(card.isValid("4485370086510891"));
     }
 
     @Test
-    public void positiveValidateCreditCard() {
+    public void testPositiveValidateCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertTrue(card.validateCreditCard("4485370086510891"));
     }
 
     @Test
-    public void negativeValidateCreditCard() {
+    public void testNegativeValidateCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertFalse(card.validateCreditCard(null));
     }
 
     @Test
-    public void positivePayCreditCard() {
+    public void testPositivePayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertTrue(card.pay("4485370086510891",50.50));
 
     }
 
     @Test
-    public void negativePayCreditCard() {
+    public void testNegativePayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertFalse(card.pay("4485370086510891",200));
     }
 
     @Test
-    public void invalidPayCreditCard() {
+    public void testInvalidPayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertFalse(card.pay(null,60));
     }
 
     @Test
-    public void invalidMoneyPayCreditCard() {
+    public void testInvalidMoneyPayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
         assertFalse(card.pay("4485370086510891",-58.2));
     }
 
     @Test
-    public void constructorZeroLoop() {
+    public void testConstructorNullFile(){
+        new CreditCardCircuit("");
+    }
+
+    @Test
+    public void testConstructorZeroLoop() {
         try {
             FileWriter f2 = new FileWriter(sFILE, false);
             f2.write("");
@@ -95,7 +100,7 @@ public class CreditCardCircuitTest {
     }
 
     @Test
-    public void constructorOneLoop() {
+    public void testConstructorOneLoop() {
         try {
             FileWriter f2 = new FileWriter(sFILE, false);
             f2.write("4485370086510891;11");
@@ -108,7 +113,13 @@ public class CreditCardCircuitTest {
     }
 
     @Test
-    public void validateCreditCardOneLoop() {
+    public void testValidateCreditCardZeroLoop() {
+        CreditCardCircuit creditCardCircuit = new CreditCardCircuit(sFILE);
+        assertFalse(creditCardCircuit.validateCreditCard(""));
+    }
+
+    @Test
+    public void testValidateCreditCardOneLoop() {
         CreditCardCircuit creditCardCircuit = new CreditCardCircuit(sFILE);
         assertFalse(creditCardCircuit.validateCreditCard("1"));
     }

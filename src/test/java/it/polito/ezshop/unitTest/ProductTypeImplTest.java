@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitBBTest;
+package it.polito.ezshop.unitTest;
 
 import it.polito.ezshop.data.ProductTypeImpl;
 import org.junit.Test;
@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class ProductTypeImplTest {
     @Test
-    public void negativeSetId() {
+    public void testNegativeSetId() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Integer mId = product.getId();
         product.setId(-5);
@@ -18,7 +18,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void positiveSetId() {
+    public void testPositiveSetId() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Integer id = 5;
         product.setId(5);
@@ -29,7 +29,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void nullSetId() {
+    public void testNullSetId() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Integer id = product.getId();
         product.setId(null);
@@ -37,7 +37,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void negativeSetQuantity() {
+    public void testNegativeSetQuantity() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Integer quantity = product.getQuantity();
         product.setQuantity(-5);
@@ -48,7 +48,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void positiveSetQuantity() {
+    public void testPositiveSetQuantity() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         product.setQuantity(20);
         Integer quantity = 20;
@@ -61,7 +61,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void invalidSetQuantity() {
+    public void testInvalidSetQuantity() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Integer quantity = product.getQuantity();
         product.setQuantity(null);
@@ -69,7 +69,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void negativeSetPricePerUnit() {
+    public void testNegativeSetPricePerUnit() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Double price = product.getPricePerUnit();
         product.setPricePerUnit(-0.50);
@@ -80,7 +80,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void invalidSetPricePerUnit() {
+    public void testInvalidSetPricePerUnit() {
 
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         Double price = product.getPricePerUnit();
@@ -89,7 +89,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void positiveSetPricePerUnit() {
+    public void testPositiveSetPricePerUnit() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.50, 50);
         product.setPricePerUnit(0.60);
         Double price = 0.60;
@@ -101,7 +101,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void invalidSetBarCode() {
+    public void testInvalidSetBarCode() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         String barcode = product.getBarCode();
         product.setBarCode("");
@@ -109,7 +109,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void nullSetBarCode() {
+    public void testNullSetBarCode() {
 
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         String barcode = product.getBarCode();
@@ -118,14 +118,14 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void positiveSetBarCode() {
+    public void testPositiveSetBarCode() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setBarCode("78515420");
         assertEquals("78515420", product.getBarCode());
     }
 
     @Test
-    public void invalidSetProductDescription() {
+    public void testInvalidSetProductDescription() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         String description = product.getProductDescription();
         product.setProductDescription("");
@@ -133,7 +133,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void nullSetProductDescription() {
+    public void testNullSetProductDescription() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         String description = product.getProductDescription();
         product.setProductDescription(null);
@@ -141,14 +141,14 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void positiveSetProductDescription() {
+    public void testPositiveSetProductDescription() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setProductDescription("yellow");
         assertEquals("yellow", product.getProductDescription());
     }
 
     @Test
-    public void invalidNote() {
+    public void testInvalidNote() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         String note = product.getNote();
         product.setNote("");
@@ -156,7 +156,7 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void nullSetNote() {
+    public void testNullSetNote() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         String note = product.getNote();
         product.setNote(null);
@@ -164,14 +164,14 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void positiveSetNote() {
+    public void testPositiveSetNote() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setNote("bad");
         assertEquals("bad", product.getNote());
     }
 
     @Test
-    public void setLocation() {
+    public void testSetLocation() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setLocation("hall");
         assertEquals("hall", product.getLocation());
@@ -182,7 +182,18 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void setTemporaryQuantity() {
+    public void testSetPosition() {
+        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
+        product.setPosition("hall");
+        assertEquals("hall", product.getLocation());
+        product.setPosition("");
+        assertEquals("", product.getLocation());
+        product.setPosition(null);
+        assertNull(product.getLocation());
+    }
+
+    @Test
+    public void testSetTemporaryQuantity() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         assertTrue(product.setTemporaryQuantity(Integer.MIN_VALUE));
         assertTrue(product.setTemporaryQuantity(Integer.MAX_VALUE));

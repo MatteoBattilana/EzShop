@@ -29,8 +29,4 @@ public class CustomerCardImpl {
     public void setCustomer(String customerCard) {
         id = customerCard;
     }
-
-    public void removeCustomer() {
-        id = null;
-    }
 }

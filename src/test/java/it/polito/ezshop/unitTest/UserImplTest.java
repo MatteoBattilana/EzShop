@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitBBTest;
+package it.polito.ezshop.unitTest;
 
 import it.polito.ezshop.data.UserImpl;
 import org.junit.Test;
@@ -10,7 +10,7 @@ public class UserImplTest {
 
 
     @Test
-    public void invalidSetUsername(){
+    public void testInvalidSetUsername(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String username= user.getUsername();
@@ -19,7 +19,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void nullSetUsername() {
+    public void testNullSetUsername() {
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String username= user.getUsername();
@@ -27,7 +27,7 @@ public class UserImplTest {
         assertEquals(username, user.getUsername());
     }
     @Test
-    public void positiveSetUsername(){
+    public void testPositiveSetUsername(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         user.setUsername("saraR");
@@ -38,7 +38,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void invalidSetPassword(){
+    public void testInvalidSetPassword(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String password= user.getPassword();
@@ -47,7 +47,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void nullSetPassword() {
+    public void testNullSetPassword() {
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String password= user.getPassword();
@@ -55,7 +55,7 @@ public class UserImplTest {
         assertEquals(password, user.getPassword());
     }
     @Test
-    public void positiveSetPassword(){
+    public void testPositiveSetPassword(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         user.setPassword("passWORD");
@@ -65,7 +65,7 @@ public class UserImplTest {
     }
 
     @Test
-    public void negativeSetId(){
+    public void testNegativeSetId(){
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         Integer id = user.getId();
         user.setId(-5);
@@ -77,7 +77,7 @@ public class UserImplTest {
     }
 
     @Test
-    public void positiveSetId(){
+    public void testPositiveSetId(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         Integer id = 5;
@@ -90,7 +90,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void invalidExistenceSetRole(){
+    public void testInvalidExistenceSetRole(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String role= user.getRole();
@@ -99,7 +99,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void nullSetRole() {
+    public void testNullSetRole() {
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String role= user.getRole();
@@ -107,7 +107,7 @@ public class UserImplTest {
         assertEquals(role, user.getRole());
     }
     @Test
-    public void invalidSetRole(){
+    public void testInvalidSetRole(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String role= user.getRole();
@@ -116,7 +116,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void positiveSetRole(){
+    public void testPositiveSetRole(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         user.setRole("ShopManager");

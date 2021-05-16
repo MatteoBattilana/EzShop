@@ -26,8 +26,7 @@ public class CreditCardCircuit {
                 line = reader.readLine();
             }
             reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
     }
 
@@ -81,9 +80,7 @@ public class CreditCardCircuit {
                         myWriter.write(card.getKey() + ";" + card.getValue() + "\n");
                     }
                     myWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                } catch (IOException ignored) { }
                 return true;
             }
         }

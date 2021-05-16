@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitBBTest;
+package it.polito.ezshop.unitTest;
 
 import it.polito.ezshop.data.CustomerCardImpl;
 import org.junit.Test;
@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class CustomerCardImplTest {
 
     @Test
-    public void setCardId(){
+    public void testSetCardId(){
         CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
         card.setCustomer("Cliente002");
         assertEquals("Cliente002",card.getCustomer());
@@ -18,7 +18,7 @@ public class CustomerCardImplTest {
     }
 
     @Test
-    public void setCardPoint(){
+    public void testSetCardPoint(){
         CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
         card.setPoints(Integer.MIN_VALUE);
         assertEquals(Integer.MIN_VALUE,card.getPoints(),1);
@@ -30,7 +30,7 @@ public class CustomerCardImplTest {
     }
 
     @Test
-    public void modifyPointsOnCard(){
+    public void testModifyPointsOnCard(){
         CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
 
         assertTrue(card.modifyPointsOnCard(Integer.MIN_VALUE));

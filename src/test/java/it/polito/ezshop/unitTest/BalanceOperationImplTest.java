@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitBBTest;
+package it.polito.ezshop.unitTest;
 
 import it.polito.ezshop.data.BalanceOperationImpl;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class BalanceOperationImplTest {
 
     @Test
-    public void negativeSetBalanceId(){
+    public void testNegativeSetBalanceId(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
 
         balance.setBalanceId(-5);
@@ -17,11 +17,10 @@ public class BalanceOperationImplTest {
         // boundary
         balance.setBalanceId(0);
         assertEquals(5,balance.getBalanceId());
-
     }
 
     @Test
-    public void positiveSetBalanceId(){
+    public void testPositiveSetBalanceId(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
 
         balance.setBalanceId(15);
@@ -33,7 +32,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void nullSetDate(){
+    public void testNullSetDate(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         LocalDate date= balance.getDate();
         balance.setDate(null);
@@ -41,7 +40,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void positiveSetDate(){
+    public void testPositiveSetDate(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
 
         balance.setDate(LocalDate.of(2022,10,12));
@@ -50,7 +49,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void nullSetType(){
+    public void testNullSetType(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String type= balance.getType();
         balance.setType(null);
@@ -58,7 +57,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void invalidSetType(){
+    public void testInvalidSetType(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String type= balance.getType();
         balance.setType(" ");
@@ -66,7 +65,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void positiveSetType(){
+    public void testPositiveSetType(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         balance.setType("SALE");
         assertEquals("SALE", balance.getType());
@@ -81,7 +80,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void nullSetStatus(){
+    public void testNullSetStatus(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String status= balance.getStatus();
         balance.setType(null);
@@ -89,7 +88,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void invalidSetStatus(){
+    public void testInvalidSetStatus(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         String status= balance.getStatus();
         balance.setType(" ");
@@ -97,7 +96,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void setStatus(){
+    public void testSetStatus(){
         BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
         balanceOperation.setStatus("UNPAID");
         assertEquals("UNPAID", balanceOperation.getStatus());
@@ -111,7 +110,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void positiveSetStatus(){
+    public void testPositiveSetStatus(){
         BalanceOperationImpl balance = new BalanceOperationImpl(5,LocalDate.of(2022,10,12), 0.0, "SALE", "UNPAID");
         balance.setStatus("UNPAID");
         assertEquals("UNPAID", balance.getStatus());
@@ -120,7 +119,7 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void setMoney(){
+    public void testSetMoney(){
         BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
         balanceOperation.setMoney(-Double.MAX_VALUE);
         assertEquals(-Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
@@ -128,6 +127,15 @@ public class BalanceOperationImplTest {
         assertEquals(0, balanceOperation.getMoney(), 0.1);
         balanceOperation.setMoney(Double.MAX_VALUE);
         assertEquals(Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
+    }
+
+    @Test
+    public void testSecondConstructor(){
+        BalanceOperationImpl balance = new BalanceOperationImpl(1, LocalDate.now(), "SALE", "UNPAID");
+        assertEquals(0, balance.getMoney(), 0.1);
+        assertEquals(1, balance.getBalanceId());
+        assertEquals("SALE", balance.getType());
+        assertEquals("UNPAID", balance.getStatus());
     }
 }
 
