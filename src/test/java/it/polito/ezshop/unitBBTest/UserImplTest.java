@@ -10,7 +10,7 @@ public class UserImplTest {
 
 
     @Test
-    public void InvalidSetUsername(){
+    public void invalidSetUsername(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String username= user.getUsername();
@@ -19,7 +19,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void NullSetUsername() {
+    public void nullSetUsername() {
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String username= user.getUsername();
@@ -27,7 +27,7 @@ public class UserImplTest {
         assertEquals(username, user.getUsername());
     }
     @Test
-    public void PositiveSetUsername(){
+    public void positiveSetUsername(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         user.setUsername("saraR");
@@ -38,7 +38,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void InvalidSetPassword(){
+    public void invalidSetPassword(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String password= user.getPassword();
@@ -47,7 +47,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void NullSetPassword() {
+    public void nullSetPassword() {
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String password= user.getPassword();
@@ -55,7 +55,7 @@ public class UserImplTest {
         assertEquals(password, user.getPassword());
     }
     @Test
-    public void PositiveSetPassword(){
+    public void positiveSetPassword(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         user.setPassword("passWORD");
@@ -65,7 +65,7 @@ public class UserImplTest {
     }
 
     @Test
-    public void NegativeSetId(){
+    public void negativeSetId(){
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         Integer id = user.getId();
         user.setId(-5);
@@ -77,16 +77,20 @@ public class UserImplTest {
     }
 
     @Test
-    public void PositiveSetId(){
+    public void positiveSetId(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         Integer id = 5;
         user.setId(5);
         assertEquals(id,user.getId());
+        // boundary
+       user.setId(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE, user.getId() ,1);
+
 
     }
     @Test
-    public void InvalidExistenceSetRole(){
+    public void invalidExistenceSetRole(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String role= user.getRole();
@@ -95,7 +99,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void NullSetRole() {
+    public void nullSetRole() {
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String role= user.getRole();
@@ -103,7 +107,7 @@ public class UserImplTest {
         assertEquals(role, user.getRole());
     }
     @Test
-    public void InvalidSetRole(){
+    public void invalidSetRole(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         String role= user.getRole();
@@ -112,7 +116,7 @@ public class UserImplTest {
 
     }
     @Test
-    public void PositiveSetRole(){
+    public void positiveSetRole(){
 
         UserImpl user= new UserImpl(34,"sara","password","Cashier");
         user.setRole("ShopManager");

@@ -31,11 +31,11 @@ Version:
 
 
 
-**Criteria for method *SetBalanceId*:**
+**Criteria for method *setBalanceId*:**
 	
  - Validity of the id
 
-**Predicates for method *SetBalanceId*:**
+**Predicates for method *setBalanceId*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -57,14 +57,14 @@ Version:
 
 | Validity of the id | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-| (minint, 1)| Invalid|T1(-5) -> new id no setted<br />T1b(0) -> new id no setted | BalanceOperationImplTest.java-> NegativeSetBalanceId()|
-|[1, maxint)|Valid|T2(15)->new id setted|BalanceOperationImplTest.java-> PositiveSetBalanceId()|
+| (minint, 1)| Invalid|T1(-5) -> new id no setted<br />T1b(0) -> new id no setted | BalanceOperationImplTest.java-> negativeSetBalanceId()|
+|[1, maxint)|Valid|T2(15)->new id setted<br /> T2b(maxint)->new id setted|BalanceOperationImplTest.java-> positiveSetBalanceId()|
 
-**Criteria for method *SetDate*:**
+**Criteria for method *setDate*:**
 	
  - Validity of the Date
   
-**Predicates for method *SetDate*:**
+**Predicates for method *setDate*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -76,18 +76,18 @@ Version:
 
 | Validity of the Date  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-| NULL| Invalid|T1(null)->new date no setted| BalanceOperationImplTest.java-> NullSetDate()|
-| Valid| Valid|Date=LocalDate.of(2022,10,12)<br />T2(Date)->new date setted| BalanceOperationImplTest.java-> PositiveSetDate()|
+| NULL| Invalid|T1(null)->new date no setted| BalanceOperationImplTest.java-> nullSetDate()|
+| Valid| Valid|Date=LocalDate.of(2022,10,12)<br />T2(Date)->new date setted| BalanceOperationImplTest.java-> positiveSetDate()|
 
 
-**Criteria for method *SetType*:**
+**Criteria for method *setType*:**
 	
  - Validity of the Type
  - Validity of the Parameters Type
   
 
 
-**Predicates for method *SetType*:**
+**Predicates for method *setType*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -103,18 +103,18 @@ Version:
 
 | Validity of the Type  | Validity of the Parameters Type  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new type no setted| BalanceOperationImplTest.java-> NullSetType()|
-|*|Invalid| Invalid|T2(" ")->new type no setted| BalanceOperationImplTest.java-> InvalidSetType()|
-|Valid|Valid("SALE","ORDER","RETURN","DEBIT","CREDIT")| Valid |T3("SALE ")->new type setted </br> T3.1("ORDER")->new type setted </br>T3.2("RETURN")->new type setted </br>T3.3("DEBIT")->new type setted </br> T3.4("CREDIT")->new type setted </br>   | BalanceOperationImplTest.java-> PositiveSetType()|
+| NULL| *|Invalid|T1(null)->new type no setted| BalanceOperationImplTest.java-> nullSetType()|
+|*|Invalid| Invalid|T2(" ")->new type no setted| BalanceOperationImplTest.java-> invalidSetType()|
+|Valid|Valid("SALE","ORDER","RETURN","DEBIT","CREDIT")| Valid |T3("SALE ")->new type setted </br> T3.1("ORDER")->new type setted </br>T3.2("RETURN")->new type setted </br>T3.3("DEBIT")->new type setted </br> T3.4("CREDIT")->new type setted </br>   | BalanceOperationImplTest.java-> positiveSetType()|
 
-**Criteria for method *SetStatus*:**
+**Criteria for method *setStatus*:**
 	
  - Validity of the Status
  - Validity of the Parameters Status
   
 
 
-**Predicates for method *SetStatus*:**
+**Predicates for method *setStatus*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -130,18 +130,18 @@ Version:
 
 | Validity of the Status  | Validity of the Parameters Status  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new status no setted| BalanceOperationImplTest.java-> NullSetStaus()|
-|*|Invalid| Invalid|T2(" ")->new status no setted| BalanceOperationImplTest.java-> InvalidSetStaus()|
-|Valid|Valid("PAID","UNPAID")| Valid |T3("PAID ")->new status setted </br> T3.1("UNPAID")->new status setted| BalanceOperationImplTest.java-> PositiveSetStaus()|
+| NULL| *|Invalid|T1(null)->new status no setted| BalanceOperationImplTest.java-> nullSetStaus()|
+|*|Invalid| Invalid|T2(" ")->new status no setted| BalanceOperationImplTest.java-> invalidSetStaus()|
+|Valid|Valid("PAID","UNPAID")| Valid |T3("PAID ")->new status setted </br> T3.1("UNPAID")->new status setted| BalanceOperationImplTest.java-> positiveSetStaus()|
 
 
 ### **Class *UserImpl***
 
-**Criteria for method *SetId*:**
+**Criteria for method *setId*:**
 	
  - Validity of the id
 
-**Predicates for method *SetId*:**
+**Predicates for method *setId*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -163,18 +163,18 @@ Version:
 
 | Validity of the id | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-| (minint, 0)| Invalid|T1(-5) -> new id no setted<br />T1b(1) -> new id no setted | UserImplTest.java-> NegativeSetId()|
-|[0, maxint)|Valid|T2(5)->new id setted|UserImplTest.java-> PositiveSetId()|
+| (minint, 0)| Invalid|T1(-5) -> new id no setted<br />T1b(1) -> new id no setted | UserImplTest.java-> negativeSetId()|
+|[0, maxint)|Valid|T2(5)->new id setted <br />T2b(maxint)->new id setted|UserImplTest.java-> positiveSetId()|
 
 
-**Criteria for method *SetUsername*:**
+**Criteria for method *setUsername*:**
 	
  - Validity of the String Username
  - Lenght of the String Userame
   
 
 
-**Predicates for method *SetUsername*:**
+**Predicates for method *setUsername*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -190,18 +190,18 @@ Version:
 
 | Validity of the String Username | Lenght of the String Username   | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new username no setted| UserImplTest.java->NullSetUsername()|
-|*|=0| Invalid|T2("")->new username no setted| UserImplTest.java->InvalidSetUsername()|
-|Valid|>0| Valid|T3"SaraR")->new username setted| UserImplTest.java->PositiveSetUsername()|
+| NULL| *|Invalid|T1(null)->new username no setted| UserImplTest.java->nullSetUsername()|
+|*|=0| Invalid|T2("")->new username no setted| UserImplTest.java->invalidSetUsername()|
+|Valid|>0| Valid|T3"SaraR")->new username setted| UserImplTest.java->positiveSetUsername()|
 
-**Criteria for method *SetPassword*:**
+**Criteria for method *setPassword*:**
 	
  - Validity of the String Password
  - Lenght of the String Password
   
 
 
-**Predicates for method *SetPassword*:**
+**Predicates for method *setPassword*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -217,11 +217,11 @@ Version:
 
 | Validity of the String Password | Lenght of the String Password  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new password no setted| UserImplTest.java->NullSetPassword()|
-|*|=0| Invalid|T2("")->new password no setted| UserImplTest.java->InvalidSetPassword()|
-|Valid|>0| Valid|T3("passWORD")->new password setted| UserImplTest.java->PositiveSetPassword()|
+| NULL| *|Invalid|T1(null)->new password no setted| UserImplTest.java->nullSetPassword()|
+|*|=0| Invalid|T2("")->new password no setted| UserImplTest.java->invalidSetPassword()|
+|Valid|>0| Valid|T3("passWORD")->new password setted| UserImplTest.java->positiveSetPassword()|
 
-**Criteria for method *SetRole*:**
+**Criteria for method *setRole*:**
 	
  - Validity of the String Role
  - Lenght of the String Role
@@ -247,18 +247,18 @@ Version:
 
 | Validity of the String Role| Lenght of the StringRole  |Validity of the Parameters Role| Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|-------|
-| NULL| *| *|Invalid|T1(null)->new role no setted| UserImplTest.java->NullSetRole()|
-|*|=0| *| Invalid|T2("")->new role no setted| UserImplTest.java->InvalidExistenceSetRole()|
-|*|>0| Invalid| Invalid|T3("Manager")->new role no setted| UserImplTest.java->InvalidSetRole()|
-|Valid|>0| Valid("Administrator","Cashier","ShopManager")|Valid|T4("ShopManager")->new role setted </br>T4.1("Cashier")->new role setted </br>T4.2("Administrator")->new role setted </br>| UserImplTest.java->PositiveSetRole()|
+| NULL| *| *|Invalid|T1(null)->new role no setted| UserImplTest.java->nullSetRole()|
+|*|=0| *| Invalid|T2("")->new role no setted| UserImplTest.java->invalidExistenceSetRole()|
+|*|>0| Invalid| Invalid|T3("Manager")->new role no setted| UserImplTest.java->invalidSetRole()|
+|Valid|>0| Valid("Administrator","Cashier","ShopManager")|Valid|T4("ShopManager")->new role setted </br>T4.1("Cashier")->new role setted </br>T4.2("Administrator")->new role setted </br>| UserImplTest.java->positiveSetRole()|
 
 ### **Class *ProductTypeImpl***
 
-**Criteria for method *SetId*:**
+**Criteria for method *setId*:**
  - Size of the Parameter of the id 	
  - Validity of the id
 
-**Predicates for method *SetId*:**
+**Predicates for method *setId*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -283,15 +283,15 @@ Version:
 
 |Size of the Parameter of the id  |   Validity of the id | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| (minint, 1)|*| Invalid|T1(-5) -> new id no setted<br />T1b(0) -> new id no setted | ProductTypeImplTest.java-> NegativeSetId()|
-| * |NULL| Invalid|T2(null) -> new id no setted setted| ProductTypeImplTest.java-> NullSetId()|
-|[1, maxint)|Valid|Valid|T3(5)->new id setted|ProductTypeImplTest.java-> PositiveSetId()|
+| (minint, 1)|*| Invalid|T1(-5) -> new id no setted<br />T1b(0) -> new id no setted | ProductTypeImplTest.java-> negativeSetId()|
+| * |NULL| Invalid|T2(null) -> new id no setted setted| ProductTypeImplTest.java-> nullSetId()|
+|[1, maxint)|Valid|Valid|T3(5)->new id setted <br />T3b(maxint)->new id setted|ProductTypeImplTest.java-> positiveSetId()|
 
-**Criteria for method *SetQuantity*:**
+**Criteria for method *setQuantity*:**
  - Size of the Parameter of the quantity	
  - Validity of the quantity
 
-**Predicates for method *SetQuantity*:**
+**Predicates for method *setQuantity*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -316,15 +316,15 @@ Version:
 
 |Size of the Parameter of the quantity	 |   Validity of the quantity | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| (minint, 0)|*| Invalid|T1(-5) -> new quantity no setted<br />T1b(-1) -> new quantity no setted | ProductTypeImplTest.java-> NegativeSetQuantity()|
-| * |NULL| Invalid|T2(null) -> new quantity no setted setted| ProductTypeImplTest.java-> InvalidSetIQuantity()|
-|[0, maxint)|Valid|Valid|T3(5)->new quantitysetted|ProductTypeImplTest.java-> PositiveSetQuantity()
+| (minint, 0)|*| Invalid|T1(-5) -> new quantity no setted<br />T1b(-1) -> new quantity no setted | ProductTypeImplTest.java-> negativeSetQuantity()|
+| * |NULL| Invalid|T2(null) -> new quantity no setted setted| ProductTypeImplTest.java-> invalidSetIQuantity()|
+|[0, maxint)|Valid|Valid|T3(20)->new quantity setted <br />T3b(maxint) -> new quantity setted |ProductTypeImplTest.java-> positiveSetQuantity()
 
-**Criteria for method *SetPricePerUnit*:**
+**Criteria for method *setPricePerUnit*:**
  - Size of the Parameter of the PricePerUnit	
  - Validity of the PricePerUnit
 
-**Predicates for method *SetQuantity*:**
+**Predicates for method *setQuantity*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -349,18 +349,18 @@ Version:
 
 |Size of the Parameter of the PricePerUnit	 |   Validity of the PricePerUnit| Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| (-maxdouble, 0)|*| Invalid|T1(-0.50) -> new PricePerUnit no setted<br />T1b(-0.0001) -> new PricePerUnit no setted | ProductTypeImplTest.java-> NegativeSetPricePerUnit()|
-| * |NULL| Invalid|T2(null) -> new PricePerUnit no setted setted| ProductTypeImplTest.java-> InvalidSetIPricePerUnit()|
-|[0, maxdouble)|Valid|Valid|T3(0.60)->new PricePerUnit setted<br />T3b(0.0001) -> new PricePerUnit setted|ProductTypeImplTest.java-> PositiveSetPricePerUnit()
+| (-maxdouble, 0)|*| Invalid|T1(-0.50) -> new PricePerUnit no setted<br />T1b(-0.0001) -> new PricePerUnit no setted | ProductTypeImplTest.java-> negativeSetPricePerUnit()|
+| * |NULL| Invalid|T2(null) -> new PricePerUnit no setted setted| ProductTypeImplTest.java-> invalidSetIPricePerUnit()|
+|[0, maxdouble)|Valid|Valid|T3(0.60)->new PricePerUnit setted<br />T3b(0.0001) -> new PricePerUnit setted|ProductTypeImplTest.java-> positiveSetPricePerUnit()
 
-**Criteria for method *SetBarCode*:**
+**Criteria for method *setBarCode*:**
 	
  - Validity of the String BarCode
  - Lenght of the String BarCode
   
 
 
-**Predicates for method *SetBarCode*:**
+**Predicates for method *setBarCode*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -376,18 +376,18 @@ Version:
 
 | Validity of the String BarCode| Lenght of the String BarCode  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new BarCode no setted| ProductTypeImplTest.java->NullSetBarCode()|
-|*|=0| Invalid|T2("")->new BarCode no setted| ProductTypeImplTest.java->InvalidSetBarCode()|
-|Valid|>0| Valid|T3("78515420")->new BarCode setted| ProductTypeImplTest.java.java->PositiveSetBarCode()|
+| NULL| *|Invalid|T1(null)->new BarCode no setted| ProductTypeImplTest.java->nullSetBarCode()|
+|*|=0| Invalid|T2("")->new BarCode no setted| ProductTypeImplTest.java->invalidSetBarCode()|
+|Valid|>0| Valid|T3("78515420")->new BarCode setted| ProductTypeImplTest.java.java->positiveSetBarCode()|
 
-**Criteria for method *SetDescription*:**
+**Criteria for method *setDescription*:**
 	
  - Validity of the String Description
  - Lenght of the String Description
   
 
 
-**Predicates for method *SetDescription*:**
+**Predicates for method *setDescription*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -403,18 +403,18 @@ Version:
 
 | Validity of the String Description| Lenght of the String Description  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new Description no setted| ProductTypeImplTest.java->NullSetDescription()|
-|*|=0| Invalid|T2("")->new Description no setted| ProductTypeImplTest.java->InvalidSetDescription()|
-|Valid|>0| Valid|T3("yellow")->new Description setted| ProductTypeImplTest.java->PositiveSetDescription()|
+| NULL| *|Invalid|T1(null)->new Description no setted| ProductTypeImplTest.java->nullSetDescription()|
+|*|=0| Invalid|T2("")->new Description no setted| ProductTypeImplTest.java->invalidSetDescription()|
+|Valid|>0| Valid|T3("yellow")->new Description setted| ProductTypeImplTest.java->positiveSetDescription()|
 
-**Criteria for method *SetNote*:**
+**Criteria for method *setNote*:**
 	
  - Validity of the String Note
  - Lenght of the String Note
   
 
 
-**Predicates for method *SetNote*:**
+**Predicates for method *setNote*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -430,9 +430,9 @@ Version:
 
 | Validity of the String Note| Lenght of the String Note  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null)->new Note no setted| ProductTypeImplTest.java->NullSetNote()|
-|*|=0| Invalid|T2("")->new Note no setted| ProductTypeImplTest.java->InvalidSetNote()|
-|Valid|>0| Valid|T3("bad")->new Note setted| ProductTypeImplTest.java->PositiveSetNote()|
+| NULL| *|Invalid|T1(null)->new Note no setted| ProductTypeImplTest.java->nullSetNote()|
+|*|=0| Invalid|T2("")->new Note no setted| ProductTypeImplTest.java->invalidSetNote()|
+|Valid|>0| Valid|T3("bad")->new Note setted| ProductTypeImplTest.java->positiveSetNote()|
 
 
 
@@ -443,11 +443,11 @@ Version:
 
 
 
-**Criteria for method *IsValid*:**
+**Criteria for method *isValid*:**
 	
  - Validity of the Credit Card
 
-**Predicates for method *IsValid*:**
+**Predicates for method *isValid*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -461,8 +461,8 @@ Version:
 
 |  Validity of the Credit Card  | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-|Invalid(credit card is not in the file) | Invalid|T1("4485370086510890") -> false | CreditCardCircuitTest.java-> NegativeValidity()|
-|Valid (credit card is in the file)|Valid|T2("4485370086510891")->true|CreditCardCircuitTest.java-> PositiveValidity()|
+|Invalid(credit card is not in the file) | Invalid|T1("4485370086510890") -> false | CreditCardCircuitTest.java-> negativeValidity()|
+|Valid (credit card is in the file)|Valid|T2("4485370086510891")->true|CreditCardCircuitTest.java-> positiveValidity()|
 
 
 
@@ -475,18 +475,14 @@ Version:
     <Report here all the created JUnit test cases, and the units/classes under test >
     <For traceability write the class and method name that contains the test case>
 
-##CreditCardCircuit-  method *Pay*
+##CreditCardCircuit-  method *pay*
 | Unit name | JUnit test case |
 |--|--|
-|CreditCardCircuit| CreditCardCircuitTest->PositivePayCreditCard()|
-|CreditCardCircuit|CreditCardCircuitTest->NegativePayCreditCard()|
-|CreditCardCircuit|CreditCardCircuitTest->InvalidPayCreditCard()|
-|CreditCardCircuit| CreditCardCircuitTest->InvalidMoneyPayCreditCard()|
+|CreditCardCircuit| CreditCardCircuitTest->positivePayCreditCard()|
+|CreditCardCircuit|CreditCardCircuitTest->negativePayCreditCard()|
+|CreditCardCircuit|CreditCardCircuitTest->invalidPayCreditCard()|
+|CreditCardCircuit| CreditCardCircuitTest->invalidMoneyPayCreditCard()|
 
-### Code coverage report
-
-    <Add here the screenshot report of the statement and branch coverage obtained using
-    the Eclemma tool. >
 
 
 ### Loop coverage analysis
@@ -496,16 +492,16 @@ Version:
 
 |Unit name | Loop rows | Number of iterations | JUnit test case |
 |---|---|---|---|
-|CreditCardCircuit|?|?|CreditCardCircuitTest->PositivePayCreditCard()|
-|CreditCardCircuit|?|?|CreditCardCircuitTest->NegativePayCreditCard()|
-|CreditCardCircuit|?|?|CreditCardCircuitTest->InvalidPayCreditCard()|
-|CreditCardCircuit|?|?|CreditCardCircuitTest->InvalidMoneyPayCreditCard()|
+|CreditCardCircuit|?|?|CreditCardCircuitTest->positivePayCreditCard()|
+|CreditCardCircuit|?|?|CreditCardCircuitTest->negativePayCreditCard()|
+|CreditCardCircuit|?|?|CreditCardCircuitTest->invalidPayCreditCard()|
+|CreditCardCircuit|?|?|CreditCardCircuitTest->invalidMoneyPayCreditCard()|
 
-##CreditCardCircuit-  method *ValidateCreditCard*
+##CreditCardCircuit-  method *validateCreditCard*
 | Unit name | JUnit test case |
 |--|--|
-|CreditCardCircuit| CreditCardCircuitTest->PositiveValidateCreditCard()|
-|CreditCardCircuit|CreditCardCircuitTest->NegativeValidateCreditCard()|
+|CreditCardCircuit| CreditCardCircuitTest->positiveValidateCreditCard()|
+|CreditCardCircuit|CreditCardCircuitTest->negativeValidateCreditCard()|
 
 ### Code coverage report
 
@@ -519,7 +515,7 @@ Version:
 
 |Unit name | Loop rows | Number of iterations | JUnit test case |
 |---|---|---|---|
-|CreditCardCircuit|0|0|CreditCardCircuitTest->NegativeValidateCreditCard()|
-|CreditCardCircuit|5|?|CreditCardCircuitTest->PositiveValidateCreditCard()|
+|CreditCardCircuit|0|0|CreditCardCircuitTest->negativeValidateCreditCard()|
+|CreditCardCircuit|5|?|CreditCardCircuitTest->positiveValidateCreditCard()|
 
 

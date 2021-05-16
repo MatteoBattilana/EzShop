@@ -5,17 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CreditCardCircuit {
-    Map<String, Double> mCreditCardMoney;
-    private static final String sFILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
-
+    private Map<String, Double> mCreditCardMoney;
+    private String fileName;
     /**
      * Constructor used to load the file cards.txt
      */
-    public CreditCardCircuit() {
+    public CreditCardCircuit(String fileName) {
+        this.fileName = fileName;
         mCreditCardMoney = new HashMap<>();
         BufferedReader reader;
         try {
-            reader = new BufferedReader(new FileReader(sFILE));
+            reader = new BufferedReader(new FileReader(fileName));
             String line = reader.readLine();
             while (line != null) {
                 if (line.charAt(0) != '#') {
@@ -37,7 +37,7 @@ public class CreditCardCircuit {
      * @return true if the credit card code is valid, according to the lunh algorithm
      */
     public boolean validateCreditCard(String creditCard) {
-        if (creditCard == null) return false;
+        if (creditCard == null || creditCard.isEmpty()) return false;
         int nSum = 0;
         boolean isSecond = false;
         for (int i = creditCard.length() - 1; i >= 0; i--) {
@@ -76,7 +76,7 @@ public class CreditCardCircuit {
 
                 // Updates the amount of money of the cards into a file
                 try {
-                    FileWriter myWriter = new FileWriter(sFILE, false);
+                    FileWriter myWriter = new FileWriter(fileName, false);
                     for (Map.Entry<String, Double> card: mCreditCardMoney.entrySet()) {
                         myWriter.write(card.getKey() + ";" + card.getValue() + "\n");
                     }
