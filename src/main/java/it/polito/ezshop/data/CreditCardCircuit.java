@@ -8,16 +8,10 @@ public class CreditCardCircuit {
     Map<String, Double> mCreditCardMoney;
     private static final String sFILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
 
-    public CreditCardCircuit() {
-        mCreditCardMoney = loadFromFile();
-    }
-
     /**
-     * Method used to load the file cards.txt
-     * @return the map with all cards and the balance
+     * Constructor used to load the file cards.txt
      */
-    private Map<String, Double> loadFromFile(){
-        Map<String, Double> ret = new HashMap<>();
+    public CreditCardCircuit() {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(sFILE));
@@ -26,13 +20,12 @@ public class CreditCardCircuit {
                 line = reader.readLine();
                 String[] card = line.split(";");
                 if(card.length == 2)
-                    ret.put(card[0], Double.valueOf(card[1]));
+                    mCreditCardMoney.put(card[0], Double.valueOf(card[1]));
             }
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ret;
     }
 
     /**
@@ -77,26 +70,21 @@ public class CreditCardCircuit {
             double amount = mCreditCardMoney.get(creditCard);
             if (amount >= money) {
                 mCreditCardMoney.put(creditCard, amount - money);
-                updateFile();
+
+                // Updates the amount of money of the cards into a file
+                try {
+                    FileWriter myWriter = new FileWriter(sFILE, false);
+                    for (Map.Entry<String, Double> card: mCreditCardMoney.entrySet()) {
+                        myWriter.write(card.getKey() + ";" + card.getValue());
+                    }
+                    myWriter.write("Files in Java might be tricky, but it is fun enough!");
+                    myWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Methods that updates the amount of money of the cards into a file
-     */
-    private void updateFile() {
-        try {
-            FileWriter myWriter = new FileWriter(sFILE, false);
-            for (Map.Entry<String, Double> card: mCreditCardMoney.entrySet()) {
-                myWriter.write(card.getKey() + ";" + card.getValue());
-            }
-            myWriter.write("Files in Java might be tricky, but it is fun enough!");
-            myWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

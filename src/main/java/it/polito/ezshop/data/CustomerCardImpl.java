@@ -2,26 +2,35 @@ package it.polito.ezshop.data;
 
 public class CustomerCardImpl {
     private String id;
-    private Integer cardpoints;
+    private int points;
 
     public CustomerCardImpl(String customerCard, Integer points) {
-        cardpoints = points;
-        id = customerCard;
+        this.points = points;
+        this.id = customerCard;
     }
 
-    public String getCardId() {
+    public String getCustomer() {
         return id;
     }
 
-    public Integer getCardPoints() {
-        return cardpoints;
+    public Integer getPoints() {
+        return points;
     }
 
-    public void setCardPoints(Integer points) {
-        cardpoints = points;
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 
-    public void setId(String customerCard) {
+    public boolean modifyPointsOnCard(int toBeAdded) {
+        this.points += toBeAdded;
+        return true;
+    }
+
+    public void setCustomer(String customerCard) {
         id = customerCard;
+    }
+
+    public void removeCustomer() {
+        id = null;
     }
 }

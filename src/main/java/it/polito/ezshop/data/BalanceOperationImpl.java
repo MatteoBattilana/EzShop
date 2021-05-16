@@ -3,73 +3,73 @@ package it.polito.ezshop.data;
 import java.time.LocalDate;
 
 public class BalanceOperationImpl implements BalanceOperation {
-    int mBalanceId;
-    LocalDate mDate;
-    double mMoney;
-    String mType;
-    String mStatus;
+    private int balanceId;
+    private LocalDate date;
+    private double amount;
+    private String type;
+    private String status;
 
-    public BalanceOperationImpl(int mBalanceId, LocalDate mDate, double mMoney, String mType, String status) {
-        this.mBalanceId = mBalanceId;
-        this.mDate = mDate;
-        this.mMoney = mMoney;
-        this.mType = mType;
-        this.mStatus = status;
+    public BalanceOperationImpl(int balanceId, LocalDate date, double mMoney, String type, String status) {
+        this.balanceId = balanceId;
+        this.date = date;
+        this.amount = mMoney;
+        this.type = type;
+        this.status = status;
     }
 
-    public BalanceOperationImpl(int mBalanceId, LocalDate mDate, String mType, String status) {
-        this(mBalanceId, mDate, 0, mType, status);
+    public BalanceOperationImpl(int balanceId, LocalDate date, String type, String status) {
+        this(balanceId, date, 0, type, status);
     }
 
     public void setStatus(String status){
         if(status != null && (status.equals("OPENED") || status.equals("CLOSED") || status.equals("PAID")))
-            this.mStatus = status;
+            this.status = status;
     }
 
     @Override
     public int getBalanceId() {
-        return mBalanceId;
+        return balanceId;
     }
 
     @Override
     public void setBalanceId(int balanceId) {
         if (balanceId > 0)
-            mBalanceId = balanceId;
+            this.balanceId = balanceId;
     }
 
     @Override
     public LocalDate getDate() {
-        return mDate;
+        return date;
     }
 
     @Override
     public void setDate(LocalDate date) {
         if (date != null)
-            mDate = date;
+            this.date = date;
     }
 
     @Override
     public double getMoney() {
-        return mMoney;
+        return amount;
     }
 
     @Override
     public void setMoney(double money) {
-        mMoney = money;
+        amount = money;
     }
 
     @Override
     public String getType() {
-        return mType;
+        return type;
     }
 
     @Override
     public void setType(String type) {
         if(type != null && (type.equals("SALE") || type.equals("ORDER") || type.equals("RETURN") || type.equals("DEBIT") || type.equals("CREDIT")))
-            mType = type;
+            this.type = type;
     }
 
     public String getStatus() {
-        return mStatus;
+        return status;
     }
 }

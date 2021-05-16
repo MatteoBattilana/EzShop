@@ -67,4 +67,9 @@ public class TransactionProduct implements TicketEntry {
     public void setDiscountRate(double discountRate) {
         this.discount = discountRate;
     }
+
+    public boolean applyDiscountRateToProduct(double discountRate) {
+        setDiscountRate(discountRate);
+        return true;
+    }
 }
