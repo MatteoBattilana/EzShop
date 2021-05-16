@@ -28,5 +28,15 @@ public class CustomerCardImplTest {
         assertEquals(Integer.MAX_VALUE,card.getPoints(),1);
 
     }
+
+    @Test
+    public void modifyPointsOnCard(){
+        CustomerCardImpl card = new CustomerCardImpl("cartacliente", 0);
+
+        assertTrue(card.modifyPointsOnCard(Integer.MIN_VALUE));
+        assertTrue(card.modifyPointsOnCard(0));
+        assertTrue(card.modifyPointsOnCard(Integer.MAX_VALUE));
+
+    }
 }
 
