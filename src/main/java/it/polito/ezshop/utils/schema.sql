@@ -79,3 +79,7 @@ CREATE TABLE IF NOT EXISTS transaction_product (
     price DOUBLE NOT NULL,
     quantity INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS balance (
+    money DOUBLE NOT NULL
+);

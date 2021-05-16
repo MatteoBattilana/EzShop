@@ -11,9 +11,12 @@ public class AccountBook {
     // Reference to the database
     private final DatabaseConnection mDatabaseConnection;
 
+    private double mBalance;
+
     public AccountBook(DatabaseConnection databaseConnection) {
         this.mDatabaseConnection = databaseConnection;
         mBalanceOperations = new ArrayList<>();
+        mBalance = 0.0;
     }
 
     /**
@@ -22,6 +25,21 @@ public class AccountBook {
      */
     public void add(BalanceOperationImpl operation) {
         mBalanceOperations.add(operation);
+    }
+
+    /**
+     * This method update the balance
+     *
+     * @param toBeAdded to the balance
+     */
+    public boolean recordBalanceUpdate(double toBeAdded) {
+        if(mBalance + toBeAdded >= 0){
+            if(mDatabaseConnection.updateBalance(mBalance + toBeAdded)){
+                mBalance += toBeAdded;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -57,14 +75,7 @@ public class AccountBook {
      * @return the balance of the system, from the list of the balance operations
      */
     public double computeBalance() {
-        double sum = 0.0;
-        for(BalanceOperationImpl op: mBalanceOperations) {
-            // Skip return transaction
-            if(!(op instanceof ReturnTransaction) && op.getStatus().equals("PAID"))
-                sum += op.getMoney();
-        }
-
-        return sum;
+        return mBalance;
     }
 
     /**
@@ -83,6 +94,7 @@ public class AccountBook {
     }
 
     void loadFromFromDb(Map<Integer, ProductTypeImpl> mProducts) {
+        mBalance = mDatabaseConnection.getBalance();
         mBalanceOperations.addAll(mDatabaseConnection.getAllBalanceOperations());
         mBalanceOperations.addAll(mDatabaseConnection.getAllOrders().values());
         for (SaleTransactionImpl sale : mDatabaseConnection.getAllSaleTransaction(mProducts).values()){

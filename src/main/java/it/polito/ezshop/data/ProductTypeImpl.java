@@ -39,6 +39,10 @@ public class ProductTypeImpl implements ProductType {
         mLocation = location;
     }
 
+    public void setPosition(String location){
+        setLocation(location);
+    }
+
     @Override
     public String getNote() {
         return mNote;

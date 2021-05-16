@@ -714,4 +714,41 @@ public class DatabaseConnection {
         }
         return false;
     }
+
+    public boolean updateBalance(double newBalance) {
+        deleteBalance();
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
+            ps.setDouble(1, newBalance);
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private void deleteBalance(){
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM balance");
+            ps.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public double getBalance() {
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT money FROM balance");
+            ResultSet resultSet = ps.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getDouble("money");
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0.0;
+    }
 }
