@@ -6,15 +6,15 @@ import java.util.Map;
 
 public class ReturnTransaction extends BalanceOperationImpl {
     // Product discount rate
-    private final double mDiscountRate;
+    private final double discountRate;
     // Map of all the transaction product used for returning the products
-    private final Map<TransactionProduct, Integer> mReturns;
+    private final Map<TransactionProduct, Integer> returns;
 
     // Constructor used for the database
     public ReturnTransaction(int balanceId, LocalDate date, String type, String status, double discountRate) {
         super(balanceId, date, type, status);
-        mDiscountRate = discountRate;
-        mReturns = new HashMap<>();
+        this.discountRate = discountRate;
+        this. returns = new HashMap<>();
     }
 
     public ReturnTransaction(int balanceId, double discountRate) {
@@ -30,16 +30,16 @@ public class ReturnTransaction extends BalanceOperationImpl {
      * @return if the product has been added to the return map
      */
     public boolean addProduct(TransactionProduct prod, int amount) {
-        if (mReturns.containsKey(prod)) {
+        if (returns.containsKey(prod)) {
             // If already present, increase the amount only if there are enough
-            if(prod.getAmount() - mReturns.get(prod) - amount >= 0) {
-                mReturns.put(prod, mReturns.get(prod) + amount);
+            if(prod.getAmount() - returns.get(prod) - amount >= 0) {
+                returns.put(prod, returns.get(prod) + amount);
                 return true;
             }
         } else {
             // If not present, add only if the amount is withing the original order amount
             if(prod.getAmount() - amount >= 0) {
-                mReturns.put(prod, amount);
+                returns.put(prod, amount);
                 return true;
             }
         }
@@ -64,10 +64,10 @@ public class ReturnTransaction extends BalanceOperationImpl {
     public double getMoney() {
         double sum = 0.0;
         // For all element to be returned, compute the price using the original discount price
-        for (Map.Entry<TransactionProduct, Integer> element : mReturns.entrySet()) {
+        for (Map.Entry<TransactionProduct, Integer> element : returns.entrySet()) {
             double priceWithDiscount = element.getKey().getPricePerUnit() - element.getKey().getPricePerUnit() * element.getKey().getDiscountRate();
             priceWithDiscount *= element.getValue();
-            sum -= priceWithDiscount - priceWithDiscount * mDiscountRate;
+            sum -= priceWithDiscount - priceWithDiscount * discountRate;
         }
 
         return sum;
@@ -79,6 +79,6 @@ public class ReturnTransaction extends BalanceOperationImpl {
      * @return the map of TransactionProduct
      */
     public Map<TransactionProduct, Integer> getReturns() {
-        return mReturns;
+        return returns;
     }
 }

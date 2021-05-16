@@ -7,13 +7,16 @@ import java.util.Map;
 
 public class AccountBook {
     // List of the balance opearations (sale, credit, order, debit, return)
-    private List<BalanceOperationImpl> mBalanceOperations;
+    private List<BalanceOperationImpl> opList;
     // Reference to the database
-    private final DatabaseConnection mDatabaseConnection;
+    private final DatabaseConnection databaseConnection;
+    // Store the balance
+    private double balance;
 
     public AccountBook(DatabaseConnection databaseConnection) {
-        this.mDatabaseConnection = databaseConnection;
-        mBalanceOperations = new ArrayList<>();
+        this.databaseConnection = databaseConnection;
+        opList = new ArrayList<>();
+        balance = 0.0;
     }
 
     /**
@@ -21,7 +24,22 @@ public class AccountBook {
      * @param operation BalanceOperationImpl instance to be added
      */
     public void add(BalanceOperationImpl operation) {
-        mBalanceOperations.add(operation);
+        opList.add(operation);
+    }
+
+    /**
+     * This method update the balance
+     *
+     * @param toBeAdded to the balance
+     */
+    public boolean recordBalanceUpdate(double toBeAdded) {
+        if(balance + toBeAdded >= 0){
+            if(databaseConnection.updateBalance(balance + toBeAdded)){
+                balance += toBeAdded;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -41,7 +59,7 @@ public class AccountBook {
         }
 
         List<BalanceOperation> filtered = new ArrayList<>();
-        for (BalanceOperationImpl op : mBalanceOperations) {
+        for (BalanceOperationImpl op : opList) {
             // Check that the operation date is >= from and <= to
             if ((from == null || op.getDate().compareTo(from) >= 0) && (to == null || op.getDate().compareTo(to) < 0) && op.getStatus().equals("PAID")) {
                 filtered.add(op);
@@ -57,37 +75,27 @@ public class AccountBook {
      * @return the balance of the system, from the list of the balance operations
      */
     public double computeBalance() {
-        double sum = 0.0;
-        for(BalanceOperationImpl op: mBalanceOperations) {
-            // Skip return transaction
-            if(!(op instanceof ReturnTransaction) && op.getStatus().equals("PAID"))
-                sum += op.getMoney();
-        }
-
-        return sum;
+        return balance;
     }
 
     /**
      * Reset the internal lists and
      */
     public void reset() {
-        for (BalanceOperationImpl op: mBalanceOperations){
+        for (BalanceOperationImpl op: opList){
             if(op != null)
-            mDatabaseConnection.deleteBalanceOperation(op);
+            databaseConnection.deleteBalanceOperation(op);
         }
-        mBalanceOperations = new ArrayList<>();
-    }
-
-    public void removeById(int id) {
-        mBalanceOperations.removeIf(op -> op.getBalanceId() == id);
+        opList = new ArrayList<>();
     }
 
     void loadFromFromDb(Map<Integer, ProductTypeImpl> mProducts) {
-        mBalanceOperations.addAll(mDatabaseConnection.getAllBalanceOperations());
-        mBalanceOperations.addAll(mDatabaseConnection.getAllOrders().values());
-        for (SaleTransactionImpl sale : mDatabaseConnection.getAllSaleTransaction(mProducts).values()){
-            mBalanceOperations.add(sale);
-            mBalanceOperations.addAll(sale.getReturnTransactions());
+        balance = databaseConnection.getBalance();
+        opList.addAll(databaseConnection.getAllBalanceOperations());
+        opList.addAll(databaseConnection.getAllOrders().values());
+        for (SaleTransactionImpl sale : databaseConnection.getAllSaleTransaction(mProducts).values()){
+            opList.add(sale);
+            opList.addAll(sale.getReturnTransactions());
         }
     }
 }

@@ -137,7 +137,7 @@ public class DatabaseConnection {
 
     public boolean createOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO order_operation(id, date_op, status, quantity, product_code, order_status, price_per_unit, date_arrival) VALUES(?,?,?,?,?,?,?,?)");
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO order_operation(id, date_op, status, quantity, product_code, order_status, price_per_unit) VALUES(?,?,?,?,?,?,?)");
             ps.setInt(1, o.getBalanceId());
             ps.setDate(2, Date.valueOf(o.getDate()));
             ps.setString(3, o.getStatus());
@@ -145,7 +145,6 @@ public class DatabaseConnection {
             ps.setString(5, o.getProductCode());
             ps.setString(6, o.getOrderStatus());
             ps.setDouble(7, o.getPricePerUnit());
-            ps.setDate(8, Date.valueOf(o.getDateArrival()));
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -519,7 +518,7 @@ public class DatabaseConnection {
 
     public boolean updateOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE order_operation SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ?, date_arrival = ? WHERE id = ?");
+            PreparedStatement ps = CON.prepareStatement("UPDATE order_operation SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ? WHERE id = ?");
             ps.setDate(1, Date.valueOf(o.getDate()));
             ps.setString(2, o.getStatus());
             ps.setInt(3, o.getQuantity());
@@ -527,7 +526,6 @@ public class DatabaseConnection {
             ps.setString(5, o.getOrderStatus());
             ps.setDouble(6, o.getPricePerUnit());
             ps.setInt(7, o.getBalanceId());
-            ps.setDate(8, Date.valueOf(o.getDateArrival()));
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -552,8 +550,7 @@ public class DatabaseConnection {
                                 resultSet.getDouble("price_per_unit"),
                                 resultSet.getInt("quantity"),
                                 resultSet.getString("status"),
-                                resultSet.getString("order_status"),
-                                new Date( resultSet.getDate("date_arrival").getTime() ).toLocalDate()
+                                resultSet.getString("order_status")
                         )
                 );
             }
@@ -668,8 +665,8 @@ public class DatabaseConnection {
     public boolean createCustomerCard(CustomerCardImpl customerCard) {
         try {
             PreparedStatement ps = CON.prepareStatement("INSERT INTO customer_card(id, points) VALUES(?,?)");
-            ps.setString(1, customerCard.getCardId());
-            ps.setInt(2, customerCard.getCardPoints());
+            ps.setString(1, customerCard.getCustomer());
+            ps.setInt(2, customerCard.getPoints());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -681,8 +678,8 @@ public class DatabaseConnection {
     public boolean updateCustomerCard(CustomerCardImpl card) {
         try {
             PreparedStatement ps = CON.prepareStatement("UPDATE customer_card SET points = ? WHERE id = ?");
-            ps.setInt(1, card.getCardPoints());
-            ps.setString(2, card.getCardId());
+            ps.setInt(1, card.getPoints());
+            ps.setString(2, card.getCustomer());
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -713,5 +710,42 @@ public class DatabaseConnection {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    public boolean updateBalance(double newBalance) {
+        deleteBalance();
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
+            ps.setDouble(1, newBalance);
+            return ps.executeUpdate()>0;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private void deleteBalance(){
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM balance");
+            ps.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public double getBalance() {
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT money FROM balance");
+            ResultSet resultSet = ps.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getDouble("money");
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0.0;
     }
 }
