@@ -28,13 +28,13 @@ public class CreditCardCircuitTest {
     @Test
     public void PositiveValidateCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit();
-        assertTrue(card.validateCreditCard("5100293991053009"));
+        assertTrue(card.validateCreditCard("4485370086510891"));
 
     }
     @Test
     public void NegativeValidateCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit();
-        assertTrue(card.validateCreditCard(null));
+        assertFalse(card.validateCreditCard(null));
 
     }
     @Test
@@ -46,19 +46,19 @@ public class CreditCardCircuitTest {
     @Test
     public void NegativePayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit();
-        assertTrue(card.pay("4485370086510891",200));
+        assertFalse(card.pay("4485370086510891",200));
 
     }
     @Test
     public void InvalidPayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit();
-        assertTrue(card.pay(null,60));
+        assertFalse(card.pay(null,60));
 
     }
     @Test
     public void InvalidMoneyPayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit();
-        assertTrue(card.pay("4485370086510891",-58.2));
+        assertFalse(card.pay("4485370086510891",-58.2));
 
     }
 }
