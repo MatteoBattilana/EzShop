@@ -12,15 +12,18 @@ public class CreditCardCircuit {
      * Constructor used to load the file cards.txt
      */
     public CreditCardCircuit() {
+        mCreditCardMoney = new HashMap<>();
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(sFILE));
             String line = reader.readLine();
-            while (line != null && line.charAt(0) != '#') {
+            while (line != null) {
+                if (line.charAt(0) != '#') {
+                    String[] card = line.split(";");
+                    if (card.length == 2)
+                        mCreditCardMoney.put(card[0], Double.valueOf(card[1]));
+                }
                 line = reader.readLine();
-                String[] card = line.split(";");
-                if(card.length == 2)
-                    mCreditCardMoney.put(card[0], Double.valueOf(card[1]));
             }
             reader.close();
         } catch (IOException e) {
