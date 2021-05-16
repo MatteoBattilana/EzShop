@@ -12,6 +12,8 @@ public class EZShop implements EZShopInterface {
     private final CreditCardCircuit creditCardCircuit;
     private final DatabaseConnection databaseConnection;
 
+    private static final String CREDIT_CARD_FILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
+
     // Map used to store the users, indexed by the user id
     private Map<Integer, User> allUsers;
     // Map for the orders
@@ -30,7 +32,7 @@ public class EZShop implements EZShopInterface {
     public EZShop() {
         loggedUser = null;
         databaseConnection = new DatabaseConnection();
-        creditCardCircuit = new CreditCardCircuit();
+        creditCardCircuit = new CreditCardCircuit(CREDIT_CARD_FILE);
         accountBook = new AccountBook(databaseConnection);
         loadFromDb();
     }
