@@ -209,5 +209,20 @@ public class ProductTypeImplTest {
 
     }
 
-}
+    @Test
+    public void SetLocation(){
+
+        ProductTypeImpl product = new ProductTypeImpl(5,"shelves", "good", "red","010003004",0.55 ,50);
+        product.setLocation("hall");
+        assertEquals("hall", product.getLocation());
+        product.setLocation("");
+        assertEquals("", product.getLocation());
+        product.setLocation(null);
+        assertEquals(null, product.getLocation());
+
+
+
+
+    }
+ }
 

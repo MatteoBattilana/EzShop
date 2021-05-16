@@ -1,4 +1,4 @@
-package it.polito.ezshop.blackbox;
+package it.polito.ezshop.unitBB;
 
 import it.polito.ezshop.data.CustomerImpl;
 import it.polito.ezshop.exceptions.*;
