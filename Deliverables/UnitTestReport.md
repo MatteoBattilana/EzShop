@@ -1,10 +1,10 @@
-11# Unit Testing Documentation
+# Unit Testing Documentation
 
-Authors:
+Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date:
+Date: 16/05/2021
 
-Version:
+Version: 1.0
 
 # Contents
 
