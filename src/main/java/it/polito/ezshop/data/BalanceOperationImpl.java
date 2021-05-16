@@ -22,7 +22,7 @@ public class BalanceOperationImpl implements BalanceOperation {
     }
 
     public void setStatus(String status){
-        if(status != null && (status.equals("PAID") || status.equals("UNPAID")))
+        if(status != null && (status.equals("OPENED") || status.equals("CLOSED") || status.equals("PAID")))
             this.mStatus = status;
     }
 

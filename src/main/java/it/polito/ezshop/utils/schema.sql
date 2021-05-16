@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS order_operation (
  quantity INTEGER,
  product_code text NOT NULL,
  order_status text NOT NULL,
- price_per_unit DOUBLE
+ price_per_unit DOUBLE,
+ date_arrival DATE
 );
 
 CREATE TABLE IF NOT EXISTS customer (

@@ -7,21 +7,24 @@ public class OrderImpl extends BalanceOperationImpl {
     private double mPricePerUnit;
     private int mQuantity;
     private String mOrderStatus;
+    private LocalDate mArrival;
 
-    public OrderImpl(int mBalanceId, LocalDate date, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus) {
+    public OrderImpl(int mBalanceId, LocalDate date, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus, LocalDate arrival) {
         super(mBalanceId, date, "ORDER", status);
         this.mProductCode = mProductCode;
         this.mPricePerUnit = mPricePerUnit;
         this.mQuantity = mQuantity;
         this.mOrderStatus = orderStatus;
+        this.mArrival = arrival;
     }
 
-    public OrderImpl(int id, LocalDate date_op, String status, int quantity, String product_code, String order_status, double price_per_unit) {
-        super(id, date_op, "ORDER", status);
-        mQuantity = quantity;
-        mProductCode = product_code;
-        mOrderStatus = order_status;
-        mPricePerUnit = price_per_unit;
+    public OrderImpl(int mBalanceId, String mProductCode, double mPricePerUnit, int mQuantity, String status, String orderStatus) {
+        super(mBalanceId, LocalDate.now(), "ORDER", status);
+        this.mProductCode = mProductCode;
+        this.mPricePerUnit = mPricePerUnit;
+        this.mQuantity = mQuantity;
+        this.mOrderStatus = orderStatus;
+        this.mArrival = null;
     }
 
     @Override
@@ -63,5 +66,10 @@ public class OrderImpl extends BalanceOperationImpl {
 
     public void recordOrderArrival() {
         mOrderStatus = "COMPLETED";
+        mArrival = LocalDate.now();
+    }
+
+    public LocalDate getDateArrival() {
+        return mArrival;
     }
 }

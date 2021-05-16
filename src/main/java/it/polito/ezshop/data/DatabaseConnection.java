@@ -137,7 +137,7 @@ public class DatabaseConnection {
 
     public boolean createOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO order_operation(id, date_op, status, quantity, product_code, order_status, price_per_unit) VALUES(?,?,?,?,?,?,?)");
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO order_operation(id, date_op, status, quantity, product_code, order_status, price_per_unit, date_arrival) VALUES(?,?,?,?,?,?,?,?)");
             ps.setInt(1, o.getBalanceId());
             ps.setDate(2, Date.valueOf(o.getDate()));
             ps.setString(3, o.getStatus());
@@ -145,6 +145,7 @@ public class DatabaseConnection {
             ps.setString(5, o.getProductCode());
             ps.setString(6, o.getOrderStatus());
             ps.setDouble(7, o.getPricePerUnit());
+            ps.setDate(8, Date.valueOf(o.getDateArrival()));
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -518,7 +519,7 @@ public class DatabaseConnection {
 
     public boolean updateOrder(OrderImpl o) {
         try {
-            PreparedStatement ps = CON.prepareStatement("UPDATE order_operation SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ? WHERE id = ?");
+            PreparedStatement ps = CON.prepareStatement("UPDATE order_operation SET date_op = ?, status = ?, quantity = ?, product_code = ?, order_status = ?, price_per_unit = ?, date_arrival = ? WHERE id = ?");
             ps.setDate(1, Date.valueOf(o.getDate()));
             ps.setString(2, o.getStatus());
             ps.setInt(3, o.getQuantity());
@@ -526,6 +527,7 @@ public class DatabaseConnection {
             ps.setString(5, o.getOrderStatus());
             ps.setDouble(6, o.getPricePerUnit());
             ps.setInt(7, o.getBalanceId());
+            ps.setDate(8, Date.valueOf(o.getDateArrival()));
             return ps.executeUpdate()>0;
         }
         catch (Exception ex) {
@@ -546,11 +548,12 @@ public class DatabaseConnection {
                         new OrderImpl(
                                 resultSet.getInt("id"),
                                 new Date( resultSet.getDate("date_op").getTime() ).toLocalDate(),
-                                resultSet.getString("status"),
-                                resultSet.getInt("quantity"),
                                 resultSet.getString("product_code"),
+                                resultSet.getDouble("price_per_unit"),
+                                resultSet.getInt("quantity"),
+                                resultSet.getString("status"),
                                 resultSet.getString("order_status"),
-                                resultSet.getDouble("price_per_unit")
+                                new Date( resultSet.getDate("date_arrival").getTime() ).toLocalDate()
                         )
                 );
             }

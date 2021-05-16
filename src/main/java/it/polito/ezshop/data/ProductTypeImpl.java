@@ -88,16 +88,4 @@ public class ProductTypeImpl implements ProductType {
     public void setId(Integer id) {
         if(id != null && id > 0) mId = id;
     }
-
-    public ProductTypeImpl clone() {
-        return  new ProductTypeImpl(
-                mQuantity,
-                mLocation,
-                mNote,
-                mDescription,
-                mBarcode,
-                mPricePerUnit,
-                mId
-        );
-    }
 }
