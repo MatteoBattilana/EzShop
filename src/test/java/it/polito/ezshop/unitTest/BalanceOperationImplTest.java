@@ -95,19 +95,6 @@ public class BalanceOperationImplTest {
         assertEquals(status, balance.getStatus());
     }
 
-    @Test
-    public void testSetStatus(){
-        BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
-        balanceOperation.setStatus("UNPAID");
-        assertEquals("UNPAID", balanceOperation.getStatus());
-        balanceOperation.setStatus("PAID");
-        assertEquals("PAID", balanceOperation.getStatus());
-
-        balanceOperation.setStatus("");
-        assertEquals("PAID", balanceOperation.getStatus());
-        balanceOperation.setStatus(null);
-        assertEquals("PAID", balanceOperation.getStatus());
-    }
 
     @Test
     public void testPositiveSetStatus(){
@@ -119,16 +106,21 @@ public class BalanceOperationImplTest {
     }
 
     @Test
-    public void testSetMoney(){
+    public void testPositiveSetMoney(){
         BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
-        balanceOperation.setMoney(-Double.MAX_VALUE);
-        assertEquals(-Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
-        balanceOperation.setMoney(0);
-        assertEquals(0, balanceOperation.getMoney(), 0.1);
+        balanceOperation.setMoney(0.50);
+        assertEquals(0.50, balanceOperation.getMoney(), 0.1);
+        //boundary
+        balanceOperation.setMoney(0.0001);
+        assertEquals(0.0001, balanceOperation.getMoney(), 0.1);
         balanceOperation.setMoney(Double.MAX_VALUE);
         assertEquals(Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
     }
-
+    @Test
+    public void testInvalidSetMoney(){
+        BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
+        balanceOperation.setMoney(-0.0001);
+         assertEquals(-0.0001, balanceOperation.getMoney(), 0.1);}
     @Test
     public void testSecondConstructor(){
         BalanceOperationImpl balance = new BalanceOperationImpl(1, LocalDate.now(), "SALE", "UNPAID");

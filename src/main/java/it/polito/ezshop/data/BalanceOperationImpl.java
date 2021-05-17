@@ -60,6 +60,7 @@ public class BalanceOperationImpl implements BalanceOperation {
 
     @Override
     public void setMoney(double money) {
+        if(money >0)
         amount = money;
     }
 

@@ -37,6 +37,16 @@ public class CreditCardCircuitTest {
         CreditCardCircuit card = new CreditCardCircuit(sFILE);
         assertFalse(card.isValid("4485370086510890"));
     }
+    @Test
+    public void testInvalidValidity() {
+        CreditCardCircuit card = new CreditCardCircuit(sFILE);
+        assertFalse(card.isValid(""));
+    }
+    @Test
+    public void testNullValidity() {
+        CreditCardCircuit card = new CreditCardCircuit(sFILE);
+        assertFalse(card.isValid(null));
+    }
 
     @Test
     public void testPositiveValidity() {

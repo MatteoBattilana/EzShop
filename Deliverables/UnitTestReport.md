@@ -59,6 +59,34 @@ Version: 1.0
 |-------|-------|-------|-------|
 | (minint, 1)| Invalid|T1(-5) -> new id no setted<br />T1b(0) -> new id no setted | BalanceOperationImplTest.testNegativeSetBalanceId()|
 |[1, maxint)|Valid|T2(15) -> new id setted<br /> T2b(maxint) -> new id setted|BalanceOperationImplTest.testPositiveSetBalanceId()|
+**Criteria for method *setMoney*:**
+
+ - Validity of the money
+
+**Predicates for method *setMoney*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of the money        |  (-maxdouble,0.0001)   |
+|                             | [0.0001, maxdouble)   |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+| Validity of the money         |  -0.0001,0.0001,maxdouble          |
+|          |                 |
+
+
+
+**Combination of predicates**:
+
+
+| Validity of the money | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|(-maxdouble,0.0001)   |  Invalid|T1(-0.001) -> new money no setted|BalanceOperationImplTest.testInvalidSetMoney()|
+|[0.0001, maxdouble)|Valid|T2(0.50) -> new money setted<br /> T2b(0.0001) -> new money setted|BalanceOperationImplTest.testPositiveSetMoney()|
 
 **Criteria for method *setDate*:**
 
@@ -319,12 +347,44 @@ Version: 1.0
 | (minint, 0)|*| Invalid|T1(-5) -> new quantity no setted<br />T1b(-1) -> new quantity no setted | ProductTypeImplTest.testNegativeSetQuantity()|
 | * |NULL| Invalid|T2(null) -> new quantity no setted setted| ProductTypeImplTest.testInvalidSetIQuantity()|
 |[0, maxint)|Valid|Valid|T3(20) -> new quantity setted <br />T3b(maxint) -> new quantity setted |ProductTypeImplTest.testPositiveSetQuantity()
+**Criteria for method *setTemporaryQuantity*:**
+ - Size of the Parameter of the quantity
+ - Validity of the quantity
+
+**Predicates for method *setTemporaryQuantity*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Size of the Parameter of the quantity	      |  (minint, 0)   |
+|                             | [0, maxint)  |
+| Validity of the quantity| Valid |
+|                             | NULL |
+
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|Size of the Parameter of the quantity	 |   -1,0,maxint  |
+|          |                 |
+
+
+
+**Combination of predicates**:
+
+
+|Size of the Parameter of the quantity	 |   Validity of the quantity | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|
+| (minint, 0)|*| Invalid|T1(-5) -> false<br />T1b(-1) -> false | ProductTypeImplTest.testNegativeSetTemporaryQuantity()|
+| * |NULL| Invalid|T2(null) -> false| ProductTypeImplTest.testNullSetTemporaryQuantity()|
+|[0, maxint)|Valid|Valid|T3(20) ->true <br />T3b(maxint) ->true<br />T3b(0) ->true |ProductTypeImplTest.testPositiveSetTemporaryQuantity()
 
 **Criteria for method *setPricePerUnit*:**
  - Size of the Parameter of the PricePerUnit
  - Validity of the PricePerUnit
 
-**Predicates for method *setQuantity*:**
+**Predicates for method *setPricePerUnit*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -352,6 +412,9 @@ Version: 1.0
 | (-maxdouble, 0)|*| Invalid|T1(-0.50) -> new PricePerUnit no setted<br />T1b(-0.0001) -> new PricePerUnit no setted | ProductTypeImplTest.testNegativeSetPricePerUnit()|
 | * |NULL| Invalid|T2(null) -> new PricePerUnit no setted setted| ProductTypeImplTest.testInvalidSetIPricePerUnit()|
 |[0, maxdouble)|Valid|Valid|T3(0.60) -> new PricePerUnit setted<br />T3b(0.0001) -> new PricePerUnit setted|ProductTypeImplTest.testPositiveSetPricePerUnit()
+
+
+
 
 **Criteria for method *setBarCode*:**
 
@@ -434,6 +497,88 @@ Version: 1.0
 |*|=0| Invalid|T2("") -> new Note no setted| ProductTypeImplTest.testInvalidSetNote()|
 |Valid|>0| Valid|T3("bad") -> new Note setted| ProductTypeImplTest.testPositiveSetNote()|
 
+**Criteria for method *setPosition*:**
+
+ - Validity of the String location
+ - Lenght of the String location
+
+
+
+**Predicates for method *setPosition*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of the String location |  Valid   |
+|                             | NULL |
+|Lenght of the String location  | >0 |
+|                             | =0 ("") |
+
+
+
+**Combination of predicates**:
+
+
+| Validity of the String location| Lenght of the String location  | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|
+| NULL| *|Invalid|T1(null) -> new location no setted| ProductTypeImplTest.testNullSetPosition()|
+|*|=0| Invalid|T2("") -> new location no setted| ProductTypeImplTest.testInvalidSetPosition()|
+|Valid|>0| Valid|T3("top shelf") -> new location setted| ProductTypeImplTest.testPositiveSetPosition()|
+
+### **Class *CustomerCardImpl***
+
+**Predicates for method *setCustomer*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of the String customercard |  Valid   |
+|                             | NULL |
+|Lenght of the String customercard  | >0 |
+|                             | =0 ("") |
+|Validity of the id|  Valid   |
+|                             | NULL |
+
+
+
+**Combination of predicates**:
+
+
+| Validity of the String customercard | Lenght of the String customercard   ||Validity of the id| Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|
+| NULL| *| * |Invalid|T1(null) -> new customercard  no setted| CustomerCardImplTest.testNullSetCustomer()|
+|*|=0| *| Invalid|T2("") -> new customercard no setted| CustomerCardImplTest.testEmptySetCustomer()|
+|* | *| NULL| Invalid|new CustomerCardImpl(null, 0);
+  T3("Cliente002") -> new customercard no setted| CustomerCardImplTest.testInvalidSetCustomer()|
+|Valid|>0|Valid| Valid|T4("Cliente002") -> new customercard  setted| CustomerCardImplTest.testInvalidSetCustomer()|
+
+**Criteria for method *setPoints*:**
+ - Size of the Parameter of the quantity
+ - Validity of the quantity
+
+**Predicates for method *setPoints*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Size of the Parameter of the points      |  (minint, 0)   |
+|                             | [0, maxint)  |
+
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|Size of the Parameter of the points	 |   -1,0,maxint  |
+|          |                 |
+
+
+
+**Combination of predicates**:
+
+
+|Size of the Parameter of the points | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+| (minint, 0)| Invalid|T1(-5) -> new points no setted<br />T1b(-1) ->  new points no setted| CustomerCardImplTest.testInvalidSetCardPoint()|
+|[0, maxint)|Valid|T3(23) ->new points setted<br />T3b(maxint) ->new points setted<br />T3b(0) ->new points setted |CustomerCardImplTest.testInvalidSetCardPoint()|
 
 
 

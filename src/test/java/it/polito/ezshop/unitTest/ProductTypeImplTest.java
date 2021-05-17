@@ -182,22 +182,42 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void testSetPosition() {
+    public void testPositiveSetPosition() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
-        product.setPosition("hall");
-        assertEquals("hall", product.getLocation());
+        product.setPosition("top shelf");
+        assertEquals("top shelf", product.getLocation());
+    }
+    @Test
+    public void testInvalidSetPosition() {
+        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setPosition("");
         assertEquals("", product.getLocation());
+    }
+    @Test
+    public void testNullSetPosition() {
+        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setPosition(null);
         assertNull(product.getLocation());
     }
 
     @Test
-    public void testSetTemporaryQuantity() {
+    public void testNegativeSetTemporaryQuantity() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
-        assertTrue(product.setTemporaryQuantity(Integer.MIN_VALUE));
+        assertFalse(product.setTemporaryQuantity(-5));
+        //boundary
+        assertFalse(product.setTemporaryQuantity(-1));}
+    @Test
+    public void testPositiveSetTemporaryQuantity() {
+        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
+        assertTrue(product.setTemporaryQuantity(20));
+        //boundary
         assertTrue(product.setTemporaryQuantity(Integer.MAX_VALUE));
-        assertTrue(product.setTemporaryQuantity(0));
+        assertTrue(product.setTemporaryQuantity(0));}
+    @Test
+    public void testNullSetTemporaryQuantity() {
+        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
+        assertFalse(product.setTemporaryQuantity(null));
+
     }
 }
 
