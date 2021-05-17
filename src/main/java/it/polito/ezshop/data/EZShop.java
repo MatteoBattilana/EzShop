@@ -499,7 +499,11 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId <= 0) throw new InvalidProductIdException();
 
         // Check position format
-        if (newPos == null || newPos.split("-").length != 3) throw new InvalidLocationException();
+        if (newPos != null){
+            String[] positionArray = newPos.split("-");
+            if(!Pattern.compile("[0-9]+").matcher(positionArray[0]).matches() || !Pattern.compile("[0-9]+").matcher(positionArray[2]).matches())
+                throw new InvalidLocationException();
+        } else throw new InvalidLocationException();
 
         // Check if the position is used by other products
         for (ProductType p : products.values()) {
