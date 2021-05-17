@@ -182,20 +182,12 @@ public class ProductTypeImplTest {
     }
 
     @Test
-    public void testPositiveSetPosition() {
+    public void testSetPosition() {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
-        product.setPosition("top shelf");
-        assertEquals("top shelf", product.getLocation());
-    }
-    @Test
-    public void testInvalidSetPosition() {
-        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
+        product.setPosition("hall");
+        assertEquals("hall", product.getLocation());
         product.setPosition("");
         assertEquals("", product.getLocation());
-    }
-    @Test
-    public void testNullSetPosition() {
-        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004", 0.55, 50);
         product.setPosition(null);
         assertNull(product.getLocation());
     }
