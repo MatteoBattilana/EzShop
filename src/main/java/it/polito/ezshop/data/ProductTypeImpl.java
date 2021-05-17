@@ -31,10 +31,11 @@ public class ProductTypeImpl implements ProductType {
         if(quantity != null && quantity >= 0) this.quantity = quantity;
     }
 
-    public boolean setTemporaryQuantity(Integer quantity){
-        if(quantity != null && quantity >= 0){
-        setQuantity(quantity);
-        return true;}
+    public boolean setTemporaryQuantity(Integer quantity) {
+        if (quantity != null && quantity >= 0) {
+            setQuantity(quantity);
+            return true;
+        }
         return false;
     }
 
@@ -48,7 +49,7 @@ public class ProductTypeImpl implements ProductType {
         position = location;
     }
 
-    public void setPosition(String location){if( location!= null && !location.isEmpty())
+    public void setPosition(String location){
         setLocation(location);
     }
 

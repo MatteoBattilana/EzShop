@@ -117,10 +117,12 @@ public class BalanceOperationImplTest {
         assertEquals(Double.MAX_VALUE, balanceOperation.getMoney(), 0.1);
     }
     @Test
-    public void testInvalidSetMoney(){
+    public void testNegativeSetMoney(){
         BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
         balanceOperation.setMoney(-0.0001);
-         assertEquals(-0.0001, balanceOperation.getMoney(), 0.1);}
+        assertEquals(-0.0001, balanceOperation.getMoney(), 0.1);
+    }
+
     @Test
     public void testSecondConstructor(){
         BalanceOperationImpl balance = new BalanceOperationImpl(1, LocalDate.now(), "SALE", "UNPAID");
@@ -129,5 +131,20 @@ public class BalanceOperationImplTest {
         assertEquals("SALE", balance.getType());
         assertEquals("UNPAID", balance.getStatus());
     }
+
+    @Test
+    public void testSetStatus(){
+        BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 0.0, "SALE", "UNPAID");
+        balanceOperation.setStatus("UNPAID");
+        assertEquals("UNPAID", balanceOperation.getStatus());
+        balanceOperation.setStatus("PAID");
+        assertEquals("PAID", balanceOperation.getStatus());
+
+        balanceOperation.setStatus("");
+        assertEquals("PAID", balanceOperation.getStatus());
+        balanceOperation.setStatus(null);
+        assertEquals("PAID", balanceOperation.getStatus());
+    }
+
 }
 

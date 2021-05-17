@@ -59,34 +59,6 @@ Version: 1.0
 |-------|-------|-------|-------|
 | (minint, 1)| Invalid|T1(-5) -> new id no setted<br />T1b(0) -> new id no setted | BalanceOperationImplTest.testNegativeSetBalanceId()|
 |[1, maxint)|Valid|T2(15) -> new id setted<br /> T2b(maxint) -> new id setted|BalanceOperationImplTest.testPositiveSetBalanceId()|
-**Criteria for method *setMoney*:**
-
- - Validity of the money
-
-**Predicates for method *setMoney*:**
-
-| Criteria | Predicate |
-| -------- | --------- |
-| Validity of the money        |  (-maxdouble,0.0001)   |
-|                             | [0.0001, maxdouble)   |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-| Validity of the money         |  -0.0001,0.0001,maxdouble          |
-|          |                 |
-
-
-
-**Combination of predicates**:
-
-
-| Validity of the money | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|
-|(-maxdouble,0.0001)   |  Invalid|T1(-0.001) -> new money no setted|BalanceOperationImplTest.testInvalidSetMoney()|
-|[0.0001, maxdouble)|Valid|T2(0.50) -> new money setted<br /> T2b(0.0001) -> new money setted|BalanceOperationImplTest.testPositiveSetMoney()|
 
 **Criteria for method *setDate*:**
 
@@ -497,32 +469,6 @@ Version: 1.0
 |*|=0| Invalid|T2("") -> new Note no setted| ProductTypeImplTest.testInvalidSetNote()|
 |Valid|>0| Valid|T3("bad") -> new Note setted| ProductTypeImplTest.testPositiveSetNote()|
 
-**Criteria for method *setPosition*:**
-
- - Validity of the String location
- - Lenght of the String location
-
-
-
-**Predicates for method *setPosition*:**
-
-| Criteria | Predicate |
-| -------- | --------- |
-|Validity of the String location |  Valid   |
-|                             | NULL |
-|Lenght of the String location  | >0 |
-|                             | =0 ("") |
-
-
-
-**Combination of predicates**:
-
-
-| Validity of the String location| Lenght of the String location  | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|
-| NULL| *|Invalid|T1(null) -> new location no setted| ProductTypeImplTest.testNullSetPosition()|
-|*|=0| Invalid|T2("") -> new location no setted| ProductTypeImplTest.testInvalidSetPosition()|
-|Valid|>0| Valid|T3("top shelf") -> new location setted| ProductTypeImplTest.testPositiveSetPosition()|
 
 ### **Class *CustomerCardImpl***
 
