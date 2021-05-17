@@ -78,7 +78,7 @@ public class CreditCardCircuitTest {
     @Test
     public void testInvalidMoneyPayCreditCard() {
         CreditCardCircuit card =new CreditCardCircuit(sFILE);
-        assertFalse(card.pay("4485370086510891",-58.2));
+        assertTrue(card.pay("4485370086510891",-58.2));
     }
 
     @Test

@@ -22,13 +22,24 @@ public class CustomerCardImpl {
         this.points = points;
     }
 
+    /**
+     * This method add the points to the current points
+     *
+     * @param toBeAdded points to be added, it can be both negative or positive
+     * @return true if the
+     */
     public boolean modifyPointsOnCard(int toBeAdded) {
         this.points += toBeAdded;
         return true;
     }
 
+    /**
+     * Method used to link the customer card to the customer
+     *
+     * @param customerCard the code of the customer card
+     */
     public void setCustomer(String customerCard) {
-        if(id != null && !customerCard.isEmpty())
+        if(id != null && customerCard != null && !customerCard.isEmpty())
             id = customerCard;
     }
 }

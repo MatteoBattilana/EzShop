@@ -1013,7 +1013,7 @@ public class EZShop implements EZShopInterface {
         }
 
         CustomerCardImpl card = customerCards.get(customerCard);
-        if (card != null && card.getPoints() + pointsToBeAdded > 0){
+        if (card != null && card.getPoints() + pointsToBeAdded >= 0){
             card.modifyPointsOnCard(pointsToBeAdded);
             if(databaseConnection.updateCustomerCard(card)){
                 return true;
@@ -1810,7 +1810,7 @@ public class EZShop implements EZShopInterface {
         allUsers = databaseConnection.getAllUsers();
         loadProductsFromDb();
         allSales = databaseConnection.getAllSaleTransaction(products);
-        accountBook.loadFromFromDb(products);
+        accountBook.loadFromFromDb(allSales);
 
         customerCards = databaseConnection.getAllCustomerCards();
         loadCustomersFromDb();

@@ -24,7 +24,8 @@ public class AccountBook {
      * @param operation BalanceOperationImpl instance to be added
      */
     public void add(BalanceOperationImpl operation) {
-        opList.add(operation);
+        if(operation != null)
+            opList.add(operation);
     }
 
     /**
@@ -84,16 +85,21 @@ public class AccountBook {
     public void reset() {
         for (BalanceOperationImpl op: opList){
             if(op != null)
-            databaseConnection.deleteBalanceOperation(op);
+                databaseConnection.deleteBalanceOperation(op);
         }
         opList = new ArrayList<>();
     }
 
-    void loadFromFromDb(Map<Integer, ProductTypeImpl> mProducts) {
+    /**
+     * Method used to load all the balance operations at the startup
+     *
+     * @param sales the sale map, used to record the sales
+     */
+    void loadFromFromDb(Map<Integer, SaleTransactionImpl> sales) {
         balance = databaseConnection.getBalance();
         opList.addAll(databaseConnection.getAllBalanceOperations());
         opList.addAll(databaseConnection.getAllOrders().values());
-        for (SaleTransactionImpl sale : databaseConnection.getAllSaleTransaction(mProducts).values()){
+        for (SaleTransactionImpl sale : sales.values()){
             opList.add(sale);
             opList.addAll(sale.getReturnTransactions());
         }

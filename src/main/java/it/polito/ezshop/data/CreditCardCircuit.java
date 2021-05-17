@@ -13,20 +13,22 @@ public class CreditCardCircuit {
     public CreditCardCircuit(String fileName) {
         this.fileName = fileName;
         mCreditCardMoney = new HashMap<>();
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(fileName));
-            String line = reader.readLine();
-            while (line != null) {
-                if (line.charAt(0) != '#') {
-                    String[] card = line.split(";");
-                    if (card.length == 2)
-                        mCreditCardMoney.put(card[0], Double.valueOf(card[1]));
+
+        if(fileName != null) {
+            BufferedReader reader;
+            try {
+                reader = new BufferedReader(new FileReader(fileName));
+                String line = reader.readLine();
+                while (line != null) {
+                    if (line.charAt(0) != '#') {
+                        String[] card = line.split(";");
+                        if (card.length == 2)
+                            mCreditCardMoney.put(card[0], Double.valueOf(card[1]));
+                    }
+                    line = reader.readLine();
                 }
-                line = reader.readLine();
-            }
-            reader.close();
-        } catch (IOException ignored) {
+                reader.close();
+            } catch (IOException ignored) { }
         }
     }
 
@@ -57,7 +59,9 @@ public class CreditCardCircuit {
      * @return if the credit card is in the list
      */
     public boolean isValid(String creditCard){
-        return mCreditCardMoney.containsKey(creditCard);
+        if(creditCard != null && !creditCard.isEmpty())
+            return mCreditCardMoney.containsKey(creditCard);
+        return false;
     }
 
     /**
@@ -68,7 +72,7 @@ public class CreditCardCircuit {
      * @return true if the payment has been successful
      */
     public boolean pay(String creditCard, double money) {
-        if (isValid(creditCard) && money >= 0) {
+        if (isValid(creditCard)) {
             double amount = mCreditCardMoney.get(creditCard);
             if (amount >= money) {
                 mCreditCardMoney.put(creditCard, amount - money);

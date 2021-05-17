@@ -21,6 +21,11 @@ public class BalanceOperationImpl implements BalanceOperation {
         this(balanceId, date, 0, type, status);
     }
 
+    /**
+     * Method used to update the status of a transaction, it can be OPENED, CLOSED or PAID
+     *
+     * @param status of the transaction
+     */
     public void setStatus(String status){
         if(status != null && (status.equals("OPENED") || status.equals("CLOSED") || status.equals("PAID")))
             this.status = status;
@@ -63,6 +68,11 @@ public class BalanceOperationImpl implements BalanceOperation {
         return type;
     }
 
+    /**
+     * Method used to update the type of a transaction, it can be SALE, ORDER, DEBIT or CREDIT
+     *
+     * @param type of the transaction
+     */
     @Override
     public void setType(String type) {
         if(type != null && (type.equals("SALE") || type.equals("ORDER") || type.equals("RETURN") || type.equals("DEBIT") || type.equals("CREDIT")))
