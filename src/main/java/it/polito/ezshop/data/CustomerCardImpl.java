@@ -18,6 +18,7 @@ public class CustomerCardImpl {
     }
 
     public void setPoints(Integer points) {
+        if(points >= 0)
         this.points = points;
     }
 
@@ -27,6 +28,7 @@ public class CustomerCardImpl {
     }
 
     public void setCustomer(String customerCard) {
-        id = customerCard;
+        if(id != null && !customerCard.isEmpty())
+            id = customerCard;
     }
 }
