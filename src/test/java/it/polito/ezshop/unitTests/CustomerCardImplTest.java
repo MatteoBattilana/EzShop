@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitTest;
+package it.polito.ezshop.unitTests;
 
 import it.polito.ezshop.data.CustomerCardImpl;
 import org.junit.Test;
