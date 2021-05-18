@@ -93,9 +93,7 @@ public class DatabaseConnection {
                 ps.setString(1, role);
                 ps.setInt(2, user.getId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -112,9 +110,7 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM users WHERE id = ?");
                 ps.setInt(1, user.getId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -141,9 +137,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -164,9 +158,7 @@ public class DatabaseConnection {
                 ps.setString(6, o.getOrderStatus());
                 ps.setDouble(7, o.getPricePerUnit());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -196,9 +188,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -219,9 +209,7 @@ public class DatabaseConnection {
                 ps.setDouble(6, prod.getPricePerUnit());
                 ps.setInt(7, prod.getId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -243,9 +231,7 @@ public class DatabaseConnection {
                 ps.setString(6, prod.getBarCode());
                 ps.setDouble(7, prod.getPricePerUnit());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -261,19 +247,12 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM product_type WHERE id = ?");
                 ps.setInt(1, productType.getId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
 
-    /**
-     * Create a sale transaction into the DB
-     * @param saleT the new sale transaction to save
-     * @return true if everything went ok, false otherwise
-     */
-    public boolean createSaleTransaction(SaleTransactionImpl saleT) {
+    private boolean createSaleTransaction(SaleTransactionImpl saleT) {
         if(saleT != null ) {
             try {
                 PreparedStatement ps = CON.prepareStatement("INSERT INTO sale_transaction(id, discount, transaction_status, date_op, type, status) VALUES(?,?,?,?,?,?)");
@@ -284,9 +263,7 @@ public class DatabaseConnection {
                 ps.setString(5, saleT.getType());
                 ps.setString(6, saleT.getStatus());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -321,9 +298,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -353,9 +328,7 @@ public class DatabaseConnection {
                             )
                     );
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return all;
     }
@@ -368,7 +341,7 @@ public class DatabaseConnection {
      * @param soldProducts
      * @return map of the return transactions
      */
-    private Map<Integer, ReturnTransaction> getAllReturnTransaction(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts, double saleDiscount, Map<ProductTypeImpl, TransactionProduct> soldProducts) {
+    public Map<Integer, ReturnTransaction> getAllReturnTransaction(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts, double saleDiscount, Map<ProductTypeImpl, TransactionProduct> soldProducts) {
         Map<Integer, ReturnTransaction> all = new HashMap<>();
         if(saleDiscount > 0 && saleDiscount >= 0 && saleDiscount <= 1) {
             try {
@@ -396,9 +369,7 @@ public class DatabaseConnection {
                     ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
                     retT.addProduct(soldProducts.get(product), resultSet.getInt("amount"));
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return all;
     }
@@ -413,21 +384,20 @@ public class DatabaseConnection {
                 ps.setInt(4, ticket.getAmount());
                 ps.setDouble(5, ticket.getPricePerUnit());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
 
     public boolean saveSaleTransaction(SaleTransactionImpl saleT) {
-        if(saleT != null &createSaleTransaction(saleT)) {
+        if(createSaleTransaction(saleT)) {
             for(TransactionProduct ticket: saleT.getTicketEntries()) {
                 addProductToSale(saleT, ticket, ticket.getProductType().getId());
                 updateProductType(ticket.getProductType());
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -454,13 +424,11 @@ public class DatabaseConnection {
                             }
                         }
                     }
+                    return true;
                 }
                 CON.commit();
                 CON.setAutoCommit(true);
-                return true;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -490,9 +458,8 @@ public class DatabaseConnection {
                             ps1.setInt(3, tp.getAmount());
                             ps1.setInt(4, transaction.getBalanceId());
                             ps1.setInt(5, tp.getProductType().getId());
-                            if (ps1.executeUpdate() <= 0) {
-                                CON.rollback();
-                                return false;
+                            if (ps1.executeUpdate() == 0) {
+                                addProductToSale(transaction, tp, tp.getProductType().getId());
                             }
                         }
                     }
@@ -500,9 +467,7 @@ public class DatabaseConnection {
                 CON.commit();
                 CON.setAutoCommit(true);
                 return true;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -522,9 +487,7 @@ public class DatabaseConnection {
                 ps.setString(4, operation.getType());
                 ps.setString(5, operation.getStatus());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -551,9 +514,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -568,9 +529,7 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM balance_operation WHERE id = ?");
                 ps.setInt(1, op.getBalanceId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -602,10 +561,7 @@ public class DatabaseConnection {
             } catch (Exception ex) {
                 try {
                     CON.rollback();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-                ex.printStackTrace();
+                } catch (SQLException ignored) {}
             }
         }
         return false;
@@ -623,9 +579,7 @@ public class DatabaseConnection {
                 ps.setString(1, returnT.getStatus());
                 ps.setInt(2, returnT.getBalanceId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -647,9 +601,7 @@ public class DatabaseConnection {
                 ps.setDouble(6, o.getPricePerUnit());
                 ps.setInt(7, o.getBalanceId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -679,9 +631,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -697,9 +647,7 @@ public class DatabaseConnection {
                 ps.setInt(1, op.getBalanceId());
 
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -717,9 +665,7 @@ public class DatabaseConnection {
                 ps.setString(2, customer.getCustomerName());
                 ps.setString(3, customer.getCustomerCard());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -737,9 +683,7 @@ public class DatabaseConnection {
                 ps.setString(2, customer.getCustomerCard());
                 ps.setInt(3, customer.getId());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -768,9 +712,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -794,9 +736,7 @@ public class DatabaseConnection {
                 );
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return all;
     }
 
@@ -812,9 +752,7 @@ public class DatabaseConnection {
                 ps.setInt(1, customer.getId());
 
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -831,9 +769,7 @@ public class DatabaseConnection {
                 ps.setString(1, customerCard.getCustomer());
                 ps.setInt(2, customerCard.getPoints());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -850,9 +786,7 @@ public class DatabaseConnection {
                 ps.setInt(1, card.getPoints());
                 ps.setString(2, card.getCustomer());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -868,9 +802,7 @@ public class DatabaseConnection {
                     PreparedStatement ps = CON.prepareStatement("DELETE FROM return_transaction WHERE id = ?");
                     ps.setInt(1, ret.getBalanceId());
                     return ps.executeUpdate() > 0;
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                } catch (Exception ignored) { }
             }
             return false;
         }
@@ -886,9 +818,7 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ?");
                 ps.setInt(1, saleId);
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -899,14 +829,14 @@ public class DatabaseConnection {
      * @return true if everything went ok, false otherwise
      */
     public boolean updateBalance(double newBalance) {
-        deleteBalance();
-        try {
-            PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
-            ps.setDouble(1, newBalance);
-            return ps.executeUpdate()>0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        if(newBalance >= 0) {
+            deleteBalance();
+            try {
+                PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
+                ps.setDouble(1, newBalance);
+                return ps.executeUpdate() > 0;
+            } catch (Exception ignored) {
+            }
         }
         return false;
     }
@@ -916,9 +846,7 @@ public class DatabaseConnection {
             PreparedStatement ps = CON.prepareStatement("DELETE FROM balance");
             ps.executeUpdate();
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
     }
 
     /**
@@ -933,9 +861,7 @@ public class DatabaseConnection {
                 return resultSet.getDouble("money");
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        catch (Exception ignored) { }
         return 0.0;
     }
 }
