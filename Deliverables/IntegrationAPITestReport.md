@@ -21,17 +21,57 @@ Version:
 
 
 
-# Dependency graph 
+# Dependency graph
 
      <report the here the dependency graph of the classes in EzShop, using plantuml>
-     
+
+
+```plantuml
+
+         class DatabaseConnection {}
+
+       Shop -[hidden]-> DatabaseConnection
+
+         Shop -- CreditCardCircuit
+         Shop -[hidden]-> CreditCardCircuit
+
+
+                DatabaseConnection --> AccountBook
+                DatabaseConnection --> Shop
+                DatabaseConnection --> SaleTransactionImpl
+       ReturnTransactionImpl --|> BalanceOperationImpl
+       SaleTransactionImpl --|> BalanceOperationImpl
+       OrderImpl -up-|> BalanceOperationImpl
+
+     AccountBook --"*" BalanceOperationImpl
+
+     SaleTransactionImpl --"*" ReturnTransactionImpl
+     SaleTransactionImpl --"*" TransactionProduct
+     TransactionProduct "*" -- ProductTypeImpl
+     CustomerCard "0..1"-- CustomerImpl
+     SaleTransactionImpl -- "0..1" CustomerCard
+
+     Order -right- ProductTypeImpl
+     ReturnTransactionImpl -- ProductTypeImpl
+     ReturnTransactionImpl --> TransactionProduct
+
+
+       Shop - "*" UserImpl
+       Shop - "*" SaleTransactionImpl
+       Shop - "*" ProductTypeImpl
+       Shop - "*" OrderImpl
+       Shop - "*" CustomerImpl
+       Shop - "*" CustomerCard
+       Shop - AccountBook
+```
+
 # Integration approach
 
     <Write here the integration sequence you adopted, in general terms (top down, bottom up, mixed) and as sequence
-    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
+    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)>
     <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
     <One step will  correspond to API testing>
-    
+
 
 
 #  Tests
@@ -51,9 +91,9 @@ Version:
 |||
 
 
-## Step n 
+## Step n
 
-   
+
 
 | Classes  | JUnit test cases |
 |--|--|
@@ -71,7 +111,7 @@ Version:
 ## Scenario UCx.y
 
 | Scenario |  name |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     |  |
 |  Post condition     |   |
 | Step#        | Description  |
@@ -83,14 +123,14 @@ Version:
 # Coverage of Scenarios and FR
 
 
-<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR. 
+<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR.
 Report also for each of the scenarios the (one or more) API JUnit tests that cover it. >
 
 
 
 
-| Scenario ID | Functional Requirements covered | JUnit  Test(s) | 
-| ----------- | ------------------------------- | ----------- | 
+| Scenario ID | Functional Requirements covered | JUnit  Test(s) |
+| ----------- | ------------------------------- | ----------- |
 |  ..         | FRx                             |             |             
 |  ..         | FRy                             |             |             
 | ...         |                                 |             |             
@@ -106,10 +146,8 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 <Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
 
 
-### 
+###
 
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
 |                            |           |
-
-
