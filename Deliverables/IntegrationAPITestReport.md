@@ -37,32 +37,26 @@ Version: 1.0
 
 
                 DatabaseConnection --> AccountBook
-                DatabaseConnection --> Shop
-                DatabaseConnection --> SaleTransactionImpl
-       ReturnTransactionImpl --|> BalanceOperationImpl
-       SaleTransactionImpl --|> BalanceOperationImpl
-       OrderImpl -up-|> BalanceOperationImpl
+                DatabaseConnection <-- Shop
+                DatabaseConnection <-- SaleTransactionImpl
 
-     AccountBook --"*" BalanceOperationImpl
+     AccountBook --> BalanceOperationImpl
 
-     SaleTransactionImpl --"*" ReturnTransactionImpl
-     SaleTransactionImpl --"*" TransactionProduct
-     TransactionProduct "*" -- ProductTypeImpl
-     CustomerCard "0..1"-- CustomerImpl
-     SaleTransactionImpl -- "0..1" CustomerCard
+     SaleTransactionImpl --> ReturnTransactionImpl
+     SaleTransactionImpl --> TransactionProduct
+     TransactionProduct --> ProductTypeImpl
+     CustomerCard <-- CustomerImpl
 
-     Order -right- ProductTypeImpl
-     ReturnTransactionImpl -- ProductTypeImpl
-     ReturnTransactionImpl --> TransactionProduct
+     ReturnTransactionImpl -> TransactionProduct
 
 
-       Shop - "*" UserImpl
-       Shop - "*" SaleTransactionImpl
-       Shop - "*" ProductTypeImpl
-       Shop - "*" OrderImpl
-       Shop - "*" CustomerImpl
-       Shop - "*" CustomerCard
-       Shop - AccountBook
+       Shop -> UserImpl
+       Shop -> SaleTransactionImpl
+       Shop -> ProductTypeImpl
+       Shop -> OrderImpl
+       Shop -> CustomerImpl
+       Shop -> CustomerCard
+       Shop -> AccountBook
 ```
 
 # Integration approach
@@ -72,6 +66,17 @@ Version: 1.0
     <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
     <One step will  correspond to API testing>
 
+
+We adopted a bottom up approach divided in the following steps:
+
+|Step  |Tested classes |
+|:-----:|:----|
+|1                 |BalanceOperationImpl                    |
+|                  |CreditCardCircuit                 |
+|                  |CustomerCardImpl                    |
+|                  |ProductTypeImpl                |
+|                  |UserImpl                |
+|                  |OrderImpl                |
 
 
 #  Tests
