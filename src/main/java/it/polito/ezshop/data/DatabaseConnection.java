@@ -34,7 +34,6 @@ public class DatabaseConnection {
         try {
             scanner = new Scanner(new File(schemaFileName)).useDelimiter(delimiter);
         } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
             return;
         }
 
@@ -48,16 +47,12 @@ public class DatabaseConnection {
                 // Execute statement
                 currentStatement = CON.createStatement();
                 currentStatement.execute(rawStatement);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
+            } catch (SQLException ignore) { } finally {
                 // Release resources
                 if (currentStatement != null) {
                     try {
                         currentStatement.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (SQLException ignore) { }
                 }
                 currentStatement = null;
             }
@@ -80,9 +75,7 @@ public class DatabaseConnection {
                 ps.setString(3, user.getPassword());
                 ps.setString(4, user.getRole());
                 return ps.executeUpdate() > 0;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
