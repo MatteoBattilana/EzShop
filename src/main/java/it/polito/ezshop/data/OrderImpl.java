@@ -39,7 +39,8 @@ public class OrderImpl extends BalanceOperationImpl {
     }
 
     public void setProductCode(String productCode) {
-        mProductCode = productCode;
+        if(productCode != null)
+            mProductCode = productCode;
     }
 
     public double getPricePerUnit() {
@@ -47,7 +48,8 @@ public class OrderImpl extends BalanceOperationImpl {
     }
 
     public void setPricePerUnit(double pricePerUnit) {
-        mPricePerUnit = pricePerUnit;
+        if(pricePerUnit >= 0.0)
+            mPricePerUnit = pricePerUnit;
     }
 
     public String getOrderStatus() {
@@ -55,15 +57,17 @@ public class OrderImpl extends BalanceOperationImpl {
     }
 
     public void setOrderStatus(String status) {
-        mOrderStatus = status;
+        if(status != null && (status.equals("ISSUED") || status.equals("PAYED") || status.equals("COMPLETED")))
+            mOrderStatus = status;
     }
 
     public void setQuantity(int quantity) {
-        mQuantity = quantity;
+        if (quantity > 0)
+            mQuantity = quantity;
     }
 
     public void recordOrderArrival() {
-        mOrderStatus = "COMPLETED";
+        setOrderStatus("COMPLETED");
         mArrival = LocalDate.now();
     }
 
