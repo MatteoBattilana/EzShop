@@ -92,16 +92,18 @@ We adopted a bottom up approach divided in the following steps:
      JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
 
 ## Step 1
-| Classes  | JUnit test cases |
-|--|--|
-|||
-
+**This step is about Unit Testing, the documented can be found [here](./UnitTestReport.md).**
 
 ## Step 2
 | Classes  | JUnit test cases |
 |--|--|
-|||
-
+| TransactionProduct.getProductType | TransactionProductTest.testName |
+|  | TransactionProductTest.testName |
+|  | TransactionProductTest.testName |
+| TransactionProduct.getBarCode | TransactionProductTest.testName |
+| | TransactionProductTest.testName |
+| | TransactionProductTest.testName |
+| | TransactionProductTest.testName |
 
 ## Step n
 
@@ -143,8 +145,15 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 
 | Scenario ID | Functional Requirements covered | JUnit  Test(s) |
 | ----------- | ------------------------------- | ----------- |
-|  ..         | FRx                             |             |             
-|  ..         | FRy                             |             |             
+|  1-1         | FR3                             |   EZShopTest.testCreateProduct()|
+|           |                              |   EZShopTest.testUpdateLocation()|    
+|  1-2         | FR3                             | **MISSING**  |
+|  1-3         | FR3                             |  **MISSING** |
+|  2-1         | FR1                             |  EZShopTest.testCreateUser() |
+|  2-2         | FR1.2                             | EZShopTest.testDeleteUser()  |
+|  2-3         | FR1.5                             |  EZShopTest.testUpdateUserRights() |
+|  5-1         | FR1.5                             |   EZShopTest.testLogin()|
+|    5-2       |  FR1.5                            |   EZShopTest.testLogout()|          
 | ...         |                                 |             |             
 | ...         |                                 |             |             
 | ...         |                                 |             |             

@@ -835,8 +835,7 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
                 ps.setDouble(1, newBalance);
                 return ps.executeUpdate() > 0;
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
