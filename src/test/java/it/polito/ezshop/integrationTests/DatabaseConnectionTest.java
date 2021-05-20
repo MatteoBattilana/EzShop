@@ -583,4 +583,17 @@ public class DatabaseConnectionTest {
         assertFalse(databaseConnection.updateBalance(-10.0));
         assertEquals(10.0, databaseConnection.getBalance(), 0.1);
     }
+
+    @Test
+    public void testAddProductToSale() {
+        ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);
+        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(databaseConnection, 1);
+        TransactionProduct transactionProduct = new TransactionProduct(apple, 0.4, 2, 1.99);
+        assertTrue(databaseConnection.addProductToSale(saleTransaction, transactionProduct));
+
+        assertFalse(databaseConnection.addProductToSale(null, transactionProduct));
+        assertFalse(databaseConnection.addProductToSale(saleTransaction, null));
+        assertFalse(databaseConnection.addProductToSale(null, null));
+
+    }
 }
