@@ -3,9 +3,9 @@
 
 Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date: 29/04/2021
+Date: 16/05/2021
 
-Version: 1.0
+Version: 1.1
 
 
 # Contents
@@ -67,10 +67,46 @@ Packages:
   left to right direction
 package it.polito.ezshop.data {
 
-    class SingletonDatabaseConnection {
-      - dbUrl: String
-      + getInstance(): SingletonDatabaseConnection
-      + getConnection(): Connection
+    class DatabaseConnection {
+      - databaseFileName: String
+      - executeSqlScript(): Connection
+      - createUser(user: User): Boolean
+      + setUserRole(user: User, role: String): Boolean
+      + deleteUser(user: User): Boolean
+      + getAllUsers(): List<User>
+      + createOrder(Order order): Boolean
+      + getAllProducts(): List<ProductType>
+      + updateProductType(prod: ProductType): Boolean
+      + createProductType(prod: ProductType): Boolean
+      + deleteProductType(prod: ProductType): Boolean
+      + createSaleTransaction(sale: SaleTransaction): Boolean
+      + getAllSaleTransaction(): List<SaleTransaction>
+      + getAllBySaleId(id: Integer): SaleTransaction
+      + getAllReturnTransaction(): List<ReturnTransaction>
+      + addProductToSale(sale: SaleTransaction, ticket: TicketEntry, productId: Integer): Boolean
+      + saveSaleTransaction(sale: SaleTransaction): Boolean
+      + deleteSaleTransaction(sale: SaleTransaction): Boolean
+      + updateSaleTransaction(sale: SaleTransaction): Boolean
+      + saveBalanceOperation(op: BalanceOperation): Boolean
+      + getAllBalanceOperations(): List<BalanceOperation>
+      + deleteBalanceOperation(op: BalanceOperation): Boolean
+      + saveReturnTransaction(returnT: ReturnTransaction): Boolean
+      + setStatusReturnTransaction(retT: ReturnTransaction): Boolean
+      + updateOrder(o: Order): Boolean
+      + getAllOrders(): List<Order>
+      + deleteOrder(o: Order): Boolean
+      + createCustomer(c: Customer): Boolean
+      + updateCustomer(c: Customer): Boolean
+      + getAllCustomers(): List<Customer>
+      + getAllCustomerCards(): List<CustomerCard>
+      + deleteCustomer(c: Customer): Boolean
+      + createCustomerCard(c: CustomerCard): Boolean
+      + updateCustomerCard(c: CustomerCard): Boolean
+      + deleteReturnTransaction(retT: ReturnTransaction): Boolean
+      + deleteAllTransactionProducts(): Boolean
+      + updateBalance(balance: Double): Boolean
+      + deleteBalance(): Boolean
+      + getBalance(): Double
     }
   class CreditCardCircuit {
     + validateCreditCart(creditCardId: String): Boolean
@@ -137,7 +173,7 @@ package it.polito.ezshop.data {
 - getSaleTransactionByReturnTransactionId(id: Integer): SaleTransaction
 - loadFromDb(): Boolean
   }
-  Shop -[hidden]-> SingletonDatabaseConnection
+  Shop -[hidden]-> DatabaseConnection
 
     Shop -- CreditCardCircuit
     Shop -[hidden]-> CreditCardCircuit
@@ -146,9 +182,10 @@ package it.polito.ezshop.data {
 package it.polito.ezshop.model {
 
   note "All classes in the model package\nare persistent" as N1
-  abstract class BalanceOperation {
+  class BalanceOperation {
+    - id: integer
     - amount: Dobule
-    - description: String
+    - status: String
     - date: LocalDate
     - type: String
   }
@@ -171,12 +208,7 @@ package it.polito.ezshop.model {
       - position: String
       - note: String
       - quantity: Integer
-      - temporaryQuantity: Integer
-      + updateProduct(newDescription: String, newCode: String, newPrice: Double, newNote: String): Boolean
-      + updatePosition(newPos: String): Boolean
-      + updateQuantity(toBeAdded: Integer): Boolean
       + updateTemporaryQuantity(toBeAdded: Integer): Boolean
-      + commitTemporaryQuantity(): Boolean
   }
   class Order {
     - id: Integer
@@ -197,7 +229,7 @@ package it.polito.ezshop.model {
   class Customer {
       - id: Integer
       - name: String
-      + modifyCustomer(newCustomerName: String, newCustomerCard: String): Boolean
+      + removeCard()
   }
   class SaleTransaction {
       - id: Integer
@@ -214,7 +246,6 @@ package it.polito.ezshop.model {
       + computePointsForSale(): Integer
       + endSaleTransaction(): Boolean
       + startReturnTransaction(): ReturnTransaction
-      + deleteReturnTransaction(): Boolean
       + getSoldQuantity(product: ProductType): Integer
       + computeTotal(): Double
       + endReturnTransaction(id: Integer, Boolean commit): Boolean
@@ -222,15 +253,19 @@ package it.polito.ezshop.model {
       + setReturnProduct(returnId: Integer, product: ProductType, amount: Integer): Boolean
       + getReturnTransactionStatus(id: Integer): Boolean
       + getReturnTransactionTotal(id: Integer): Boolean
+      + setPaidReturnTransaction(id: Integer): Boolean
       + getReturnTransaction(id: Integer): ReturnTransaction
+      + getReturnTransactions(): List<ReturnTransaction>
       + commitAllTemporaryQuantity()
+      + reset()
   }
   class ReturnTransaction {
     - id: Integer
     - quantity: Integer
     - committed: String
     - status: Boolean
-    + updateProductQuantity(): Boolean
+    + addProduct(t: TicketEntry, amount: Integer)
+    + getReturns(): Mao<TicketEntry, Integer>
     + computeTotal(): Double
   }
   class TransactionProduct {
@@ -281,14 +316,14 @@ ReturnTransaction -- ProductType
 # Verification traceability matrix
 
 | | Shop  | CreditCardCircuit |  SaleTransaction |ReturnTransaction | TransactionProduct|ProductType| Customer |CustomerCard|Order    | User |  AccountBook |
-| :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:| 
-| FR1   |X|  || |||| || X|| 
-| FR3   |X || || |X| || |X| | 
+| :---: |:--------------:| :-------------:      | :---------: |:-------------:    | :-----:        | :-------------:      |:-------------:| :-------------: |:-------------:| :-------------: |:-------------:|
+| FR1   |X|  || |||| || X||
+| FR3   |X || || |X| || |X| |
 | FR4   | X|| || |X| || X|X|X |
-| FR5   | X||  || ||X |X| |X| | 
+| FR5   | X||  || ||X |X| |X| |
 | FR6   |X |X|X |X|X || |X| |X| X|
 | FR7   |X |X| || || || |X|X |
-| FR8   | X|| || || || |X| X| 
+| FR8   | X|| || || || |X| X|
 
 
 
@@ -401,9 +436,9 @@ return
 activate Shop
     Shop -> Order: 2: setStatus()
     activate Order
-      Order -> ProductType: 3 updateQuantity()
-      activate ProductType
-      return
+    return
+    Shop -> ProductType: 3: setQuantity()
+    activate ProductType
     return
 return
 @enduml
@@ -483,20 +518,10 @@ activate Shop
   return
 
 
-Shop -> AccountBook: 14: updateBalance()
+Shop -> AccountBook: 14: recordBalanceUpdate()
 activate AccountBook
 return
 
-  Shop -> SaleTransaction: 15: commitAllTemporaryQuantity()
-  activate SaleTransaction
-
-    loop prodList
-    SaleTransaction -> ProductType: 16: commitTemporaryQuantity()
-    activate ProductType
-    return
-
-    end
-  return
 
 return
 @enduml
@@ -542,10 +567,6 @@ return
 -> Shop: 11: returnCashPayment()
 activate Shop
     Shop -> Shop: 12: getSaleTransactionByReturnTransactionId()
-
-    Shop -> SaleTransaction: 13: getReturnTransactionStatus()
-    activate SaleTransaction
-    return
 
   Shop -> SaleTransaction: 14: getReturnTransactionTotal()
     activate SaleTransaction

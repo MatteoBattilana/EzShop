@@ -1,3 +1,4 @@
+.idea/
 .metadata
 .DS_Store
 target/
@@ -14,7 +15,8 @@ local.properties
 .loadpath
 .recommenders
 data/*
-
+src/main/java/it/polito/ezshop/utils/database.db
+ezshop.iml
 
 # External tool builders
 .externalToolBuilders/
@@ -65,3 +67,4 @@ data/*
 # Typically, this file would be tracked if it contains build/dependency configurations:
 #.project
 
+ezshop.iml
