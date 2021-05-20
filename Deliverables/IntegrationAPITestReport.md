@@ -77,6 +77,13 @@ We adopted a bottom up approach divided in the following steps:
 |                  |ProductTypeImpl                |
 |                  |UserImpl                |
 |                  |OrderImpl                |
+|2                 |TransactionProduct + ProductTypeImpl                    |
+||OrderImplAdapter + OrderImpl|
+||AccountBook + BalanceOperationImpl|
+|3|ReturnTransaction + TransactionProduct |
+|4|SaleTransactionImpl + ProductTypeImpl + TransactionProduct + ReturnTransaction |
+|5|DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl |
+|6|EZShop + DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl |
 
 
 #  Tests
