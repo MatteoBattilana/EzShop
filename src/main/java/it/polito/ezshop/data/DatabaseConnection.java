@@ -798,14 +798,14 @@ public class DatabaseConnection {
      */
     public boolean deleteReturnTransaction(ReturnTransaction ret) {
         if(ret != null) {
-                try {
-                    PreparedStatement ps = CON.prepareStatement("DELETE FROM return_transaction WHERE id = ?");
-                    ps.setInt(1, ret.getBalanceId());
-                    return ps.executeUpdate() > 0;
-                } catch (Exception ignored) { }
-            }
-            return false;
+            try {
+                PreparedStatement ps = CON.prepareStatement("DELETE FROM return_transaction WHERE id = ?");
+                ps.setInt(1, ret.getBalanceId());
+                return ps.executeUpdate() > 0;
+            } catch (Exception ignored) { }
         }
+        return false;
+    }
 
     /**
      * Delete all the Ticket Entry for a given sale

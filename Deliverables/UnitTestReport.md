@@ -413,7 +413,7 @@ Version: 1.0
 |-------|-------|-------|-------|-------|
 | NULL| *|Invalid|T1(null) -> new BarCode no setted| ProductTypeImplTest.testNullSetBarCode()|
 |*|=0| Invalid|T2("") -> new BarCode no setted| ProductTypeImplTest.testInvalidSetBarCode()|
-|Valid|>0| Valid|T3("78515420") -> new BarCode setted| ProductTypeImplTest.testPositiveSetBarCode()|
+|Valid|>0| Valid|T3("785154200568") -> new BarCode setted| ProductTypeImplTest.testPositiveSetBarCode()|
 
 **Criteria for method *setDescription*:**
 
@@ -488,12 +488,11 @@ Version: 1.0
 **Combination of predicates**:
 
 
-| Validity of the String customercard | Lenght of the String customercard   ||Validity of the id| Valid / Invalid | Description of the test case | JUnit test case |
+| Validity of the String customercard | Lenght of the String customercard   |Validity of the id| Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|-------|
 | NULL| *| * |Invalid|T1(null) -> new customercard  no setted| CustomerCardImplTest.testNullSetCustomer()|
 |*|=0| *| Invalid|T2("") -> new customercard no setted| CustomerCardImplTest.testEmptySetCustomer()|
-|* | *| NULL| Invalid|new CustomerCardImpl(null, 0);
-  T3("Cliente002") -> new customercard no setted| CustomerCardImplTest.testInvalidSetCustomer()|
+|* | *| NULL| Invalid| T3("null") -> new customercard no setted| CustomerCardImplTest.testInvalidSetCustomer()|
 |Valid|>0|Valid| Valid|T4("Cliente002") -> new customercard  setted| CustomerCardImplTest.testInvalidSetCustomer()|
 
 **Criteria for method *setPoints*:**
