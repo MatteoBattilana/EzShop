@@ -1008,20 +1008,13 @@ public class EZShopTest {
         assertFalse(ezShop.deleteCustomer(id));
     }
 
-    @Test
+    @Test(expected = UnauthorizedException.class)
     public void testWrongLoginDeleteCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
         loginAs("Cashier");
         Integer id = ezShop.defineCustomer("lucas");
 
-        try {
-            ezShop.deleteCustomer(-1);
-            fail();
-        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
-
-        try {
-            ezShop.deleteCustomer(null);
-            fail();
-        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+        ezShop.logout();
+        ezShop.deleteCustomer(id);
     }
 
     @Test
@@ -1029,7 +1022,69 @@ public class EZShopTest {
         loginAs("Cashier");
         Integer id = ezShop.defineCustomer("lucas");
 
-        assertTrue(ezShop.deleteCustomer(id));
+        try {
+            ezShop.deleteCustomer(-1);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.deleteCustomer(null);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testGetCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        Customer customer = ezShop.getCustomer(id);
+        assertNotNull(customer);
+        assertEquals("lucas", customer.getCustomerName());
+
+        assertNull(ezShop.getCustomer(10));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginGetCustomer() throws UnauthorizedException, InvalidCustomerIdException {
+        ezShop.getCustomer(1);
+    }
+
+    @Test
+    public void testWrongParametersGetCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        Customer customer = ezShop.getCustomer(id);
+        assertNotNull(customer);
+        assertEquals("lucas", customer.getCustomerName());
+
+        try {
+            ezShop.getCustomer(-1);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.getCustomer(null);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testGetAllCustomers() throws InvalidCustomerNameException, UnauthorizedException {
+        loginAs("ShopManager");
+        Integer id = ezShop.defineCustomer("lucas");
+        Integer id2 = ezShop.defineCustomer("matteo");
+
+        List<Customer> allCustomers = ezShop.getAllCustomers();
+        assertEquals(2, allCustomers.size());
+        for(Customer o: allCustomers){
+            if(o.getId().intValue() != id && o.getId().intValue() != id2)
+                fail();
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginGetAllCustomers() throws InvalidCustomerNameException, UnauthorizedException {
+        ezShop.getAllCustomers();
     }
 
 
