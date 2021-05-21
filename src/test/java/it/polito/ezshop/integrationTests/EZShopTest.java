@@ -593,7 +593,444 @@ public class EZShopTest {
         } catch (InvalidProductIdException ignored) {} catch (Exception ignored) {fail();}
     }
 
+    @Test
+    public void testWrongParametersIssueOrder() {
+        loginAs("ShopManager");
 
+        try {
+            ezShop.issueOrder("01234567890129", 10, 1.99);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.issueOrder("", 10, 1.99);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.issueOrder(null, 10, 1.99);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.issueOrder("01234567890129", -1, 1.99);
+            fail();
+        } catch (InvalidQuantityException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.issueOrder("01234567890129", 10, -1.99);
+            fail();
+        } catch (InvalidPricePerUnitException ignored) {} catch (Exception ignored) {fail();}
+
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginIssueOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+
+        loginAs("Cashier");
+        Integer integer = ezShop.issueOrder("01234567890128", 10, 1.99);
+    }
+
+    @Test
+    public void testIssueOrder() throws UnauthorizedException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidProductDescriptionException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        assertNotNull(orderId1);
+        assertTrue(orderId1 > 0);
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("ISSUED", allOrders.get(0).getStatus());
+
+        assertEquals(-1, ezShop.issueOrder("1234567890128", 10, 1.99).intValue());
+
+        Integer orderId2 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        assertNotNull(orderId2);
+        assertEquals(orderId1 + 1, orderId2.intValue());
+    }
+
+    @Test
+    public void testPayOrderFor() throws UnauthorizedException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidProductDescriptionException {
+        loginAs("ShopManager");
+
+        ezShop.recordBalanceUpdate(100.0);
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.payOrderFor("01234567890128", 10, 1.99);
+        assertNotNull(orderId1);
+        assertTrue(orderId1 > 0);
+        assertEquals(100 - 10*1.99, ezShop.computeBalance(), 0.1);
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("PAYED", allOrders.get(0).getStatus());
+
+        assertEquals(-1, ezShop.payOrderFor("1234567890128", 10, 1.99).intValue());
+
+        Integer orderId2 = ezShop.payOrderFor("01234567890128", 10, 1.99);
+        assertNotNull(orderId2);
+        assertEquals(orderId1 + 1, orderId2.intValue());
+    }
+
+    @Test
+    public void testWrongParametersPayOrderFor() throws UnauthorizedException {
+        loginAs("ShopManager");
+        ezShop.recordBalanceUpdate(100.0);
+
+        try {
+            ezShop.payOrderFor("01234567890129", 10, 1.99);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.payOrderFor("", 10, 1.99);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.payOrderFor(null, 10, 1.99);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.payOrderFor("01234567890129", -1, 1.99);
+            fail();
+        } catch (InvalidQuantityException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.payOrderFor("01234567890129", 10, -1.99);
+            fail();
+        } catch (InvalidPricePerUnitException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginPayOrderFor() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        ezShop.recordBalanceUpdate(100.0);
+
+        loginAs("Cashier");
+        Integer integer = ezShop.payOrderFor("01234567890128", 10, 1.99);
+    }
+
+    @Test
+    public void testNegativeBalancePayOrderFor() throws UnauthorizedException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidProductDescriptionException {
+        loginAs("ShopManager");
+
+        ezShop.recordBalanceUpdate(2.00);
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.payOrderFor("01234567890128", 10, 1.99);
+        assertNotNull(orderId1);
+        assertEquals(-1, orderId1.intValue());
+        assertEquals(2.00, ezShop.computeBalance(), 0.1);
+    }
+
+    @Test
+    public void testPayOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        ezShop.recordBalanceUpdate(100);
+
+        assertTrue(ezShop.payOrder(orderId1));
+        assertEquals(100 - 10 * 1.99, ezShop.computeBalance(), 0.1);
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("PAYED", allOrders.get(0).getStatus());
+
+        assertFalse(ezShop.payOrder(100));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginPayOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        ezShop.recordBalanceUpdate(100);
+
+        loginAs("Cashier");
+        ezShop.payOrder(orderId1);
+    }
+
+    @Test
+    public void testNegativeBalancePayOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        ezShop.recordBalanceUpdate(1.99);
+
+        assertFalse(ezShop.payOrder(orderId1));
+        assertEquals(1.99, ezShop.computeBalance(), 0.1);
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("ISSUED", allOrders.get(0).getStatus());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLogicPayOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        ezShop.recordBalanceUpdate(1.99);
+
+        loginAs("Cashier");
+        ezShop.payOrder(orderId1);
+    }
+
+    @Test
+    public void testAlreadyPayedPayOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        ezShop.recordBalanceUpdate(1.99);
+
+        ezShop.payOrder(orderId1);
+        assertFalse(ezShop.payOrder(orderId1));
+    }
+
+    @Test
+    public void testWrongParametersPayOrder() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException {
+        loginAs("ShopManager");
+        ezShop.recordBalanceUpdate(1.99);
+
+        try {
+            ezShop.payOrder(null);
+            fail();
+        } catch (InvalidOrderIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.payOrder(-1);
+            fail();
+        } catch (InvalidOrderIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testRecordOrderArrival() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidLocationException, InvalidOrderIdException, InvalidProductIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        ezShop.updatePosition(apple, "1-w-2");
+        ezShop.recordBalanceUpdate(100);
+        Integer orderId1 = ezShop.payOrderFor("01234567890128", 10, 1.99);
+
+        assertTrue(ezShop.recordOrderArrival(orderId1));
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("COMPLETED", allOrders.get(0).getStatus());
+        ProductType productTypeByBarCode = ezShop.getProductTypeByBarCode("01234567890128");
+        assertEquals(10, productTypeByBarCode.getQuantity().intValue());
+    }
+
+    @Test
+    public void testLocationNotSetRecordOrderArrival() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidLocationException, InvalidOrderIdException, InvalidProductIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        ezShop.recordBalanceUpdate(100);
+        Integer orderId1 = ezShop.payOrderFor("01234567890128", 10, 1.99);
+
+        try {
+            ezShop.recordOrderArrival(orderId1);
+        } catch (InvalidLocationException ignored) {} catch (Exception e) {fail();}
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("PAYED", allOrders.get(0).getStatus());
+        ProductType productTypeByBarCode = ezShop.getProductTypeByBarCode("01234567890128");
+        assertEquals(0, productTypeByBarCode.getQuantity().intValue());
+    }
+
+    @Test
+    public void testOrderNotPayedRecordOrderArrival() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidLocationException, InvalidOrderIdException, InvalidProductIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        ezShop.recordBalanceUpdate(100);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+
+        assertFalse(ezShop.recordOrderArrival(orderId1));
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(1, allOrders.size());
+        assertEquals("ISSUED", allOrders.get(0).getStatus());
+        ProductType productTypeByBarCode = ezShop.getProductTypeByBarCode("01234567890128");
+        assertEquals(0, productTypeByBarCode.getQuantity().intValue());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginRecordOrderArrival() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidLocationException, InvalidOrderIdException, InvalidProductIdException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        ezShop.recordBalanceUpdate(100);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+
+        loginAs("Cashier");
+        ezShop.recordOrderArrival(orderId1);
+    }
+
+    @Test
+    public void testGetAllOrders() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        Integer orderId2 = ezShop.issueOrder("01234567890128", 10, 1.99);
+
+        List<Order> allOrders = ezShop.getAllOrders();
+        assertEquals(2, allOrders.size());
+        for(Order o: allOrders){
+            if(o.getBalanceId().intValue() != orderId1.intValue() && o.getBalanceId().intValue() != orderId2.intValue())
+                fail();
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginGetAllOrders() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException {
+        loginAs("ShopManager");
+        Integer apple = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        Integer orderId1 = ezShop.issueOrder("01234567890128", 10, 1.99);
+        Integer orderId2 = ezShop.issueOrder("01234567890128", 10, 1.99);
+
+        loginAs("Cashier");
+        ezShop.getAllOrders();
+    }
+
+    @Test
+    public void testDefineCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("luca");
+        Integer id3 = ezShop.defineCustomer("matteo");
+        assertNotNull(id);
+        assertTrue(id > 0);
+        Customer customer = ezShop.getCustomer(id);
+        assertEquals("luca", customer.getCustomerName());
+
+        Integer id2 = ezShop.defineCustomer("luca");
+        assertEquals(-1, id2.intValue());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginDefineCustomer() throws InvalidCustomerNameException, UnauthorizedException {
+        ezShop.defineCustomer("luca");
+    }
+
+    @Test
+    public void testWrongParametersDefineCustomer() {
+        loginAs("Cashier");
+        try {
+            ezShop.defineCustomer("");
+            fail();
+        } catch (InvalidCustomerNameException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.defineCustomer(null);
+            fail();
+        } catch (InvalidCustomerNameException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testModifyCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException, InvalidCustomerCardException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        String card = ezShop.createCard();
+        assertTrue(ezShop.modifyCustomer(id, "luca", card));
+        Customer customer = ezShop.getCustomer(id);
+        assertNotNull(customer);
+        assertEquals("luca", customer.getCustomerName());
+        assertEquals(card, customer.getCustomerCard());
+
+        assertFalse(ezShop.modifyCustomer(100, "matteo", null));
+    }
+
+    @Test
+    public void testCardNotPresentModifyCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException, InvalidCustomerCardException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        assertFalse(ezShop.modifyCustomer(id, "luca", "0000000001"));
+    }
+
+    @Test
+    public void testDeleteCardModifyCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException, InvalidCustomerCardException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        assertTrue(ezShop.modifyCustomer(id, "luca", ""));
+        Customer customer = ezShop.getCustomer(id);
+        assertNotNull(customer);
+        assertEquals("luca", customer.getCustomerName());
+        assertNull(customer.getCustomerCard());
+    }
+
+    @Test
+    public void testDeleteCardModifyCustomer2() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException, InvalidCustomerCardException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+        String card = ezShop.createCard();
+        assertTrue(ezShop.modifyCustomer(id, "luca", card));
+
+        assertTrue(ezShop.modifyCustomer(id, "luca", null));
+        Customer customer = ezShop.getCustomer(id);
+        assertNotNull(customer);
+        assertEquals("luca", customer.getCustomerName());
+        assertEquals(card, customer.getCustomerCard());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginModifyCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException, InvalidCustomerCardException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        ezShop.logout();
+        ezShop.modifyCustomer(id, "luca", null);
+    }
+
+    @Test
+    public void testWrongParametersModifyCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException, InvalidCustomerCardException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        try {
+            ezShop.modifyCustomer(-1, "luca", null);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.modifyCustomer(id, "", null);
+            fail();
+        } catch (InvalidCustomerNameException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.modifyCustomer(id, null, null);
+            fail();
+        } catch (InvalidCustomerNameException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.modifyCustomer(id, "marco", "00000001");
+            fail();
+        } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testDeleteCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        assertTrue(ezShop.deleteCustomer(id));
+        assertFalse(ezShop.deleteCustomer(id));
+    }
+
+    @Test
+    public void testWrongLoginDeleteCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        try {
+            ezShop.deleteCustomer(-1);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.deleteCustomer(null);
+            fail();
+        } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testWrongParametersDeleteCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        Integer id = ezShop.defineCustomer("lucas");
+
+        assertTrue(ezShop.deleteCustomer(id));
+    }
 
 
 

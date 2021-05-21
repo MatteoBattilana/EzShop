@@ -668,17 +668,17 @@ public class EZShop implements EZShopInterface {
             // Check if balance would be negative
             order.setOrderStatus("PAYED");
             order.setStatus("PAID");
-            if (accountBook.computeBalance() - order.getMoney() >= 0) {
+            if (accountBook.computeBalance() + order.getMoney() >= 0) {
                 if (databaseConnection.updateOrder(order)) {
                     accountBook.add(order);
                     accountBook.recordBalanceUpdate(order.getMoney());
                     return true;
                 }
-
-                // Rollback order to previous state
-                order.setOrderStatus("ISSUED");
-                order.setStatus("UNPAID");
             }
+
+            // Rollback order to previous state
+            order.setOrderStatus("ISSUED");
+            order.setStatus("UNPAID");
         }
 
         return false;
@@ -816,7 +816,6 @@ public class EZShop implements EZShopInterface {
      * @throws InvalidCustomerCardException if the customer card is empty, null or if it is not in a valid format (string with 10 digits)
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
         // Check logged user
@@ -842,6 +841,8 @@ public class EZShop implements EZShopInterface {
                     customer.removeCard();
                 else if (card != null)
                     customer.setCustomerCard(card);
+                else
+                    return false;
             }
 
             if(databaseConnection.updateCustomer(customer)) {
