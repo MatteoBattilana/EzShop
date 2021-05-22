@@ -1,4 +1,4 @@
-package it.polito.ezshop.unitTests;
+package it.polito.ezshop.integrationTests;
 
 import it.polito.ezshop.data.TransactionProduct;
 import it.polito.ezshop.data.ProductTypeImpl;
