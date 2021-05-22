@@ -374,12 +374,12 @@ public class DatabaseConnection {
         return all;
     }
 
-    private boolean addProductToSale(SaleTransactionImpl transaction, TicketEntry ticket, int productId) {
-        if(transaction != null && ticket != null && productId > 0) {
+    public boolean addProductToSale(SaleTransactionImpl transaction, TransactionProduct ticket) {
+        if(transaction != null && ticket != null) {
             try {
                 PreparedStatement ps = CON.prepareStatement("INSERT INTO transaction_product(id_sale, id_product, discount, quantity, price) VALUES(?,?,?,?,?)");
                 ps.setInt(1, transaction.getTicketNumber());
-                ps.setInt(2, productId);
+                ps.setInt(2, ticket.getProductType().getId());
                 ps.setDouble(3, ticket.getDiscountRate());
                 ps.setInt(4, ticket.getAmount());
                 ps.setDouble(5, ticket.getPricePerUnit());
@@ -392,7 +392,7 @@ public class DatabaseConnection {
     public boolean saveSaleTransaction(SaleTransactionImpl saleT) {
         if(createSaleTransaction(saleT)) {
             for(TransactionProduct ticket: saleT.getTicketEntries()) {
-                addProductToSale(saleT, ticket, ticket.getProductType().getId());
+                addProductToSale(saleT, ticket);
                 updateProductType(ticket.getProductType());
             }
             return true;
@@ -459,7 +459,7 @@ public class DatabaseConnection {
                             ps1.setInt(4, transaction.getBalanceId());
                             ps1.setInt(5, tp.getProductType().getId());
                             if (ps1.executeUpdate() == 0) {
-                                addProductToSale(transaction, tp, tp.getProductType().getId());
+                                addProductToSale(transaction, tp);
                             }
                         }
                     }
@@ -835,8 +835,7 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
                 ps.setDouble(1, newBalance);
                 return ps.executeUpdate() > 0;
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }

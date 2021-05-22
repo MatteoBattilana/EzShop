@@ -289,6 +289,11 @@ public class EZShop implements EZShopInterface {
             if (id > newId)
                 newId = id;
 
+        // Check if barcode already exists
+        for(ProductTypeImpl pt: products.values())
+            if (pt.getBarCode().equals(productCode))
+                return -1;
+
         ProductTypeImpl newProduct = new ProductTypeImpl(0, null, note == null ? "" : note, description, productCode, pricePerUnit, ++newId);
         if(databaseConnection.createProductType(newProduct)) {
             products.put(newProduct.getId(), newProduct);
@@ -319,7 +324,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
         // Check logged user
-        validateLoggedUser("Administrator");
+        validateLoggedUser("ShopManager");
 
         // Check product id
         if (id == null || id <= 0) throw new InvalidProductIdException();
@@ -332,6 +337,11 @@ public class EZShop implements EZShopInterface {
 
         // Check price
         if (newPrice <= 0) throw new InvalidPricePerUnitException();
+
+        // Check if barcode already exists
+        for(ProductTypeImpl pt: products.values())
+            if (pt.getBarCode().equals(newCode))
+                return false;
 
         // Update product information
         ProductTypeImpl product = products.get(id);
@@ -460,7 +470,7 @@ public class EZShop implements EZShopInterface {
         // Set the new quantity only if the product exists
         ProductTypeImpl productType = products.get(productId);
         if (productType != null) {
-            if (productType.getLocation() != null && toBeAdded >= 0) {
+            if (productType.getLocation() != null && productType.getQuantity() + toBeAdded >= 0) {
                 // Database saved, update local object
                 productType.setQuantity(productType.getQuantity() + toBeAdded);
                 // Try to save into the DB
@@ -658,17 +668,17 @@ public class EZShop implements EZShopInterface {
             // Check if balance would be negative
             order.setOrderStatus("PAYED");
             order.setStatus("PAID");
-            if (accountBook.computeBalance() - order.getMoney() >= 0) {
+            if (accountBook.computeBalance() + order.getMoney() >= 0) {
                 if (databaseConnection.updateOrder(order)) {
                     accountBook.add(order);
                     accountBook.recordBalanceUpdate(order.getMoney());
                     return true;
                 }
-
-                // Rollback order to previous state
-                order.setOrderStatus("ISSUED");
-                order.setStatus("UNPAID");
             }
+
+            // Rollback order to previous state
+            order.setOrderStatus("ISSUED");
+            order.setStatus("UNPAID");
         }
 
         return false;
@@ -806,7 +816,6 @@ public class EZShop implements EZShopInterface {
      * @throws InvalidCustomerCardException if the customer card is empty, null or if it is not in a valid format (string with 10 digits)
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
         // Check logged user
@@ -832,6 +841,8 @@ public class EZShop implements EZShopInterface {
                     customer.removeCard();
                 else if (card != null)
                     customer.setCustomerCard(card);
+                else
+                    return false;
             }
 
             if(databaseConnection.updateCustomer(customer)) {
@@ -1758,7 +1769,7 @@ public class EZShop implements EZShopInterface {
      */
     private void validateLoggedUser(String minRight) throws UnauthorizedException {
         if (loggedUser == null) throw new UnauthorizedException();
-        else if (loggedUser.getRole().equals("ShopManager") && minRight.equals("Administrator"))
+        else if (loggedUser.getRole().equals("Cashier") && minRight.equals("ShopManager"))
             throw new UnauthorizedException();
         else if (!loggedUser.getRole().equals("Administrator") && minRight.equals("Administrator"))
             throw new UnauthorizedException();

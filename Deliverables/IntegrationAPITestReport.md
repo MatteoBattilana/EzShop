@@ -1,14 +1,14 @@
 # Integration and API Test Documentation
 
-Authors:
+Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date:
+Date: 18/05/2021
 
-Version:
+Version: 1.0
 
 # Contents
 
-- [Dependency graph](#dependency graph)
+- [Dependency graph](#dependency-graph)
 
 - [Integration approach](#integration)
 
@@ -21,17 +21,69 @@ Version:
 
 
 
-# Dependency graph 
+# Dependency graph
 
      <report the here the dependency graph of the classes in EzShop, using plantuml>
-     
+
+
+```plantuml
+
+         class DatabaseConnection {}
+
+       Shop -[hidden]-> DatabaseConnection
+
+         Shop -- CreditCardCircuit
+         Shop -[hidden]-> CreditCardCircuit
+
+
+                DatabaseConnection --> AccountBook
+                DatabaseConnection <-- Shop
+                DatabaseConnection <-- SaleTransactionImpl
+
+     AccountBook --> BalanceOperationImpl
+
+     SaleTransactionImpl --> ReturnTransactionImpl
+     SaleTransactionImpl --> TransactionProduct
+     TransactionProduct --> ProductTypeImpl
+     CustomerCard <-- CustomerImpl
+
+     ReturnTransactionImpl -> TransactionProduct
+
+
+       Shop -> UserImpl
+       Shop -> SaleTransactionImpl
+       Shop -> ProductTypeImpl
+       Shop -> OrderImpl
+       Shop -> CustomerImpl
+       Shop -> CustomerCard
+       Shop -> AccountBook
+```
+
 # Integration approach
 
     <Write here the integration sequence you adopted, in general terms (top down, bottom up, mixed) and as sequence
-    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
+    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)>
     <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
     <One step will  correspond to API testing>
-    
+
+
+We adopted a bottom up approach divided in the following steps:
+
+|Step  |Tested classes |
+|:-----:|:----|
+|1                 |BalanceOperationImpl                    |
+|                  |CreditCardCircuit                 |
+|                  |CustomerCardImpl                    |
+|                  |ProductTypeImpl                |
+|                  |UserImpl                |
+|                  |OrderImpl                |
+|2                 |TransactionProduct + ProductTypeImpl                    |
+||OrderImplAdapter + OrderImpl|
+||AccountBook + BalanceOperationImpl|
+|3|ReturnTransaction + TransactionProduct |
+|4|SaleTransactionImpl + ProductTypeImpl + TransactionProduct + ReturnTransaction |
+|5|DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl |
+|6|EZShop + DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl |
 
 
 #  Tests
@@ -40,20 +92,22 @@ Version:
      JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
 
 ## Step 1
-| Classes  | JUnit test cases |
-|--|--|
-|||
-
+**This step is about Unit Testing, the documented can be found [here](./UnitTestReport.md).**
 
 ## Step 2
 | Classes  | JUnit test cases |
 |--|--|
-|||
+| TransactionProduct.getProductType | TransactionProductTest.testName |
+|  | TransactionProductTest.testName |
+|  | TransactionProductTest.testName |
+| TransactionProduct.getBarCode | TransactionProductTest.testName |
+| | TransactionProductTest.testName |
+| | TransactionProductTest.testName |
+| | TransactionProductTest.testName |
+
+## Step n
 
 
-## Step n 
-
-   
 
 | Classes  | JUnit test cases |
 |--|--|
@@ -71,7 +125,7 @@ Version:
 ## Scenario UCx.y
 
 | Scenario |  name |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     |  |
 |  Post condition     |   |
 | Step#        | Description  |
@@ -83,16 +137,23 @@ Version:
 # Coverage of Scenarios and FR
 
 
-<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR. 
+<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR.
 Report also for each of the scenarios the (one or more) API JUnit tests that cover it. >
 
 
 
 
-| Scenario ID | Functional Requirements covered | JUnit  Test(s) | 
-| ----------- | ------------------------------- | ----------- | 
-|  ..         | FRx                             |             |             
-|  ..         | FRy                             |             |             
+| Scenario ID | Functional Requirements covered | JUnit  Test(s) |
+| ----------- | ------------------------------- | ----------- |
+|  1-1         | FR3                             |   EZShopTest.testCreateProduct()|
+|           |                              |   EZShopTest.testUpdateLocation()|    
+|  1-2         | FR3                             | **MISSING**  |
+|  1-3         | FR3                             |  **MISSING** |
+|  2-1         | FR1                             |  EZShopTest.testCreateUser() |
+|  2-2         | FR1.2                             | EZShopTest.testDeleteUser()  |
+|  2-3         | FR1.5                             |  EZShopTest.testUpdateUserRights() |
+|  5-1         | FR1.5                             |   EZShopTest.testLogin()|
+|    5-2       |  FR1.5                            |   EZShopTest.testLogout()|          
 | ...         |                                 |             |             
 | ...         |                                 |             |             
 | ...         |                                 |             |             
@@ -106,10 +167,8 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 <Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
 
 
-### 
+###
 
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
 |                            |           |
-
-
