@@ -116,7 +116,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         double sum = 0.0;
         // Compute the price using the sale and product discounts
         for (TicketEntry t: prodList.values()) {
-            sum += (t.getPricePerUnit() - t.getPricePerUnit() * getDiscountRate()) * t.getAmount();
+            sum += (t.getPricePerUnit() - t.getPricePerUnit() * t.getDiscountRate()) * t.getAmount();
         }
 
         sum -= sum * discount;
@@ -184,7 +184,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                     transactionProduct.setAmount(transactionProduct.getAmount() - amount);
                 }
 
-                product.setQuantity(transactionProduct.getAmount() + amount);
+                product.setQuantity(product.getQuantity() + amount);
                 return true;
             }
         }

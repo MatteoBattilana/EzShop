@@ -1215,7 +1215,7 @@ public class EZShop implements EZShopInterface {
 
         // Set discount rate to sale
         SaleTransactionImpl transaction = allSales.get(transactionId);
-        if (transaction != null) {
+        if (transaction != null && transaction.getStatus().equals("UNPAID")) {
             transaction.setDiscountRate(discountRate);
             return true;
         }

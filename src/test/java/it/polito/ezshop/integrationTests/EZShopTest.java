@@ -1083,14 +1083,422 @@ public class EZShopTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void testWrongLoginGetAllCustomers() throws InvalidCustomerNameException, UnauthorizedException {
+    public void testWrongLoginGetAllCustomers() throws UnauthorizedException {
         ezShop.getAllCustomers();
     }
 
+    @Test
+    public void testStartSaleTransaction() throws UnauthorizedException {
+        loginAs("Cashier");
+        Integer id1 = ezShop.startSaleTransaction();
+        Integer id2 = ezShop.startSaleTransaction();
 
+        assertNotEquals(-1, id1.intValue());
+        assertEquals(id1 + 1, id2.intValue());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginStartSaleTransaction() throws UnauthorizedException {
+        ezShop.startSaleTransaction();
+    }
 
     @Test
-    public void normalSale() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+    public void testAddProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+
+        Integer saleId = ezShop.startSaleTransaction();
+        assertTrue(ezShop.addProductToSale(saleId, "01234567890128", 2));
+        assertEquals(10 - 2, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+        assertTrue(ezShop.addProductToSale(saleId, "01234567890128", 2));
+        assertEquals(10 - 2 - 2, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+
+        assertFalse(ezShop.addProductToSale(saleId, "1234567890128", 1));
+        assertFalse(ezShop.addProductToSale(10, "01234567890128", 1));
+        assertFalse(ezShop.addProductToSale(saleId, "01234567890128", 11));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginAddProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+
+        ezShop.logout();
+        ezShop.startSaleTransaction();
+    }
+
+    @Test
+    public void testWrongParametersAddProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+
+        Integer saleId = ezShop.startSaleTransaction();
+        try {
+            ezShop.addProductToSale(-1, "1234567890128", 1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.addProductToSale(null, "1234567890128", 1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.addProductToSale(saleId, null, 1);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.addProductToSale(saleId, "", 1);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.addProductToSale(saleId, "1221", 1);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.addProductToSale(saleId, "01234567890128", -1);
+            fail();
+        } catch (InvalidQuantityException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testDeleteProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        assertEquals(10, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 4);
+        assertEquals(10 - 4, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+        assertTrue(ezShop.deleteProductFromSale(saleId, "01234567890128", 1));
+        assertEquals(10 - 4 + 1, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+        assertTrue(ezShop.deleteProductFromSale(saleId, "01234567890128", 3));
+        assertEquals(10 - 4 + 1 + 3, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+
+        assertFalse(ezShop.deleteProductFromSale(saleId, "01234567890128", 1));
+        assertFalse(ezShop.deleteProductFromSale(saleId, "1234567890128", 1));
+        assertFalse(ezShop.deleteProductFromSale(100, "01234567890128", 1));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginDeleteProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 4);
+
+        ezShop.logout();
+        ezShop.deleteProductFromSale(saleId, "01234567890128", 2);
+    }
+
+    @Test
+    public void testWrongParametersDeleteProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 4);
+
+        try {
+            ezShop.deleteProductFromSale(-1, "01234567890128", 2);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.deleteProductFromSale(null, "01234567890128", 2);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.deleteProductFromSale(saleId, "", 2);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.deleteProductFromSale(saleId, null, 2);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.deleteProductFromSale(saleId, "1234567890127", 2);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.deleteProductFromSale(saleId, "1234567890127", -2);
+            fail();
+        } catch (InvalidQuantityException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+
+        assertTrue(ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.10));
+        assertFalse(ezShop.applyDiscountRateToProduct(saleId, "1234567890128", 0.10));
+        assertFalse(ezShop.applyDiscountRateToProduct(100, "01234567890128", 0.10));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginApplyDiscountRateToProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+
+        ezShop.logout();
+        ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.10);
+    }
+
+    @Test
+    public void testWrongParametersApplyDiscountRateToProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+
+        try {
+            ezShop.applyDiscountRateToProduct(-1, "01234567890128", 0.10);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.applyDiscountRateToProduct(null, "01234567890128", 0.10);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.applyDiscountRateToProduct(saleId, null, 0.10);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.applyDiscountRateToProduct(saleId, "", 0.10);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.applyDiscountRateToProduct(saleId, "1234567890127", 0.10);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.applyDiscountRateToProduct(saleId, "1234567890128", 1.1);
+            fail();
+        } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.applyDiscountRateToProduct(saleId, "1234567890128", -0.1);
+            fail();
+        } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testApplyDiscountRateToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidLocationException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+
+        assertTrue(ezShop.applyDiscountRateToSale(saleId, 0.1));
+        assertFalse(ezShop.applyDiscountRateToSale(100, 0.1));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginApplyDiscountRateToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidLocationException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+
+        ezShop.logout();
+        ezShop.applyDiscountRateToSale(saleId, 0.1);
+    }
+
+    @Test
+    public void testWrongParameterApplyDiscountRateToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidLocationException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+
+        try {
+            ezShop.applyDiscountRateToProduct(-1, "1234567890128", 1.1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.applyDiscountRateToProduct(null, "1234567890128", 1.1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            assertTrue(ezShop.applyDiscountRateToSale(saleId, -0.1));
+            fail();
+        } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            assertTrue(ezShop.applyDiscountRateToSale(saleId, 1.1));
+            fail();
+        } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testComputePointsForSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException, InvalidTransactionIdException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 6.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 20);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 10);
+
+        assertEquals(6, ezShop.computePointsForSale(saleId));
+        assertEquals(-1, ezShop.computePointsForSale(100));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginComputePointsForSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException, InvalidTransactionIdException {
+        loginAs("ShopManager");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 6.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 20);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 10);
+
+        ezShop.logout();
+        ezShop.computePointsForSale(saleId);
+    }
+
+    @Test
+    public void testWrongParametersComputePointsForSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException, InvalidTransactionIdException {
+        loginAs("ShopManager");
+
+        try {
+            ezShop.computePointsForSale(-1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.computePointsForSale(null);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testEndSaleTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException {
+        loginAs("ShopManager");
+        double initialBalance = ezShop.computeBalance();
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 6.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 20);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 10);
+        ezShop.applyDiscountRateToSale(saleId, 0.2);
+        ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.1);
+
+        assertTrue(ezShop.endSaleTransaction(saleId));
+        assertFalse(ezShop.endSaleTransaction(saleId));
+        assertFalse(ezShop.endSaleTransaction(100));
+        assertFalse(ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.1));
+
+        SaleTransaction saleTransaction = ezShop.getSaleTransaction(saleId);
+        assertNotNull(saleTransaction);
+        double priceWithoutSaleDiscount = (6.99 - 6.99 * 0.1) * 10;
+        assertEquals(priceWithoutSaleDiscount - priceWithoutSaleDiscount * 0.2, saleTransaction.getPrice(), 0.1);
+
+        assertEquals(initialBalance, ezShop.computeBalance(), 0.1);
+        boolean find = false;
+        for (BalanceOperation op: ezShop.getCreditsAndDebits(null, null))
+            if (op.getType().equals("SALE")) find = true;
+        assertFalse(find);
+    }
+
+    @Test (expected = UnauthorizedException.class)
+    public void testWrongLoginEndSaleTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException {
+        ezShop.endSaleTransaction(1);
+    }
+
+    @Test
+    public void testWrongParametersEndSaleTransaction() {
+        loginAs("ShopManager");
+        try {
+            assertTrue(ezShop.endSaleTransaction(null));
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            assertTrue(ezShop.endSaleTransaction(-1));
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testDeleteSaleTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("ShopManager");
+
+        double initialBalance = ezShop.computeBalance();
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+
+        Integer banana = ezShop.createProductType("banana", "01234567890128", 2, "empty");
+        ezShop.updatePosition(banana, "1-1-3");
+        ezShop.updateQuantity(banana, 10);
+
+        // Sale = 5 apple and 2 banana
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+        ezShop.endSaleTransaction(saleId);
+        assertTrue(ezShop.deleteSaleTransaction(saleId));
+        assertFalse(ezShop.deleteSaleTransaction(saleId));
+
+        assertEquals(10, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+        assertEquals(10, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
+        List<BalanceOperation> creditsAndDebits = ezShop.getCreditsAndDebits(null, null);
+
+        assertEquals(initialBalance, ezShop.computeBalance(), 0.1);
+        boolean find = false;
+        for (BalanceOperation op: creditsAndDebits)
+            if (op.getType().equals("SALE")) find = true;
+        assertFalse(find);
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginDeleteSaleTransaction() throws InvalidTransactionIdException, UnauthorizedException {
+        ezShop.deleteSaleTransaction(1);
+    }
+
+    @Test
+    public void testWrongParametersDeleteSaleTransaction() {
+        loginAs("ShopManager");
+        try {
+            assertTrue(ezShop.endSaleTransaction(null));
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            assertTrue(ezShop.endSaleTransaction(-1));
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testNormalSale2() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
         ezShop.createUser("username", "password", "Administrator");
         ezShop.login("username", "password");
 
@@ -1123,36 +1531,54 @@ public class EZShopTest {
     }
 
     @Test
-    public void rollBackSale() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
-        ezShop.createUser("username", "password", "Administrator");
-        ezShop.login("username", "password");
-
-        double initialBalance = ezShop.computeBalance();
-        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
-        ezShop.updatePosition(apple, "1-1-2");
-        ezShop.updateQuantity(apple, 10);
-
-        Integer banana = ezShop.createProductType("banana", "01234567890128", 2, "empty");
-        ezShop.updatePosition(banana, "1-1-3");
-        ezShop.updateQuantity(banana, 10);
-
-        // Sale = 5 apple and 2 banana
+    public void testGetSaleTransaction() throws UnauthorizedException, InvalidLocationException, InvalidProductIdException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException {
+        loginAs("Administrator");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 6.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 20);
         Integer saleId = ezShop.startSaleTransaction();
-        ezShop.addProductToSale(saleId, "1234567890128", 5);
-        ezShop.addProductToSale(saleId, "01234567890128", 2);
+        ezShop.addProductToSale(saleId, "01234567890128", 10);
+
+        loginAs("Cashier");
+        assertNull(ezShop.getSaleTransaction(saleId));
+        assertNull(ezShop.getSaleTransaction(100));
         ezShop.endSaleTransaction(saleId);
-        assertTrue(ezShop.deleteSaleTransaction(saleId));
-
-        assertEquals(10, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
-        assertEquals(10, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
-        List<BalanceOperation> creditsAndDebits = ezShop.getCreditsAndDebits(null, null);
-
-        assertEquals(initialBalance, ezShop.computeBalance(), 0.1);
-        boolean find = false;
-        for (BalanceOperation op: creditsAndDebits)
-            if (op.getType().equals("SALE") && op.getMoney() == 9.0) find = true;
-        assertFalse(find);
+        assertNotNull(ezShop.getSaleTransaction(saleId));
     }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginGetSaleTransaction() throws UnauthorizedException, InvalidLocationException, InvalidProductIdException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException {
+        ezShop.getSaleTransaction(1);
+    }
+
+    @Test
+    public void testWrongParametersGetSaleTransaction() throws UnauthorizedException, InvalidLocationException, InvalidProductIdException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException {
+        loginAs("Administrator");
+        Integer productType = ezShop.createProductType("apple", "01234567890128", 6.99, "note");
+        ezShop.updatePosition(productType, "1-3-2");
+        ezShop.updateQuantity(productType, 20);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "01234567890128", 10);
+
+        loginAs("Cashier");
+        try {
+            ezShop.getSaleTransaction(null);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.getSaleTransaction(-1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+
+
+
+
+
+
+
+
 
     @Test
     public void returnTransaction() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
@@ -1289,8 +1715,5 @@ public class EZShopTest {
             if(t.getBarCode().equals("01234567890128")) assertEquals(2, t.getAmount());
         }
     }
-
-
-
 }
 
