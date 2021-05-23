@@ -5,10 +5,7 @@ import it.polito.ezshop.data.*;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -164,6 +161,7 @@ public class SaleTransactionImplTest {
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ReturnTransaction returnT =sale.startReturnTransaction(2);
         assertEquals(returnT,sale.getReturnTransaction(2));
+        assertNull(sale.getReturnTransaction(-1));
 
     }
     @Test
@@ -297,6 +295,16 @@ public class SaleTransactionImplTest {
         assertEquals(products,  sale.getTicketEntries());
 
 
+    }
+
+    @Test
+    public void testDummySetters(){
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        SaleTransactionImpl saleTransaction = new SaleTransactionImpl(databaseConnection, 1);
+
+        saleTransaction.setEntries(Collections.emptyList());
+        saleTransaction.setPrice(1);
+        saleTransaction.setMoney(1);
     }
 
     @Test

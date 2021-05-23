@@ -2214,7 +2214,7 @@ public class EZShopTest {
     }
 
     @Test
-    public void reset() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+    public void testReset() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
         loginAs("Administrator");
         // BALANCE UPDATE
         assertTrue(ezShop.recordBalanceUpdate(100));
@@ -2255,5 +2255,79 @@ public class EZShopTest {
         assertEquals(0, ezShop.getAllProductTypes().size());
         assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
         assertNull(ezShop.getSaleTransaction(saleId));
+    }
+
+    @Test
+    public void testLoadFromDB() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidDiscountRateException {
+        loginAs("Administrator");
+        // BALANCE UPDATE
+        assertTrue(ezShop.recordBalanceUpdate(100));
+
+        // SALE and RETURN
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer banana = ezShop.createProductType("banana", "01234567890128", 2, "empty");
+        ezShop.updatePosition(banana, "1-1-3");
+        ezShop.updateQuantity(banana, 10);
+
+        // Sale = 5 apple and 2 banana
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.applyDiscountRateToProduct(saleId, "1234567890128", 0.2);
+        ezShop.addProductToSale(saleId, "01234567890128", 2);
+        ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.1);
+        ezShop.applyDiscountRateToSale(saleId, 0.5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+        double initialBalance = ezShop.computeBalance();
+
+        Integer invalidSaleId = ezShop.startReturnTransaction(100);
+        assertEquals(-1, invalidSaleId.intValue());
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        assertNotEquals(-1, returnId.intValue());
+        assertFalse(ezShop.returnProduct(returnId, "1234567890128", 6));
+        assertTrue(ezShop.returnProduct(returnId, "1234567890128", 2));
+        assertFalse(ezShop.returnProduct(returnId, "01234567890128", 3));
+        assertTrue(ezShop.returnProduct(returnId, "01234567890128", 2));
+
+        assertEquals(-1, ezShop.returnCashPayment(returnId), 0.1);
+        assertEquals(-1, ezShop.returnCashPayment(100), 0.1);
+        assertTrue(ezShop.endReturnTransaction(returnId, true));
+
+        assertEquals(5+2, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
+        assertEquals(10, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
+        SaleTransaction saleTransaction = ezShop.getSaleTransaction(saleId);
+        for(TicketEntry t : saleTransaction.getEntries()) {
+            if(t.getBarCode().equals("1234567890128")) assertEquals(5-2, t.getAmount());
+            if(t.getBarCode().equals("01234567890128")) assertEquals(2-2, t.getAmount());
+        }
+
+        double tot = 2*(2-2*0.1) + 2*(1 - 1 * 0.2);
+        assertEquals(tot - tot*0.5, ezShop.returnCashPayment(returnId), 0.1);
+        assertEquals(-1, ezShop.returnCashPayment(returnId), 0.1);
+        assertFalse(ezShop.deleteReturnTransaction(returnId));
+
+        for (BalanceOperation t : ezShop.getCreditsAndDebits(null, null)){
+            if(t.getType().equals("RETURN")) assertEquals(- (tot - tot*0.5), t.getMoney(), 0.1);
+        }
+
+        assertEquals(initialBalance - (tot - tot*0.5), ezShop.computeBalance(), 0.1);
+
+        // ORDER
+        ezShop.payOrderFor("1234567890128", 10, 1.99);
+
+        assertEquals(1, ezShop.getAllOrders().size());
+        assertEquals(2, ezShop.getAllProductTypes().size());
+        assertEquals(4, ezShop.getCreditsAndDebits(null, null).size());
+        assertNotNull(ezShop.getSaleTransaction(saleId));
+
+        // Try simulate on-off-on
+        ezShop = new EZShop();
+        loginAs("Administrator");
+        assertEquals(1, ezShop.getAllOrders().size());
+        assertEquals(2, ezShop.getAllProductTypes().size());
+        assertEquals(4, ezShop.getCreditsAndDebits(null, null).size());
+        assertNotNull(ezShop.getSaleTransaction(saleId));
     }
 }
