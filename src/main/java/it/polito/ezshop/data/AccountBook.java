@@ -51,7 +51,7 @@ public class AccountBook {
      * @param to end date
      * @return list of BalanceOperation within the selected period
      */
-    List<BalanceOperation> getCreditAndDebits(LocalDate from, LocalDate to) {
+    public List<BalanceOperation> getCreditAndDebits(LocalDate from, LocalDate to) {
         // Invert in case
         if(from != null && to != null && from.compareTo(to) > 0) {
             LocalDate temp = from;
