@@ -408,7 +408,7 @@ public class DatabaseConnection {
     public boolean deleteSaleTransaction(SaleTransactionImpl transaction) {
         if(transaction != null) {
             try {
-                CON.setAutoCommit(false);
+                setAutoCommit(false);
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
                 ps.setInt(1, transaction.getTicketNumber());
                 if (ps.executeUpdate() > 0) {
@@ -427,8 +427,10 @@ public class DatabaseConnection {
                     return true;
                 }
                 CON.commit();
-                CON.setAutoCommit(true);
             } catch (Exception ignored) { }
+            finally {
+                setAutoCommit(true);
+            }
         }
         return false;
     }
@@ -441,7 +443,7 @@ public class DatabaseConnection {
     public boolean updateSaleTransaction(SaleTransactionImpl transaction) {
         if(transaction != null) {
             try {
-                CON.setAutoCommit(false);
+                setAutoCommit(false);
                 PreparedStatement ps = CON.prepareStatement("UPDATE sale_transaction SET discount = ?, transaction_status = ?, date_op = ?,  type = ?, status = ? WHERE id = ?");
                 ps.setDouble(1, transaction.getDiscountRate());
                 ps.setString(2, transaction.getTransactionStatus());
@@ -465,9 +467,11 @@ public class DatabaseConnection {
                     }
                 }
                 CON.commit();
-                CON.setAutoCommit(true);
                 return true;
             } catch (Exception ignored) { }
+            finally {
+                setAutoCommit(true);
+            }
         }
         return false;
     }
@@ -543,7 +547,7 @@ public class DatabaseConnection {
     public boolean saveReturnTransaction(ReturnTransaction returnTransaction, Integer saleId) {
         if(returnTransaction != null && saleId > 0) {
             try {
-                CON.setAutoCommit(false);
+                setAutoCommit(false);
                 for (Map.Entry<TransactionProduct, Integer> entry : returnTransaction.getReturns().entrySet()) {
                     PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, type, status, id_product, amount,  id_sale) VALUES(?,?,?,?,?,?,?)");
                     ps.setInt(1, returnTransaction.getBalanceId());
@@ -556,12 +560,14 @@ public class DatabaseConnection {
                     ps.executeUpdate();
                 }
                 CON.commit();
-                CON.setAutoCommit(true);
                 return true;
             } catch (Exception ex) {
                 try {
                     CON.rollback();
                 } catch (SQLException ignored) {}
+            }
+            finally {
+                setAutoCommit(true);
             }
         }
         return false;
@@ -862,5 +868,11 @@ public class DatabaseConnection {
         }
         catch (Exception ignored) { }
         return 0.0;
+    }
+
+    public void setAutoCommit(boolean state) {
+        try {
+            CON.setAutoCommit(state);
+        } catch (SQLException ignore) { }
     }
 }

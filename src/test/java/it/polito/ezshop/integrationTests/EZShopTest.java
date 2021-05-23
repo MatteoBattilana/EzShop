@@ -2212,4 +2212,48 @@ public class EZShopTest {
         loginAs("Cashier");
         ezShop.getCreditsAndDebits(null, null);
     }
+
+    @Test
+    public void reset() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
+        // BALANCE UPDATE
+        assertTrue(ezShop.recordBalanceUpdate(100));
+
+        // SALE
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+
+        // ORDER
+        ezShop.payOrderFor("1234567890128", 10, 1.99);
+
+        assertEquals(1, ezShop.getAllOrders().size());
+        assertEquals(1, ezShop.getAllProductTypes().size());
+        assertEquals(3, ezShop.getCreditsAndDebits(null, null).size());
+        assertNotNull(ezShop.getSaleTransaction(saleId));
+
+        // Try simulate on-off-on
+        loginAs("Administrator");
+        assertEquals(1, ezShop.getAllOrders().size());
+        assertEquals(1, ezShop.getAllProductTypes().size());
+        assertEquals(3, ezShop.getCreditsAndDebits(null, null).size());
+        assertNotNull(ezShop.getSaleTransaction(saleId));
+
+        ezShop.reset();
+        assertEquals(0, ezShop.getAllOrders().size());
+        assertEquals(0, ezShop.getAllProductTypes().size());
+        assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
+        assertNull(ezShop.getSaleTransaction(saleId));
+
+        ezShop = new EZShop();
+        loginAs("Administrator");
+        assertEquals(0, ezShop.getAllOrders().size());
+        assertEquals(0, ezShop.getAllProductTypes().size());
+        assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
+        assertNull(ezShop.getSaleTransaction(saleId));
+    }
 }
