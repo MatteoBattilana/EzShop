@@ -1571,19 +1571,9 @@ public class EZShopTest {
         } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
     }
 
-
-
-
-
-
-
-
-
-
     @Test
-    public void returnTransaction() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
-        ezShop.createUser("username", "password", "Administrator");
-        ezShop.login("username", "password");
+    public void testStartReturnTransaction() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidDiscountRateException {
+        loginAs("Administrator");
 
         Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
         ezShop.updatePosition(apple, "1-1-2");
@@ -1595,11 +1585,16 @@ public class EZShopTest {
         // Sale = 5 apple and 2 banana
         Integer saleId = ezShop.startSaleTransaction();
         ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.applyDiscountRateToProduct(saleId, "1234567890128", 0.2);
         ezShop.addProductToSale(saleId, "01234567890128", 2);
+        ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.1);
+        ezShop.applyDiscountRateToSale(saleId, 0.5);
         ezShop.endSaleTransaction(saleId);
         ezShop.receiveCashPayment(saleId, 100);
         double initialBalance = ezShop.computeBalance();
 
+        Integer invalidSaleId = ezShop.startReturnTransaction(100);
+        assertEquals(-1, invalidSaleId.intValue());
         Integer returnId = ezShop.startReturnTransaction(saleId);
         assertNotEquals(-1, returnId.intValue());
         assertFalse(ezShop.returnProduct(returnId, "1234567890128", 6));
@@ -1607,7 +1602,10 @@ public class EZShopTest {
         assertFalse(ezShop.returnProduct(returnId, "01234567890128", 3));
         assertTrue(ezShop.returnProduct(returnId, "01234567890128", 2));
 
+        loginAs("Cashier");
         assertTrue(ezShop.endReturnTransaction(returnId, true));
+
+        loginAs("ShopManager");
         assertEquals(5+2, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
         assertEquals(10, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
         SaleTransaction saleTransaction = ezShop.getSaleTransaction(saleId);
@@ -1616,14 +1614,15 @@ public class EZShopTest {
             if(t.getBarCode().equals("01234567890128")) assertEquals(2-2, t.getAmount());
         }
 
-        assertEquals(2*2 + 2*1, ezShop.returnCashPayment(returnId), 0.1);
+        double tot = 2*(2-2*0.1) + 2*(1 - 1 * 0.2);
+        assertEquals(tot - tot*0.5, ezShop.returnCashPayment(returnId), 0.1);
         assertFalse(ezShop.deleteReturnTransaction(returnId));
 
         for (BalanceOperation t : ezShop.getCreditsAndDebits(null, null)){
-            if(t.getType().equals("RETURN")) assertEquals(- (2*2 + 2*1), t.getMoney(), 0.1);
+            if(t.getType().equals("RETURN")) assertEquals(- (tot - tot*0.5), t.getMoney(), 0.1);
         }
 
-        assertEquals(initialBalance - (2*2 + 2*1), ezShop.computeBalance(), 0.1);
+        assertEquals(initialBalance - (tot - tot*0.5), ezShop.computeBalance(), 0.1);
 
 
         // Try to open another return transaction
@@ -1634,12 +1633,88 @@ public class EZShopTest {
         assertEquals(7+2, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
     }
 
-    @Test
-    public void returnTransactionDeleteBeforePay() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
-        ezShop.createUser("username", "password", "Administrator");
-        ezShop.login("username", "password");
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginStartReturnTransaction() throws InvalidTransactionIdException, UnauthorizedException {
+        ezShop.startReturnTransaction(11);
+    }
 
-        double initialBalance = ezShop.computeBalance();
+    @Test
+    public void testWrongParametersStartReturnTransaction() {
+        loginAs("Cashier");
+        try {
+            ezShop.startReturnTransaction(null);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.startReturnTransaction(-1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginReturnProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        ezShop.logout();
+        ezShop.returnProduct(returnId, "1234567890128", 1);
+    }
+
+    @Test
+    public void testWrongParametersReturnProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        try {
+            ezShop.returnProduct(null, "1234567890128", 1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnProduct(-1, "1234567890128", 1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.returnProduct(returnId, null, 1);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnProduct(returnId, "", 1);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnProduct(returnId, "1234567890129", 1);
+            fail();
+        } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.returnProduct(returnId, "1234567890129", 0);
+            fail();
+        } catch (InvalidQuantityException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnProduct(returnId, "1234567890129", -1);
+            fail();
+        } catch (InvalidQuantityException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testReturnTransactionDeleteBeforePay() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
+
         Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
         ezShop.updatePosition(apple, "1-1-2");
         ezShop.updateQuantity(apple, 10);
@@ -1653,6 +1728,7 @@ public class EZShopTest {
         ezShop.addProductToSale(saleId, "01234567890128", 2);
         ezShop.endSaleTransaction(saleId);
         ezShop.receiveCashPayment(saleId, 100);
+        double initialBalance = ezShop.computeBalance();
 
         Integer returnId = ezShop.startReturnTransaction(saleId);
         assertNotEquals(-1, returnId.intValue());
@@ -1671,6 +1747,8 @@ public class EZShopTest {
         }
 
         assertTrue(ezShop.deleteReturnTransaction(returnId));
+        assertFalse(ezShop.endReturnTransaction(returnId, false));
+        assertEquals(initialBalance, ezShop.computeBalance(), 0.1);
         assertEquals(5, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
         assertEquals(8, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
         for(TicketEntry t : saleTransaction.getEntries()) {
@@ -1680,11 +1758,9 @@ public class EZShopTest {
     }
 
     @Test
-    public void returnTransactionCommitFalse() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
-        ezShop.createUser("username", "password", "Administrator");
-        ezShop.login("username", "password");
+    public void testReturnTransactionCommitFalse() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
 
-        double initialBalance = ezShop.computeBalance();
         Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
         ezShop.updatePosition(apple, "1-1-2");
         ezShop.updateQuantity(apple, 10);
@@ -1699,6 +1775,7 @@ public class EZShopTest {
         ezShop.endSaleTransaction(saleId);
         ezShop.receiveCashPayment(saleId, 100);
 
+        double initialBalance = ezShop.computeBalance();
         Integer returnId = ezShop.startReturnTransaction(saleId);
         assertNotEquals(-1, returnId.intValue());
         assertFalse(ezShop.returnProduct(returnId, "1234567890128", 6));
@@ -1707,6 +1784,8 @@ public class EZShopTest {
         assertTrue(ezShop.returnProduct(returnId, "01234567890128", 2));
 
         assertTrue(ezShop.endReturnTransaction(returnId, false));
+        assertFalse(ezShop.endReturnTransaction(returnId, false));
+        assertEquals(initialBalance, ezShop.computeBalance(), 0.1);
         assertEquals(5, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
         assertEquals(8, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
         SaleTransaction saleTransaction = ezShop.getSaleTransaction(saleId);
@@ -1714,6 +1793,48 @@ public class EZShopTest {
             if(t.getBarCode().equals("1234567890128")) assertEquals(5, t.getAmount());
             if(t.getBarCode().equals("01234567890128")) assertEquals(2, t.getAmount());
         }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginEndReturnTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
+
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        ezShop.returnProduct(returnId, "1234567890128", 2);
+
+        ezShop.logout();
+        ezShop.endReturnTransaction(returnId, false);
+    }
+
+    @Test
+    public void testWrongParametersEndReturnTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        loginAs("Administrator");
+
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        ezShop.returnProduct(returnId, "1234567890128", 2);
+
+        try {
+            ezShop.endReturnTransaction(-1, false);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.endReturnTransaction(null, false);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
     }
 }
 
