@@ -108,11 +108,21 @@ public class SaleTransactionImplTest {
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
         sale.addProductToSale(product,2);
         sale.addProductToSale(product2,2);
-        Double price =((product.getPricePerUnit() - product.getPricePerUnit() * 0) * 2) + ((product2.getPricePerUnit() - product2.getPricePerUnit() * 0) * 2);
-        assertEquals(price,sale.computeTotal(),0.01);
         assertEquals(sale.getPrice(),sale.getMoney(),0.01);
 
         }
+    @Test
+    public void testGetPrice() {
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
+        ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
+        ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
+        sale.addProductToSale(product,2);
+        sale.addProductToSale(product2,2);
+        Double price =((product.getPricePerUnit() - product.getPricePerUnit() * 0) * 2) + ((product2.getPricePerUnit() - product2.getPricePerUnit() * 0) * 2);
+        assertEquals(price,sale.getPrice(),0.01);
+
+    }
     @Test
     public void testComputeTotal() {
         DatabaseConnection databaseConnection = new DatabaseConnection();
@@ -121,8 +131,6 @@ public class SaleTransactionImplTest {
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
         sale.addProductToSale(product,2);
         sale.addProductToSale(product2,2);
-        Double price =((product.getPricePerUnit() - product.getPricePerUnit() * 0) * 2) + ((product2.getPricePerUnit() - product2.getPricePerUnit() * 0) * 2);
-        assertEquals(price,sale.computeTotal(),0.01);
         assertEquals(sale.getMoney(),sale.computeTotal(),0.01);
 
     }
