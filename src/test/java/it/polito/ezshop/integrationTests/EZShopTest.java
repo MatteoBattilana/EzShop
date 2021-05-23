@@ -1863,6 +1863,115 @@ public class EZShopTest {
     }
 
     @Test
+    public void testCreateCard() throws UnauthorizedException{
+        loginAs("Cashier");
+        String card = ezShop.createCard();
+        String card2 = ezShop.createCard();
+        assertNotNull(card);
+        assertNotNull(card2);
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testNotLoggedCreateCard() throws UnauthorizedException{
+        ezShop.createCard();
+    }
+
+    @Test
+    public void testModifyPointsOnCard() throws InvalidCustomerCardException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException {
+        loginAs("Cashier");
+        String card = ezShop.createCard();
+        Integer customerId = ezShop.defineCustomer("matteo");
+        ezShop.attachCardToCustomer(card, customerId);
+
+        assertTrue(ezShop.modifyPointsOnCard(card, 10));
+        assertEquals(10, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertTrue(ezShop.modifyPointsOnCard(card, -10));
+        assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertFalse(ezShop.modifyPointsOnCard(card, -10));
+        assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertFalse(ezShop.modifyPointsOnCard("0000000011", 10));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginModifyPointsOnCard() throws InvalidCustomerCardException, UnauthorizedException{
+       loginAs("Cashier");
+       String card = ezShop.createCard();
+
+       ezShop.logout();
+       ezShop.modifyPointsOnCard(card,12);
+    }
+
+    @Test
+    public void testWrongParametersModifyPointsOnCard() {
+        loginAs("Cashier");
+
+        try {
+            ezShop.modifyPointsOnCard("",12);
+            fail();
+        } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.modifyPointsOnCard(null,12);
+            fail();
+        } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidCustomerNameException {
+        loginAs("Cashier");
+        String card = ezShop.createCard();
+        Integer customerId = ezShop.defineCustomer("matteo");
+        Integer customerId2 = ezShop.defineCustomer("luca");
+        assertNull(ezShop.getCustomer(customerId).getCustomerCard());
+        assertTrue(ezShop.attachCardToCustomer(card, customerId));
+        assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertFalse(ezShop.attachCardToCustomer(card, 100));
+        assertFalse(ezShop.attachCardToCustomer(card, customerId2));
+        assertFalse(ezShop.attachCardToCustomer("0000000010", customerId2));
+    }
+
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
+        loginAs("Cashier");
+        String card = ezShop.createCard();
+        ezShop.logout();
+        ezShop.attachCardToCustomer(card,1);
+    }
+
+    @Test
+        public void testWrongParametersAttachCardToCustomer() throws UnauthorizedException {
+            loginAs("Cashier");
+            String card= ezShop.createCard();
+
+            try {
+                ezShop.attachCardToCustomer(card,null);
+                fail();
+            } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+            try {
+                ezShop.attachCardToCustomer(card,-1);
+                fail();
+            } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
+
+            try {
+                ezShop.attachCardToCustomer(null,1);
+                fail();
+            } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
+            try {
+                ezShop.attachCardToCustomer("",1);
+                fail();
+            } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
+            try {
+                ezShop.attachCardToCustomer("cliente22299",1);
+                fail();
+            } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
+        }
+
+    @Test
     public void testWrongParametersEndReturnTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
         loginAs("Administrator");
 
@@ -2104,4 +2213,3 @@ public class EZShopTest {
         ezShop.getCreditsAndDebits(null, null);
     }
 }
-

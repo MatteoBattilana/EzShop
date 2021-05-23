@@ -566,24 +566,23 @@ public class EZShop implements EZShopInterface {
 
         // Check barcode validity
         ProductType product = getProductTypeByBarCode(productCode);
-        if (product == null)
-            return -1;
+        if (product != null) {
 
-        // New order id
-        int newIdOrder = 0;
-        for (Integer id : orders.keySet()) {
-            if (id > newIdOrder) {
-                newIdOrder = id;
+            // New order id
+            int newIdOrder = 0;
+            for (Integer id : orders.keySet()) {
+                if (id > newIdOrder) {
+                    newIdOrder = id;
+                }
+            }
+
+            // Add the order to the system
+            OrderImpl order = new OrderImpl(newIdOrder + 1, productCode, pricePerUnit, quantity, "UNPAID", "ISSUED");
+            if (databaseConnection.createOrder(order)) {
+                orders.put(order.getBalanceId(), order);
+                return order.getBalanceId();
             }
         }
-
-        // Add the order to the system
-        OrderImpl order = new OrderImpl(newIdOrder + 1, productCode, pricePerUnit, quantity, "UNPAID", "ISSUED");
-        if(databaseConnection.createOrder(order)) {
-            orders.put(order.getBalanceId(), order);
-            return order.getBalanceId();
-        }
-
         return -1;
     }
 
@@ -985,7 +984,7 @@ public class EZShop implements EZShopInterface {
 
         // Check that no other customer has the same card
         for (CustomerImpl customer : customers.values()){
-            if (customer.getCustomerCard().equals(customerCard))
+            if (customer.getCustomerCard() != null && customer.getCustomerCard().equals(customerCard))
                 return false;
         }
 
