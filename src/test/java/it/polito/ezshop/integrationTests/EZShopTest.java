@@ -3,15 +3,20 @@ package it.polito.ezshop.integrationTests;
 
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class EZShopTest {
+    private static final String sFILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
     EZShopInterface ezShop;
 
     private void loginAs(String role){
@@ -25,9 +30,44 @@ public class EZShopTest {
 
     @Before
     public void setup(){
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(sFILE));
+            writer.write("#Do not delete the lines preceded by an \"#\" and do not modify the first three credit cards\n" +
+                    "#since they will be used in the acceptance tests.\n" +
+                    "#The lines preceded by an \"#\" must be ignored.\n" +
+                    "#Here you can add all the credit card numbers you need with their balance. The format MUST be :\n" +
+                    "#<creditCardNumber>;<balance>\n" +
+                    "4485370086510891;150.00\n" +
+                    "5100293991053009;10.00\n" +
+                    "4716258050958645;0.00\n");
+            writer.close();
+        }
+        catch (Exception ex) {
+            fail();
+        }
+
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
         ezShop = new EZShop();
+    }
+
+    @After
+    public void end() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(sFILE));
+            writer.write("#Do not delete the lines preceded by an \"#\" and do not modify the first three credit cards\n" +
+                    "#since they will be used in the acceptance tests.\n" +
+                    "#The lines preceded by an \"#\" must be ignored.\n" +
+                    "#Here you can add all the credit card numbers you need with their balance. The format MUST be :\n" +
+                    "#<creditCardNumber>;<balance>\n" +
+                    "4485370086510891;150.00\n" +
+                    "5100293991053009;10.00\n" +
+                    "4716258050958645;0.00\n");
+            writer.close();
+        }
+        catch (Exception ex) {
+            fail();
+        }
     }
 
     @Test
@@ -1518,7 +1558,12 @@ public class EZShopTest {
         assertEquals(10 - 2, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());
 
         ezShop.endSaleTransaction(saleId);
+        double resto2 = ezShop.receiveCashPayment(100, 100);
+        double resto3 = ezShop.receiveCashPayment(saleId, 0.99);
         double resto = ezShop.receiveCashPayment(saleId, 100);
+
+        assertEquals(-1, resto2, 0.1);
+        assertEquals(-1, resto3, 0.1);
         assertEquals(100.0-(5*1 + 2*2), resto, 0.1);
 
         assertEquals(5*1 + 2*2, ezShop.computeBalance(), 0.1);
@@ -1602,6 +1647,9 @@ public class EZShopTest {
         assertFalse(ezShop.returnProduct(returnId, "01234567890128", 3));
         assertTrue(ezShop.returnProduct(returnId, "01234567890128", 2));
 
+        assertEquals(-1, ezShop.returnCashPayment(returnId), 0.1);
+        assertEquals(-1, ezShop.returnCashPayment(100), 0.1);
+
         loginAs("Cashier");
         assertTrue(ezShop.endReturnTransaction(returnId, true));
 
@@ -1616,6 +1664,7 @@ public class EZShopTest {
 
         double tot = 2*(2-2*0.1) + 2*(1 - 1 * 0.2);
         assertEquals(tot - tot*0.5, ezShop.returnCashPayment(returnId), 0.1);
+        assertEquals(-1, ezShop.returnCashPayment(returnId), 0.1);
         assertFalse(ezShop.deleteReturnTransaction(returnId));
 
         for (BalanceOperation t : ezShop.getCreditsAndDebits(null, null)){
@@ -1835,6 +1884,224 @@ public class EZShopTest {
             ezShop.endReturnTransaction(null, false);
             fail();
         } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginDeleteReturnTransaction() throws InvalidTransactionIdException, UnauthorizedException {
+        ezShop.deleteReturnTransaction(1);
+    }
+
+    @Test
+    public void testWrongParametersDeleteReturnTransaction() throws InvalidTransactionIdException, UnauthorizedException {
+        loginAs("Administrator");
+        assertFalse(ezShop.deleteReturnTransaction(100));
+        try {
+            ezShop.deleteReturnTransaction(-1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.deleteReturnTransaction(null);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginReceiveCashPayment() throws InvalidTransactionIdException, UnauthorizedException, InvalidPaymentException {
+        ezShop.receiveCashPayment(100, 100);
+    }
+
+    @Test
+    public void testWrongParametersReceiveCashPayment() throws InvalidTransactionIdException, UnauthorizedException, InvalidPaymentException {
+        loginAs("Administrator");
+        try {
+            ezShop.receiveCashPayment(-1, 0.99);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.receiveCashPayment(null, 0.99);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.receiveCashPayment(100, -0.1);
+            fail();
+        } catch (InvalidPaymentException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testReceiveCreditCardPayment() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidCreditCardException {
+        loginAs("Administrator");
+
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        assertFalse(ezShop.receiveCreditCardPayment(saleId, "4716258050958645"));
+        assertFalse(ezShop.receiveCreditCardPayment(100, "4485370086510891"));
+        assertFalse(ezShop.receiveCreditCardPayment(saleId, "4507039484760770"));
+
+        assertTrue(ezShop.receiveCreditCardPayment(saleId, "4485370086510891"));
+
+        assertEquals(5*1, ezShop.computeBalance(), 0.1);
+        List<BalanceOperation> creditsAndDebits = ezShop.getCreditsAndDebits(null, null);
+        boolean find = false;
+        for (BalanceOperation op: creditsAndDebits)
+            if (op.getType().equals("SALE") && op.getMoney() == 5.0) find = true;
+        assertTrue(find);
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginReceiveCreditCardPayment() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidCreditCardException {
+        loginAs("Administrator");
+
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.logout();
+        ezShop.receiveCreditCardPayment(saleId, "4485370086510891");
+    }
+
+    @Test
+    public void testWrongParametersReceiveCreditCardPayment() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidCreditCardException {
+        loginAs("Administrator");
+        try {
+            ezShop.receiveCreditCardPayment(-1, "4485370086510891");
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.receiveCreditCardPayment(null, "4485370086510891");
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.receiveCreditCardPayment(1, null);
+            fail();
+        } catch (InvalidCreditCardException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.receiveCreditCardPayment(1, "");
+            fail();
+        } catch (InvalidCreditCardException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.receiveCreditCardPayment(1, "3213213213");
+            fail();
+        } catch (InvalidCreditCardException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginReturnCashPayment() throws InvalidTransactionIdException, UnauthorizedException {
+        ezShop.returnCashPayment(1);
+    }
+
+    @Test
+    public void testWrongParametersReturnCashPayment() {
+        loginAs("Administrator");
+        try {
+            ezShop.returnCashPayment(-1);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnCashPayment(null);
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testReturnCreditCardPayment() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidDiscountRateException, InvalidCreditCardException {
+        loginAs("Administrator");
+
+        Integer apple = ezShop.createProductType("apple", "1234567890128", 1, "empty");
+        ezShop.updatePosition(apple, "1-1-2");
+        ezShop.updateQuantity(apple, 10);
+
+        Integer saleId = ezShop.startSaleTransaction();
+        ezShop.addProductToSale(saleId, "1234567890128", 5);
+        ezShop.endSaleTransaction(saleId);
+        ezShop.receiveCashPayment(saleId, 100);
+        double initialBalance = ezShop.computeBalance();
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        assertTrue(ezShop.returnProduct(returnId, "1234567890128", 2));
+        assertTrue(ezShop.endReturnTransaction(returnId, true));
+
+        assertEquals(2*1, ezShop.returnCreditCardPayment(returnId, "4716258050958645"), 0.1);
+        assertEquals(initialBalance - 2, ezShop.computeBalance(), 0.1);
+        assertEquals(-1, ezShop.returnCreditCardPayment(returnId, "4716258050958645"), 0.1);
+        assertEquals(-1, ezShop.returnCreditCardPayment(100, "4716258050958645"), 0.1);
+        assertEquals(-1, ezShop.returnCreditCardPayment(100, "4507039484760770"), 0.1);
+
+        for (BalanceOperation t : ezShop.getCreditsAndDebits(null, null)){
+            if(t.getType().equals("RETURN")) assertEquals(-2, t.getMoney(), 0.1);
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginReturnCreditCardPayment() throws UnauthorizedException, InvalidTransactionIdException, InvalidCreditCardException {
+        ezShop.returnCreditCardPayment(1, "4716258050958645");
+    }
+
+    @Test
+    public void testWrongParametersReturnCreditCardPayment() {
+        loginAs("Administrator");
+        try {
+            ezShop.returnCreditCardPayment(null, "4716258050958645");
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnCreditCardPayment(-1, "4716258050958645");
+            fail();
+        } catch (InvalidTransactionIdException ignored) {} catch (Exception ignored) {fail();}
+
+        try {
+            ezShop.returnCreditCardPayment(1, null);
+            fail();
+        } catch (InvalidCreditCardException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnCreditCardPayment(1, "");
+            fail();
+        } catch (InvalidCreditCardException ignored) {} catch (Exception ignored) {fail();}
+        try {
+            ezShop.returnCreditCardPayment(1, "a12213");
+            fail();
+        } catch (InvalidCreditCardException ignored) {} catch (Exception ignored) {fail();}
+    }
+
+    @Test
+    public void testRecordBalanceUpdate() throws UnauthorizedException {
+        loginAs("ShopManager");
+        assertTrue(ezShop.recordBalanceUpdate(10));
+        assertFalse(ezShop.recordBalanceUpdate(-11));
+        assertTrue(ezShop.recordBalanceUpdate(-5));
+        assertEquals(5, ezShop.computeBalance(), 0.1);
+        assertEquals(2, ezShop.getCreditsAndDebits(null, null).size());
+        for (BalanceOperation op : ezShop.getCreditsAndDebits(null, null)){
+            if(op.getType().equals("CREDIT")){
+                assertEquals(10, op.getMoney(), 0.1);
+            } else {
+                assertEquals(-5, op.getMoney(), 0.1);
+            }
+        }
+
+        assertEquals(2, ezShop.getCreditsAndDebits(LocalDate.now().plusDays(1), LocalDate.of(2019, 01, 01)).size());
+        assertEquals(2, ezShop.getCreditsAndDebits(LocalDate.of(2019, 01, 01), LocalDate.now().plusDays(1)).size());
+        assertEquals(2, ezShop.getCreditsAndDebits(LocalDate.of(2019, 01, 01), null).size());
+        assertEquals(2, ezShop.getCreditsAndDebits(null, LocalDate.now().plusDays(1)).size());
+        assertEquals(0, ezShop.getCreditsAndDebits(LocalDate.now().plusDays(1), null).size());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginRecordBalanceUpdate() throws UnauthorizedException {
+        loginAs("Cashier");
+        ezShop.recordBalanceUpdate(10);
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testWrongLoginGetCreditsAndDebits() throws UnauthorizedException {
+        loginAs("Cashier");
+        ezShop.getCreditsAndDebits(null, null);
     }
 }
 

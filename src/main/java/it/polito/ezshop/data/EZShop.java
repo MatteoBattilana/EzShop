@@ -1624,7 +1624,7 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(sale != null) {
             double returnTotal = sale.getReturnTransactionTotal(returnId);
-            if (sale.setPaidReturnTransaction(returnId)) {
+            if (returnTotal != -1 && sale.setPaidReturnTransaction(returnId)) {
                 accountBook.recordBalanceUpdate(-returnTotal);
                 accountBook.add(sale.getReturnTransaction(returnId));
                 return returnTotal;
