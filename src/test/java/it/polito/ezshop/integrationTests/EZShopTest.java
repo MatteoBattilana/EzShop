@@ -1293,37 +1293,47 @@ public class EZShopTest {
     @Test
     public void testCreateCard() throws UnauthorizedException{
         loginAs("Cashier");
-        String card= ezShop.createCard();
+        String card = ezShop.createCard();
+        String card2 = ezShop.createCard();
         assertNotNull(card);
+        assertNotNull(card2);
     }
 
     @Test(expected = UnauthorizedException.class)
     public void testNotLoggedCreateCard() throws UnauthorizedException{
         ezShop.createCard();
     }
+
     @Test
-    public void testModifyPointsOnCard() throws InvalidCustomerCardException, UnauthorizedException {
+    public void testModifyPointsOnCard() throws InvalidCustomerCardException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException {
         loginAs("Cashier");
         String card = ezShop.createCard();
-        List<Customer> allCustomers= ezShop.getAllCustomers();
-        for (Customer c: allCustomers) {
-            if (!c.getCustomerCard().equals("card")  || (c.getPoints()+12)<0) {
-                assertFalse(ezShop.modifyPointsOnCard("card", 12));}
+        Integer customerId = ezShop.defineCustomer("matteo");
+        ezShop.attachCardToCustomer(card, customerId);
 
-            assertTrue(ezShop.modifyPointsOnCard("card", 12));}
+        assertTrue(ezShop.modifyPointsOnCard(card, 10));
+        assertEquals(10, ezShop.getCustomer(customerId).getPoints().intValue());
 
+        assertTrue(ezShop.modifyPointsOnCard(card, -10));
+        assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertFalse(ezShop.modifyPointsOnCard(card, -10));
+        assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertFalse(ezShop.modifyPointsOnCard("0000000011", 10));
     }
 
     @Test(expected = UnauthorizedException.class)
     public void testWrongLoginModifyPointsOnCard() throws InvalidCustomerCardException, UnauthorizedException{
+       loginAs("Cashier");
        String card = ezShop.createCard();
-        ezShop.modifyPointsOnCard("card",12);
+
+       ezShop.logout();
+       ezShop.modifyPointsOnCard(card,12);
     }
 
-
-
     @Test
-    public void testWrongParametersModifyPointsOnCard() throws InvalidCustomerCardException, UnauthorizedException  {
+    public void testWrongParametersModifyPointsOnCard() {
         loginAs("Cashier");
 
         try {
@@ -1338,35 +1348,40 @@ public class EZShopTest {
     }
 
     @Test
-    public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
+    public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidCustomerNameException {
         loginAs("Cashier");
         String card = ezShop.createCard();
-        Integer id = 1;
-        List<Customer> allCustomers= ezShop.getAllCustomers();
-        for (Customer c: allCustomers) {
-            if (!c.getCustomerCard().equals("card") && c.getCustomerCard()==null && c.getId()==id) {
-                assertTrue(ezShop.attachCardToCustomer("card",id));}
-            assertFalse(ezShop.attachCardToCustomer("card",id));
-    }}
+        Integer customerId = ezShop.defineCustomer("matteo");
+        Integer customerId2 = ezShop.defineCustomer("luca");
+        assertNull(ezShop.getCustomer(customerId).getCustomerCard());
+        assertTrue(ezShop.attachCardToCustomer(card, customerId));
+        assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
+
+        assertFalse(ezShop.attachCardToCustomer(card, 100));
+        assertFalse(ezShop.attachCardToCustomer(card, customerId2));
+        assertFalse(ezShop.attachCardToCustomer("0000000010", customerId2));
+    }
 
 
     @Test(expected = UnauthorizedException.class)
     public void testWrongLoginAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
+        loginAs("Cashier");
         String card = ezShop.createCard();
-        ezShop.attachCardToCustomer("card",1);
+        ezShop.logout();
+        ezShop.attachCardToCustomer(card,1);
     }
 
     @Test
-        public void testWrongParametersAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
+        public void testWrongParametersAttachCardToCustomer() throws UnauthorizedException {
             loginAs("Cashier");
             String card= ezShop.createCard();
 
             try {
-                ezShop.attachCardToCustomer("card",null);
+                ezShop.attachCardToCustomer(card,null);
                 fail();
             } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
             try {
-                ezShop.attachCardToCustomer("card",-1);
+                ezShop.attachCardToCustomer(card,-1);
                 fail();
             } catch (InvalidCustomerIdException ignored) {} catch (Exception ignored) {fail();}
 

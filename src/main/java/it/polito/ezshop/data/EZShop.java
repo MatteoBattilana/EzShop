@@ -985,7 +985,7 @@ public class EZShop implements EZShopInterface {
 
         // Check that no other customer has the same card
         for (CustomerImpl customer : customers.values()){
-            if (customer.getCustomerCard().equals(customerCard))
+            if (customer.getCustomerCard() != null && customer.getCustomerCard().equals(customerCard))
                 return false;
         }
 
