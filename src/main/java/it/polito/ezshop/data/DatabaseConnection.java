@@ -876,8 +876,6 @@ public class DatabaseConnection {
         } catch (SQLException ignore) { }
     }
 
-
-
     public void closeConnection(){
         if(CON != null){
             try {
