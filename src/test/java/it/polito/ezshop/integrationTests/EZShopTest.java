@@ -5,7 +5,9 @@ import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,8 +18,11 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class EZShopTest {
+    @Rule public TestName name = new TestName();
     private static final String sFILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
     EZShopInterface ezShop;
+
+    long startTime = 0;
 
     private void loginAs(String role){
         try {
@@ -49,10 +54,12 @@ public class EZShopTest {
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
         ezShop = new EZShop();
+        startTime = System.currentTimeMillis();
     }
 
     @After
     public void end() {
+        System.out.println("EZShopTest." + name.getMethodName() + "() -> " + (System.currentTimeMillis() - startTime) + " ms");
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(sFILE));
             writer.write("#Do not delete the lines preceded by an \"#\" and do not modify the first three credit cards\n" +
