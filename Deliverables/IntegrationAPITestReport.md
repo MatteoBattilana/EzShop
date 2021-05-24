@@ -97,23 +97,256 @@ We adopted a bottom up approach divided in the following steps:
 ## Step 2
 | Classes  | JUnit test cases |
 |--|--|
-| TransactionProduct.getProductType | TransactionProductTest.testName |
-|  | TransactionProductTest.testName |
-|  | TransactionProductTest.testName |
-| TransactionProduct.getBarCode | TransactionProductTest.testName |
-| | TransactionProductTest.testName |
-| | TransactionProductTest.testName |
-| | TransactionProductTest.testName |
+| TransactionProduct + ProductTypeImpl |TransactionProductTest.testProductType() |
+||TransactionProductTest.testPositiveSetBarCode() |
+||TransactionProductTest.testNullSetBarCode() |
+||TransactionProductTest.testInvalidSetBarCode() |
+||TransactionProductTest.testInvalidSetProductDescription() |
+||TransactionProductTest.testNullSetProductDescription() |
+||TransactionProductTest.testPositiveSetProductDescription() |
+||TransactionProductTest.testNegativeSetAmount() |
+||TransactionProductTest.testPositiveSetAmount() |
+||TransactionProductTest.testPricePerUnit() |
+||TransactionProductTest.testDiscountRate() |
+||TransactionProductTest.testApplyDiscountRateToProduct() |
+| OrderImplAdapter + OrderImpl |OrderImplAdapterTest.testPositiveBalanceId() |
+||OrderImplAdapterTest.testNegativeBalanceId() |
+||OrderImplAdapterTest.testSetProductCode() |
+||OrderImplAdapterTest.testSetPricePerUnit() |
+||OrderImplAdapterTest.testSetQuantity() |
+||OrderImplAdapterTest.testSetStatus() |
+||OrderImplAdapterTest.testNegativeSetOrderId() |
+||OrderImplAdapterTest.testPositiveSetOrderId() |
+|AccountBook + BalanceOperationImpl |AccountBookTest.testUnpaidBalanceOperation() |
+||AccountBookTest.testPaidBalanceOperation() |
+||AccountBookTest.testNullBalanceOperation() |
+||AccountBookTest.testUpdatedBalance() |
+||AccountBookTest.testNotUpdatedBalance() |
+||AccountBookTest.testComputeBalance() |
+||AccountBookTest.testOpListReset() |
+||AccountBookTest.testNullOpListReset() |
 
-## Step n
-
-
+## Step 3
 
 | Classes  | JUnit test cases |
 |--|--|
-|||
+|ReturnTransaction + TransactionProduct|ReturnTransactionTest.testAddProduct() |
+||ReturnTransactionTest.testGetMoney() |
+||ReturnTransactionTest.testComputeTotal() |
+||ReturnTransactionTest.testGetReturns() |
+
+## Step 4
+
+| Classes  | JUnit test cases |
+|--|--|
+|SaleTransactionImpl + ProductTypeImpl + TransactionProduct + ReturnTransaction|ReturnTransactionTest.testAddProduct() |SaleTransactionImplTest.testSecondConstructor() |
+||SaleTransactionImplTest.testStartReturnTransaction() |
+||SaleTransactionImplTest.testGetReturnTransactions() |
+||SaleTransactionImplTest.testAddProductToSale() |
+||SaleTransactionImplTest.testSetReturnProduct() |
+||SaleTransactionImplTest.testSetTransactionStatus() |
+||SaleTransactionImplTest.testSetTicketNumber() |
+||SaleTransactionImplTest.testSetDiscountRate() |
+||SaleTransactionImplTest.testGetMoney() |
+||SaleTransactionImplTest.testGetPrice() |
+||SaleTransactionImplTest.testComputeTotal() |
+||SaleTransactionImplTest.testDeleteProductFromSale() |
+||SaleTransactionImplTest.testComputePointsForSale() |
+||SaleTransactionImplTest.testGetReturnTransaction() |
+||SaleTransactionImplTest.testApplyDiscountRateToProduct() |
+||SaleTransactionImplTest.testDeleteReturnTransaction() |
+||SaleTransactionImplTest.testGetReturnTransactionTotal() |
+||SaleTransactionImplTest.testEndReturnTransaction() |
+||SaleTransactionImplTest.testSetPaidReturnTransaction() |
+||SaleTransactionImplTest.testReset() |
+||SaleTransactionImplTest.testEndSaleTransaction() |
+||SaleTransactionImplTest.testGetSoldQuantity() |
+||SaleTransactionImplTest.testGetTicketEntries() |
+||SaleTransactionImplTest.testDummySetters() |
+||SaleTransactionImplTest.testGetEntries() |
 
 
+## Step 5
+
+| Classes  | JUnit test cases |
+|--|--|
+|	DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl | DatabaseConnectionTest.testExecuteStartUpMultipleTimes() |
+||DatabaseConnectionTest.testExecuteStartUpInvalidFile() |
+||DatabaseConnectionTest.testWrongSchemaSQL() |
+||DatabaseConnectionTest.testCreateUser() |
+||DatabaseConnectionTest.testSetUserRole() |
+||DatabaseConnectionTest.testSetWrongRole() |
+||DatabaseConnectionTest.testDeleteUser() |
+||DatabaseConnectionTest.testGetAllUsers() |
+||DatabaseConnectionTest.testCreateOrder() |
+||DatabaseConnectionTest.testGetAllProducts() |
+||DatabaseConnectionTest.testCreateProductType() |
+||DatabaseConnectionTest.testUpdateProductType() |
+||DatabaseConnectionTest.testDeleteProductType() |
+||DatabaseConnectionTest.testSaveSaleTransaction() |
+||DatabaseConnectionTest.testGetAllSaleTransaction() |
+||DatabaseConnectionTest.testDeleteSaleTransaction() |
+||DatabaseConnectionTest.testUpdateSaleTransactionWithoutProducts() |
+||DatabaseConnectionTest.testUpdateSaleTransaction() |
+||DatabaseConnectionTest.testSaveBalanceOperation() |
+||DatabaseConnectionTest.testGetAllBalanceOperations() |
+||DatabaseConnectionTest.testGetAllReturnTransaction() |
+||DatabaseConnectionTest.testDeleteBalanceOperation() |
+||DatabaseConnectionTest.testUpdateOrder() |
+||DatabaseConnectionTest.testGetAllOrders() |
+||DatabaseConnectionTest.testDeleteOrder() |
+||DatabaseConnectionTest.testCreateCustomer() |
+||DatabaseConnectionTest.testUpdateCustomer() |
+||DatabaseConnectionTest.testGetAllCustomers() |
+||DatabaseConnectionTest.testGetAllCustomerCards() |
+||DatabaseConnectionTest.testDeleteCustomer() |
+||DatabaseConnectionTest.testCreateCustomerCard() |
+||DatabaseConnectionTest.testUpdateCustomerCard() |
+||DatabaseConnectionTest.testBalance() |
+||DatabaseConnectionTest.testAddProductToSale() |
+
+
+## Step 6 - API testing
+
+| Classes  | JUnit test cases |
+|--|--|
+| EZShop + DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl |EZShopTest.testCreateProduct() |
+||EZShopTest.testNotLoggedCreateProduct() |
+||EZShopTest.testWrongParametersCreateProduct() |
+||EZShopTest.testUpdateLocation() |
+||EZShopTest.testWrongLoginUpdateLocation() |
+||EZShopTest.testWrongParametersUpdateLocation() |
+||EZShopTest.testCreateUser() |
+||EZShopTest.testWrongParametersCreateUser() |
+||EZShopTest.testDeleteUser() |
+||EZShopTest.testWrongLoginDeleteUser() |
+||EZShopTest.testWrongParametersDeleteUser() |
+||EZShopTest.testGetAllUsers() |
+||EZShopTest.testWrongLoginGetAllUsers() |
+||EZShopTest.testGetUser() |
+||EZShopTest.testWrongLoginGetUser() |
+||EZShopTest.testUpdateUserRights() |
+||EZShopTest.testWrongLoginUpdateUserRights() |
+||EZShopTest.testWrongParametersUpdateUserRights() |
+||EZShopTest.testWrongParametersGetUser() |
+||EZShopTest.testLoginUsernameNull() |
+||EZShopTest.testLoginUsernameEmpty() |
+||EZShopTest.testLoginPasswordNull() |
+||EZShopTest.testLoginPasswordEmpty() |
+||EZShopTest.testLoginWrongPassword() |
+||EZShopTest.testLogin() |
+||EZShopTest.testLogout() |
+||EZShopTest.testUpdateProduct() |
+||EZShopTest.testWrongLoginUpdateProduct() |
+||EZShopTest.testWrongParamentersUpdateProduct() |
+||EZShopTest.testDeleteProductType() |
+||EZShopTest.testWrongLoginDeleteProductType() |
+||EZShopTest.testWrongParametersDeleteProductType() |
+||EZShopTest.testGetAllProductTypes() |
+||EZShopTest.testGetProductTypeByBarCode() |
+||EZShopTest.testWrongLoginGetProductTypeByBarCode() |
+||EZShopTest.testWrongParameterGetProductTypeByBarCode() |
+||EZShopTest.testGetProductTypesByDescription() |
+||EZShopTest.testUpdateQuantity() |
+||EZShopTest.testWrongLoginUpdateQuantity() |
+||EZShopTest.testWrongParametersUpdateQuantity() |
+||EZShopTest.testWrongParametersIssueOrder() |
+||EZShopTest.testWrongLoginIssueOrder() |
+||EZShopTest.testIssueOrder() |
+||EZShopTest.testPayOrderFor() |
+||EZShopTest.testWrongParametersPayOrderFor() |
+||EZShopTest.testWrongLoginPayOrderFor() |
+||EZShopTest.testNegativeBalancePayOrderFor() |
+||EZShopTest.testPayOrder() |
+||EZShopTest.testWrongLoginPayOrder() |
+||EZShopTest.testNegativeBalancePayOrder() |
+||EZShopTest.testWrongLogicPayOrder() |
+||EZShopTest.testAlreadyPayedPayOrder() |
+||EZShopTest.testWrongParametersPayOrder() |
+||EZShopTest.testRecordOrderArrival() |
+||EZShopTest.testLocationNotSetRecordOrderArrival() |
+||EZShopTest.testOrderNotPayedRecordOrderArrival() |
+||EZShopTest.testWrongLoginRecordOrderArrival() |
+||EZShopTest.testGetAllOrders() |
+||EZShopTest.testWrongLoginGetAllOrders() |
+||EZShopTest.testDefineCustomer() |
+||EZShopTest.testWrongLoginDefineCustomer() |
+||EZShopTest.testWrongParametersDefineCustomer() |
+||EZShopTest.testModifyCustomer() |
+||EZShopTest.testCardNotPresentModifyCustomer() |
+||EZShopTest.testDeleteCardModifyCustomer() |
+||EZShopTest.testDeleteCardModifyCustomer2() |
+||EZShopTest.testWrongLoginModifyCustomer() |
+||EZShopTest.testWrongParametersModifyCustomer() |
+||EZShopTest.testDeleteCustomer() |
+||EZShopTest.testWrongLoginDeleteCustomer() |
+||EZShopTest.testWrongParametersDeleteCustomer() |
+||EZShopTest.testGetCustomer() |
+||EZShopTest.testWrongLoginGetCustomer() |
+||EZShopTest.testWrongParametersGetCustomer() |
+||EZShopTest.testGetAllCustomers() |
+||EZShopTest.testWrongLoginGetAllCustomers() |
+||EZShopTest.testStartSaleTransaction() |
+||EZShopTest.testWrongLoginStartSaleTransaction() |
+||EZShopTest.testAddProductToSale() |
+||EZShopTest.testWrongLoginAddProductToSale() |
+||EZShopTest.testWrongParametersAddProductToSale() |
+||EZShopTest.testDeleteProductToSale() |
+||EZShopTest.testWrongLoginDeleteProductToSale() |
+||EZShopTest.testWrongParametersDeleteProductToSale() |
+||EZShopTest.testApplyDiscountRateToProduct() |
+||EZShopTest.testWrongLoginApplyDiscountRateToProduct() |
+||EZShopTest.testWrongParametersApplyDiscountRateToProduct() |
+||EZShopTest.testApplyDiscountRateToSale() |
+||EZShopTest.testWrongLoginApplyDiscountRateToSale() |
+||EZShopTest.testWrongParameterApplyDiscountRateToSale() |
+||EZShopTest.testComputePointsForSale() |
+||EZShopTest.testWrongLoginComputePointsForSale() |
+||EZShopTest.testWrongParametersComputePointsForSale() |
+||EZShopTest.testEndSaleTransaction() |
+||EZShopTest.testWrongLoginEndSaleTransaction() |
+||EZShopTest.testWrongParametersEndSaleTransaction() |
+||EZShopTest.testDeleteSaleTransaction() |
+||EZShopTest.testWrongLoginDeleteSaleTransaction() |
+||EZShopTest.testWrongParametersDeleteSaleTransaction() |
+||EZShopTest.testNormalSale2() |
+||EZShopTest.testGetSaleTransaction() |
+||EZShopTest.testWrongLoginGetSaleTransaction() |
+||EZShopTest.testWrongParametersGetSaleTransaction() |
+||EZShopTest.testStartReturnTransaction() |
+||EZShopTest.testWrongLoginStartReturnTransaction() |
+||EZShopTest.testWrongParametersStartReturnTransaction() |
+||EZShopTest.testWrongLoginReturnProduct() |
+||EZShopTest.testWrongParametersReturnProduct() |
+||EZShopTest.testReturnTransactionDeleteBeforePay() |
+||EZShopTest.testReturnTransactionCommitFalse() |
+||EZShopTest.testWrongLoginEndReturnTransaction() |
+||EZShopTest.testCreateCard() |
+||EZShopTest.testNotLoggedCreateCard() |
+||EZShopTest.testModifyPointsOnCard() |
+||EZShopTest.testWrongLoginModifyPointsOnCard() |
+||EZShopTest.testWrongParametersModifyPointsOnCard() |
+||EZShopTest.testAttachCardToCustomer() |
+||EZShopTest.testWrongLoginAttachCardToCustomer() |
+||EZShopTest.testWrongParametersAttachCardToCustomer() |
+||EZShopTest.testWrongParametersEndReturnTransaction() |
+||EZShopTest.testWrongLoginDeleteReturnTransaction() |
+||EZShopTest.testWrongParametersDeleteReturnTransaction() |
+||EZShopTest.testWrongLoginReceiveCashPayment() |
+||EZShopTest.testWrongParametersReceiveCashPayment() |
+||EZShopTest.testReceiveCreditCardPayment() |
+||EZShopTest.testWrongLoginReceiveCreditCardPayment() |
+||EZShopTest.testWrongParametersReceiveCreditCardPayment() |
+||EZShopTest.testWrongLoginReturnCashPayment() |
+||EZShopTest.testWrongParametersReturnCashPayment() |
+||EZShopTest.testReturnCreditCardPayment() |
+||EZShopTest.testWrongLoginReturnCreditCardPayment() |
+||EZShopTest.testWrongParametersReturnCreditCardPayment() |
+||EZShopTest.testRecordBalanceUpdate() |
+||EZShopTest.testWrongLoginRecordBalanceUpdate() |
+||EZShopTest.testWrongLoginGetCreditsAndDebits() |
+||EZShopTest.testReset() |
+||EZShopTest.testLoadFromDB() |
 
 
 # Scenarios
