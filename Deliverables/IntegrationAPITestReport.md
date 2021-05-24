@@ -469,11 +469,9 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 |           |                              |   EZShopTest.testUpdateLocation()|    
 |  1-2         | FR3                             | EZShopTest.testGetProductTypeByBarCode()  |
 | | |EZShopTest.testUpdateLocation() |
-|  1-3         | FR3                             |  
-EZShopTest.testGetProductTypeByBarCode()  |
+|  1-3         | FR3|  EZShopTesttestGetProductTypeByBarCode()  |
 | | |EZShopTest.testUpdateProduct() |
-|  1-4        | FR3.2                            |  
-EZShopTest.testDeleteProductType()   |
+|  1-4        | FR3.2    |  EZShopTest.testDeleteProductType()   |
 |  2-1         | FR1                             |  EZShopTest.testCreateUser() |
 |  2-2         | FR1.2                             | EZShopTest.testDeleteUser()  |
 |  2-3         | FR1.5                             |  EZShopTest.testUpdateUserRights() |
@@ -526,15 +524,11 @@ EZShopTest.testDeleteProductType()   |
 | | |EZShopTest.testDeleteProductToSale() |
 | | |EZShopTest.testEndSaleTransaction()  |
 | | |EZShopTest.testReceiveCreditCardPayment()  |
-| 7-1       |               FR7.2              | 
-EZShopTest.testReceiveCreditCardPayment()|
-| 7-2      |       FR7.2                           | 
-EZShopTest.testReceiveCreditCardPayment()|
+| 7-1       |               FR7.2     |EZShopTest.testReceiveCreditCardPayment()|
+| 7-2      |       FR7.2                           | EZShopTest.testReceiveCreditCardPayment()|
 | | | EZShopTest.testWrongParametersReceiveCreditCardPayment()|
-| 7-3      |     FR7.2                             | 
-EZShopTest.testReceiveCreditCardPayment()|
-| 7-4       |   FR7.1                          | 
-EZShopTest.testNormalSale2()|
+| 7-3      |     FR7.2                                         |EZShopTest.testReceiveCreditCardPayment()|
+| 7-4       |   FR7.1                       |EZShopTest.testNormalSale2()|
 | 8-1       |     FR6.12-FR6.14-FR6.15- FR7.4      |   EZShopTest.testStartReturnTransaction()|
 | | |EZShopTest.testReturnCreditCardPayment() |
 | 8-2      |   FR6.12-FR6.14-FR6.15- FR7.3    |   EZShopTest.testStartReturnTransaction()|
