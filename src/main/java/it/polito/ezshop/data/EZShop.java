@@ -622,25 +622,24 @@ public class EZShop implements EZShopInterface {
 
         // Check barcode validity
         ProductType product = getProductTypeByBarCode(productCode);
-        if (product == null)
-            return -1;
-
-        if (accountBook.computeBalance() - quantity * pricePerUnit >= 0) {
-            // New order id
-            int newIdOrder = 0;
-            for (Integer id : orders.keySet()) {
-                if (id > newIdOrder) {
-                    newIdOrder = id;
+        if (product != null) {
+            if (accountBook.computeBalance() - quantity * pricePerUnit >= 0) {
+                // New order id
+                int newIdOrder = 0;
+                for (Integer id : orders.keySet()) {
+                    if (id > newIdOrder) {
+                        newIdOrder = id;
+                    }
                 }
-            }
 
-            // Add the order to the system
-            OrderImpl operation = new OrderImpl(newIdOrder + 1, productCode, pricePerUnit, quantity, "PAID", "PAYED");
-            if(databaseConnection.createOrder(operation)) {
-                accountBook.recordBalanceUpdate(operation.getMoney());
-                accountBook.add(operation);
-                orders.put(operation.getBalanceId(), operation);
-                return operation.getBalanceId();
+                // Add the order to the system
+                OrderImpl operation = new OrderImpl(newIdOrder + 1, productCode, pricePerUnit, quantity, "PAID", "PAYED");
+                if (databaseConnection.createOrder(operation)) {
+                    accountBook.recordBalanceUpdate(operation.getMoney());
+                    accountBook.add(operation);
+                    orders.put(operation.getBalanceId(), operation);
+                    return operation.getBalanceId();
+                }
             }
         }
         return -1;
@@ -880,7 +879,7 @@ public class EZShop implements EZShopInterface {
         }
 
         CustomerImpl customer = customers.get(id);
-        if(databaseConnection.deleteCustomer(customer)) {
+        if(customer != null && databaseConnection.deleteCustomer(customer)) {
             customers.remove(id);
             return true;
         }
@@ -947,7 +946,7 @@ public class EZShop implements EZShopInterface {
         }
 
         // Save the card
-        CustomerCardImpl customerCard = new CustomerCardImpl(String.format("%010d", ++last), 0);
+        CustomerCardImpl customerCard = new CustomerCardImpl(String.format("%010d", last + 1), 0);
         if(databaseConnection.createCustomerCard(customerCard)) {
             customerCards.put(
                     customerCard.getCustomer(),
@@ -997,7 +996,7 @@ public class EZShop implements EZShopInterface {
 
         // Link card to user
         CustomerImpl customer = customers.get(customerId);
-        if (card != null && customer != null && customer.getCustomerCard() == null) {
+        if (card != null && customer != null) {
             customer.setCustomerCard(card);
             return databaseConnection.updateCustomer(customer);
         }
@@ -1026,7 +1025,7 @@ public class EZShop implements EZShopInterface {
         // Check logged user
         validateLoggedUser("Cashier");
 
-        if ( customerCard== null || customerCard.isEmpty()){
+        if ( customerCard== null || customerCard.isEmpty() || !Pattern.compile("[0-9]{10}").matcher(customerCard).matches()){
             throw new InvalidCustomerCardException("Customer Card is not valid");
         }
 

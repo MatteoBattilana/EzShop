@@ -969,7 +969,9 @@ public class EZShopTest {
         loginAs("Cashier");
         Integer id = ezShop.defineCustomer("lucas");
 
+        String card1 = ezShop.createCard();
         String card = ezShop.createCard();
+        assertTrue(card1.compareTo(card) < 0);
         assertTrue(ezShop.modifyCustomer(id, "luca", card));
         Customer customer = ezShop.getCustomer(id);
         assertNotNull(customer);
@@ -1054,6 +1056,7 @@ public class EZShopTest {
 
         assertTrue(ezShop.deleteCustomer(id));
         assertFalse(ezShop.deleteCustomer(id));
+        assertFalse(ezShop.deleteCustomer(100));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -1920,7 +1923,10 @@ public class EZShopTest {
             ezShop.modifyPointsOnCard("",12);
             fail();
         } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
-
+        try {
+            ezShop.modifyPointsOnCard("121",12);
+            fail();
+        } catch (InvalidCustomerCardException ignored) {} catch (Exception ignored) {fail();}
         try {
             ezShop.modifyPointsOnCard(null,12);
             fail();
@@ -1931,9 +1937,11 @@ public class EZShopTest {
     public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidCustomerNameException {
         loginAs("Cashier");
         String card = ezShop.createCard();
+        String card1 = ezShop.createCard();
         Integer customerId = ezShop.defineCustomer("matteo");
         Integer customerId2 = ezShop.defineCustomer("luca");
         assertNull(ezShop.getCustomer(customerId).getCustomerCard());
+        assertTrue(ezShop.attachCardToCustomer(card1, customerId));
         assertTrue(ezShop.attachCardToCustomer(card, customerId));
         assertEquals(0, ezShop.getCustomer(customerId).getPoints().intValue());
 
