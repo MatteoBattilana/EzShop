@@ -1219,7 +1219,7 @@ public class EZShopTest {
     }
 
     @Test
-    public void testDeleteProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
+    public void testDeleteProductToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException, InvalidPaymentException {
         loginAs("ShopManager");
         Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
         ezShop.updatePosition(productType, "1-3-2");
@@ -1237,6 +1237,12 @@ public class EZShopTest {
         assertFalse(ezShop.deleteProductFromSale(saleId, "01234567890128", 1));
         assertFalse(ezShop.deleteProductFromSale(saleId, "1234567890128", 1));
         assertFalse(ezShop.deleteProductFromSale(100, "01234567890128", 1));
+
+        // Not allow delete products
+        ezShop.endSaleTransaction(saleId);
+        assertFalse(ezShop.deleteProductFromSale(saleId, "01234567890128", 1));
+        ezShop.receiveCashPayment(saleId, 100);
+        assertFalse(ezShop.deleteProductFromSale(saleId, "01234567890128", 1));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -1358,7 +1364,7 @@ public class EZShopTest {
     }
 
     @Test
-    public void testApplyDiscountRateToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidLocationException, InvalidDiscountRateException {
+    public void testApplyDiscountRateToSale() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidLocationException, InvalidDiscountRateException, InvalidPaymentException {
         loginAs("ShopManager");
         Integer productType = ezShop.createProductType("apple", "01234567890128", 1.99, "note");
         ezShop.updatePosition(productType, "1-3-2");
@@ -1368,6 +1374,10 @@ public class EZShopTest {
 
         assertTrue(ezShop.applyDiscountRateToSale(saleId, 0.1));
         assertFalse(ezShop.applyDiscountRateToSale(100, 0.1));
+        ezShop.endSaleTransaction(saleId);
+        assertTrue(ezShop.applyDiscountRateToSale(saleId, 0.1));
+        ezShop.receiveCashPayment(saleId, 100);
+        assertFalse(ezShop.applyDiscountRateToSale(saleId, 0.1));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -1452,7 +1462,7 @@ public class EZShopTest {
     }
 
     @Test
-    public void testEndSaleTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException {
+    public void testEndSaleTransaction() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidPaymentException {
         loginAs("ShopManager");
         double initialBalance = ezShop.computeBalance();
         Integer productType = ezShop.createProductType("apple", "01234567890128", 6.99, "note");
@@ -1478,6 +1488,11 @@ public class EZShopTest {
         for (BalanceOperation op: ezShop.getCreditsAndDebits(null, null))
             if (op.getType().equals("SALE")) find = true;
         assertFalse(find);
+
+        ezShop.receiveCashPayment(saleId, 100);
+        assertFalse(ezShop.endSaleTransaction(saleId));
+        assertFalse(ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.1));
+        assertFalse(ezShop.deleteSaleTransaction(saleId));
     }
 
     @Test (expected = UnauthorizedException.class)
@@ -1645,13 +1660,23 @@ public class EZShopTest {
         ezShop.addProductToSale(saleId, "01234567890128", 2);
         ezShop.applyDiscountRateToProduct(saleId, "01234567890128", 0.1);
         ezShop.applyDiscountRateToSale(saleId, 0.5);
+
+        Integer returnId = ezShop.startReturnTransaction(saleId);
+        assertEquals(-1, returnId.intValue());
+
         ezShop.endSaleTransaction(saleId);
+
+        returnId = ezShop.startReturnTransaction(saleId);
+        assertEquals(-1, returnId.intValue());
+
+        assertFalse(ezShop.addProductToSale(saleId, "1234567890128", 1));
         ezShop.receiveCashPayment(saleId, 100);
+        assertFalse(ezShop.addProductToSale(saleId, "1234567890128", 1));
         double initialBalance = ezShop.computeBalance();
 
         Integer invalidSaleId = ezShop.startReturnTransaction(100);
         assertEquals(-1, invalidSaleId.intValue());
-        Integer returnId = ezShop.startReturnTransaction(saleId);
+        returnId = ezShop.startReturnTransaction(saleId);
         assertNotEquals(-1, returnId.intValue());
         assertFalse(ezShop.returnProduct(returnId, "1234567890128", 6));
         assertTrue(ezShop.returnProduct(returnId, "1234567890128", 2));
@@ -1808,6 +1833,7 @@ public class EZShopTest {
 
         assertTrue(ezShop.deleteReturnTransaction(returnId));
         assertFalse(ezShop.endReturnTransaction(returnId, false));
+        assertFalse(ezShop.endReturnTransaction(returnId, true));
         assertEquals(initialBalance, ezShop.computeBalance(), 0.1);
         assertEquals(5, ezShop.getProductTypeByBarCode("1234567890128").getQuantity().intValue());
         assertEquals(8, ezShop.getProductTypeByBarCode("01234567890128").getQuantity().intValue());

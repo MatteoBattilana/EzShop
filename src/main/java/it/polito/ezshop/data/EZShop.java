@@ -1362,7 +1362,7 @@ public class EZShop implements EZShopInterface {
 
         // Start return transaction and add it to AccountBook
         SaleTransactionImpl saleTransaction = allSales.get(transactionId);
-        if(saleTransaction != null) {
+        if(saleTransaction != null && saleTransaction.getStatus().equals("PAID")) {
             // Next id
             int id = 0;
             for (SaleTransactionImpl sale : allSales.values())
