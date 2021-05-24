@@ -1180,10 +1180,11 @@ public class EZShop implements EZShopInterface {
         // Check discount rate
         if(discountRate < 0.0 || discountRate > 1.0) throw new InvalidDiscountRateException();
 
+        ProductType product = getProductTypeByBarCode(productCode);
         // Set discount rate to product on sale
         SaleTransactionImpl transaction = allSales.get(transactionId);
-        if (transaction != null) {
-            return transaction.applyDiscountRateToProduct(getProductTypeByBarCode(productCode), discountRate);
+        if (product != null && transaction != null) {
+            return transaction.applyDiscountRateToProduct(product, discountRate);
         }
         return false;
     }
@@ -1671,7 +1672,7 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
         if(sale != null) {
             double returnTotal = sale.getReturnTransactionTotal(returnId);
-            if (creditCardCircuit.pay(creditCard, -returnTotal)) {
+            if (returnTotal != -1 && creditCardCircuit.pay(creditCard, -returnTotal)) {
                 if (sale.setPaidReturnTransaction(returnId)) {
                     accountBook.recordBalanceUpdate(-returnTotal);
                     accountBook.add(sale.getReturnTransaction(returnId));

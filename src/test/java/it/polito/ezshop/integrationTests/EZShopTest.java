@@ -2150,6 +2150,7 @@ public class EZShopTest {
         double initialBalance = ezShop.computeBalance();
         Integer returnId = ezShop.startReturnTransaction(saleId);
         assertTrue(ezShop.returnProduct(returnId, "1234567890128", 2));
+        assertEquals(-1, ezShop.returnCreditCardPayment(returnId, "4716258050958645"), 0.1);
         assertTrue(ezShop.endReturnTransaction(returnId, true));
 
         assertEquals(2*1, ezShop.returnCreditCardPayment(returnId, "4716258050958645"), 0.1);
