@@ -202,6 +202,7 @@ public class DatabaseConnectionTest {
     public void testUpdateProductType() {
         ProductTypeImpl p1 = new ProductTypeImpl(10, "1-A-2", "note", "apple", "1234567890128", 3.99, 1);
         assertTrue(databaseConnection.createProductType(p1));
+        assertTrue(databaseConnection.updateProductType(p1));
 
         p1.setPosition("1-A-3");
         p1.setQuantity(12);

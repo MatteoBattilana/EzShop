@@ -510,16 +510,19 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId <= 0) throw new InvalidProductIdException();
 
         // Check position format
-        if (newPos != null){
+        if (newPos != null && !newPos.isEmpty()){
             String[] positionArray = newPos.split("-");
             if(!Pattern.compile("[0-9]+").matcher(positionArray[0]).matches() || !Pattern.compile("[0-9]+").matcher(positionArray[2]).matches())
                 throw new InvalidLocationException();
-        } else throw new InvalidLocationException();
 
-        // Check if the position is used by other products
-        for (ProductType p : products.values()) {
-            if (p.getLocation() != null && p.getLocation().equals(newPos))
-                return false;
+            // Check if the position is used by other products
+            for (ProductType p : products.values()) {
+                if (p.getLocation() != null && p.getLocation().equals(newPos))
+                    return false;
+            }
+        }
+        else {
+            newPos = null;
         }
 
         // Set the new position only if the product exists

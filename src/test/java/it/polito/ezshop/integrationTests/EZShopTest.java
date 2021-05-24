@@ -133,7 +133,16 @@ public class EZShopTest {
         assertTrue(ezShop.updatePosition(productTypeId, "1-3e-4"));
         assertFalse(ezShop.updatePosition(productTypeId2, "1-3e-4"));
 
+        assertTrue(ezShop.updatePosition(productTypeId, ""));
         ProductType productTypeByBarCode = ezShop.getProductTypeByBarCode("1234567890128");
+        assertNull(null, productTypeByBarCode.getLocation());
+
+        assertTrue(ezShop.updatePosition(productTypeId, null));
+        productTypeByBarCode = ezShop.getProductTypeByBarCode("1234567890128");
+        assertNull(null, productTypeByBarCode.getLocation());
+
+        assertTrue(ezShop.updatePosition(productTypeId, "1-3e-4"));
+        productTypeByBarCode = ezShop.getProductTypeByBarCode("1234567890128");
         assertEquals("1-3e-4", productTypeByBarCode.getLocation());
     }
 
@@ -160,10 +169,6 @@ public class EZShopTest {
         } catch (InvalidProductIdException ignored) {} catch (Exception ignored) {fail();}
         assertFalse(ezShop.updatePosition(100, "1-3a-4"));
 
-        try {
-            ezShop.updatePosition(productTypeId, null);
-            fail();
-        } catch (InvalidLocationException ignored) {} catch (Exception ignored) {fail();}
         try {
             ezShop.updatePosition(productTypeId, "1-8t-a");
             fail();
