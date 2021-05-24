@@ -19,7 +19,6 @@ public class EZShopTest {
     EZShop ezShop;
 
     long startTime = 0;
-    private DatabaseConnection databaseConnection;
 
     private void loginAs(String role){
         try {
@@ -55,8 +54,7 @@ public class EZShopTest {
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
 
-        databaseConnection = new DatabaseConnection();
-        ezShop = new EZShop(databaseConnection);
+        ezShop = new EZShop();
         startTime = System.currentTimeMillis();
     }
 
@@ -78,7 +76,7 @@ public class EZShopTest {
         catch (Exception ex) {
             fail();
         }
-        databaseConnection.closeConnection();
+        ezShop.close();
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
     }
@@ -2302,9 +2300,8 @@ public class EZShopTest {
         assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
         assertNull(ezShop.getSaleTransaction(saleId));
 
-        databaseConnection.closeConnection();
-        databaseConnection = new DatabaseConnection();
-        ezShop = new EZShop(databaseConnection);
+        ezShop.close();
+        ezShop = new EZShop();
         loginAs("Administrator");
         assertEquals(0, ezShop.getAllOrders().size());
         assertEquals(0, ezShop.getAllProductTypes().size());
@@ -2379,9 +2376,8 @@ public class EZShopTest {
 
         // Try simulate on-off-on
 
-        databaseConnection.closeConnection();
-        databaseConnection = new DatabaseConnection();
-        ezShop = new EZShop(databaseConnection);
+        ezShop.close();
+        ezShop = new EZShop();
         loginAs("Administrator");
         assertEquals(1, ezShop.getAllOrders().size());
         assertEquals(2, ezShop.getAllProductTypes().size());

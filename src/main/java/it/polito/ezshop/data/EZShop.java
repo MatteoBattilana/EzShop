@@ -31,15 +31,15 @@ public class EZShop implements EZShopInterface {
     private User loggedUser;
 
     public EZShop() {
-        this(new DatabaseConnection());
-    }
-
-    public EZShop(DatabaseConnection databaseConnection) {
-        this.databaseConnection = databaseConnection;
+        databaseConnection = new DatabaseConnection();
         loggedUser = null;
         creditCardCircuit = new CreditCardCircuit(CREDIT_CARD_FILE);
         accountBook = new AccountBook(databaseConnection);
         loadFromDb();
+    }
+
+    public void close() {
+        databaseConnection.closeConnection();
     }
 
     /**
