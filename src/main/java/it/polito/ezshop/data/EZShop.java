@@ -107,9 +107,10 @@ public class EZShop implements EZShopInterface {
                     user.getId(),
                     user
             );
+            return newId;
         }
 
-        return newId;
+        return -1;
     }
 
     /**
