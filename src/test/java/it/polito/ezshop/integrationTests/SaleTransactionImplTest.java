@@ -2,17 +2,35 @@ package it.polito.ezshop.integrationTests;
 
 import it.polito.ezshop.data.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.Assert.*;
 
 public class SaleTransactionImplTest {
+    private DatabaseConnection databaseConnection;
+
+    @Before
+    public void setUp() throws Exception {
+        File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
+        f.delete();
+        databaseConnection = new DatabaseConnection();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        databaseConnection.closeConnection();
+        File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
+        f.delete();
+    }
+    
     @Test
     public void testSecondConstructor() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         assertEquals(LocalDate.now(), sale.getDate());
         assertEquals("SALE", sale.getType());
@@ -23,7 +41,6 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testStartReturnTransaction() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ReturnTransaction returnT =sale.startReturnTransaction(2);
         assertNotNull(returnT);
@@ -34,7 +51,6 @@ public class SaleTransactionImplTest {
 
     @Test
     public void testGetReturnTransactions() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         List<ReturnTransaction> returns = new ArrayList<>();
         ReturnTransaction returnT = sale.startReturnTransaction(2);
@@ -47,7 +63,6 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testAddProductToSale() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         assertTrue(sale.addProductToSale(product,2));
@@ -61,7 +76,6 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testSetReturnProduct() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
@@ -76,7 +90,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testSetTransactionStatus() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.setTransactionStatus("CLOSED");
         assertEquals("CLOSED",sale.getTransactionStatus());
@@ -84,7 +98,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testSetTicketNumber() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.setTicketNumber(4);
         assertEquals(4,sale.getTicketNumber(),1);
@@ -92,7 +106,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testSetDiscountRate() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.setDiscountRate(0.45);
         assertEquals(0.45,sale.getDiscountRate(),0.01);
@@ -100,7 +114,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testGetMoney() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
@@ -111,7 +125,7 @@ public class SaleTransactionImplTest {
         }
     @Test
     public void testGetPrice() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
@@ -123,7 +137,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testComputeTotal() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
@@ -134,7 +148,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testDeleteProductFromSale() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
@@ -151,7 +165,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testComputePointsForSale() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         int points =( int) (Math.floor(sale.getMoney()/10.0));
         assertEquals(points,sale.computePointsForSale());
@@ -159,7 +173,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testGetReturnTransaction() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ReturnTransaction returnT =sale.startReturnTransaction(2);
         assertEquals(returnT,sale.getReturnTransaction(2));
@@ -168,7 +182,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testApplyDiscountRateToProduct() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
@@ -184,7 +198,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testDeleteReturnTransaction() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.startReturnTransaction(2);
         assertTrue(sale.deleteReturnTransaction(2));
@@ -197,7 +211,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testGetReturnTransactionTotal() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ReturnTransaction returnT =  sale.startReturnTransaction(3);
         returnT.setStatus("CLOSED");
@@ -209,7 +223,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testEndReturnTransaction() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.startReturnTransaction(2);
         assertTrue(sale.endReturnTransaction(2,false));
@@ -221,7 +235,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testSetPaidReturnTransaction() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ReturnTransaction returnT =  sale.startReturnTransaction(3);
         ReturnTransaction returnT2 =  sale.startReturnTransaction(4);
@@ -247,7 +261,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testReset() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ReturnTransaction returnT =  sale.startReturnTransaction(3);
         sale.startReturnTransaction(4);
@@ -266,7 +280,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testEndSaleTransaction() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         assertTrue(sale.endSaleTransaction());
         assertEquals("CLOSED",sale.getTransactionStatus());
@@ -275,7 +289,7 @@ public class SaleTransactionImplTest {
     }
     @Test
     public void testGetSoldQuantity() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);
         sale.addProductToSale(apple,8);
@@ -286,7 +300,7 @@ public class SaleTransactionImplTest {
 }
     @Test
     public void testGetTicketEntries() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         Map <Integer, ReturnTransaction> returns = new HashMap<>();
         Map<ProductTypeImpl, TransactionProduct> tickets= new HashMap<>();
         ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);
@@ -302,7 +316,7 @@ public class SaleTransactionImplTest {
 
     @Test
     public void testDummySetters(){
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         SaleTransactionImpl saleTransaction = new SaleTransactionImpl(databaseConnection, 1);
 
         saleTransaction.setEntries(Collections.emptyList());
@@ -312,7 +326,7 @@ public class SaleTransactionImplTest {
 
     @Test
     public void testGetEntries() {
-        DatabaseConnection databaseConnection = new DatabaseConnection();
+        
         Map <Integer, ReturnTransaction> returns = new HashMap<>();
         Map<ProductTypeImpl, TransactionProduct> tickets= new HashMap<>();
         ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);

@@ -2,6 +2,7 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 
+import javax.xml.crypto.Data;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -30,8 +31,12 @@ public class EZShop implements EZShopInterface {
     private User loggedUser;
 
     public EZShop() {
+        this(new DatabaseConnection());
+    }
+
+    public EZShop(DatabaseConnection databaseConnection) {
+        this.databaseConnection = databaseConnection;
         loggedUser = null;
-        databaseConnection = new DatabaseConnection();
         creditCardCircuit = new CreditCardCircuit(CREDIT_CARD_FILE);
         accountBook = new AccountBook(databaseConnection);
         loadFromDb();

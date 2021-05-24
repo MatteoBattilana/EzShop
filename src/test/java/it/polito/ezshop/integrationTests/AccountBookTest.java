@@ -16,16 +16,19 @@ import static org.junit.Assert.*;
 
 public class AccountBookTest {
     AccountBook accountBook;
+    private DatabaseConnection database;
 
     @Before
     public void setup() {
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
-        accountBook = new AccountBook(new DatabaseConnection());
+        database = new DatabaseConnection();
+        accountBook = new AccountBook(database);
     }
 
     @After
     public void cleanup() {
+        database.closeConnection();
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
     }

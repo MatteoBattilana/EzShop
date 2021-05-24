@@ -16,17 +16,22 @@ import static org.junit.Assert.*;
 
 public class EZShopTest {
     private static final String sFILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
-    EZShopInterface ezShop;
+    EZShop ezShop;
 
     long startTime = 0;
+    private DatabaseConnection databaseConnection;
 
     private void loginAs(String role){
         try {
             ezShop.createUser("username" + role, "password", role);
-            ezShop.login("username" + role, "password");
-        } catch (Exception ex) {
+        }
+        catch (Exception ignored) {}
+        try {
+            assertNotNull(ezShop.login("username" + role, "password"));
+        } catch (Exception ignored) {
             fail();
         }
+
     }
 
     @Before
@@ -49,7 +54,9 @@ public class EZShopTest {
 
         File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
         f.delete();
-        ezShop = new EZShop();
+
+        databaseConnection = new DatabaseConnection();
+        ezShop = new EZShop(databaseConnection);
         startTime = System.currentTimeMillis();
     }
 
@@ -71,6 +78,9 @@ public class EZShopTest {
         catch (Exception ex) {
             fail();
         }
+        databaseConnection.closeConnection();
+        File f = new File("src/main/java/it/polito/ezshop/utils/database.db");
+        f.delete();
     }
 
     @Test
@@ -2292,7 +2302,9 @@ public class EZShopTest {
         assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
         assertNull(ezShop.getSaleTransaction(saleId));
 
-        ezShop = new EZShop();
+        databaseConnection.closeConnection();
+        databaseConnection = new DatabaseConnection();
+        ezShop = new EZShop(databaseConnection);
         loginAs("Administrator");
         assertEquals(0, ezShop.getAllOrders().size());
         assertEquals(0, ezShop.getAllProductTypes().size());
@@ -2366,7 +2378,10 @@ public class EZShopTest {
         assertNotNull(ezShop.getSaleTransaction(saleId));
 
         // Try simulate on-off-on
-        ezShop = new EZShop();
+
+        databaseConnection.closeConnection();
+        databaseConnection = new DatabaseConnection();
+        ezShop = new EZShop(databaseConnection);
         loginAs("Administrator");
         assertEquals(1, ezShop.getAllOrders().size());
         assertEquals(2, ezShop.getAllProductTypes().size());

@@ -875,4 +875,16 @@ public class DatabaseConnection {
             CON.setAutoCommit(state);
         } catch (SQLException ignore) { }
     }
+
+
+
+    public void closeConnection(){
+        if(CON != null){
+            try {
+                CON.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
 }
