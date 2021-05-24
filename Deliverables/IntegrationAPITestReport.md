@@ -190,7 +190,6 @@ We adopted a bottom up approach divided in the following steps:
 |--|--|
 |	DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl | DatabaseConnectionTest.testExecuteStartUpMultipleTimes() |
 ||DatabaseConnectionTest.testExecuteStartUpInvalidFile() |
-||DatabaseConnectionTest.testWrongSchemaSQL() |
 ||DatabaseConnectionTest.testCreateUser() |
 ||DatabaseConnectionTest.testSetUserRole() |
 ||DatabaseConnectionTest.testSetWrongRole() |

@@ -59,24 +59,6 @@ public class DatabaseConnectionTest {
     }
 
     @Test
-    public void testWrongSchemaSQL() throws IOException {
-        File f = new File("src/main/java/it/polito/ezshop/utils/schema.sql");
-        if (f.exists() && f.isFile()) {
-            f.renameTo(new File("src/main/java/it/polito/ezshop/utils/schema_bak.sql"));
-        }
-        FileWriter myWriter = new FileWriter("src/main/java/it/polito/ezshop/utils/schema.sql");
-        myWriter.write("NOT SQL statements");
-        myWriter.close();
-
-        databaseConnection.closeConnection();
-        databaseConnection = new DatabaseConnection();
-        File fileBak = new File("src/main/java/it/polito/ezshop/utils/schema_bak.sql");
-        if (fileBak.exists() && fileBak.isFile()) {
-            fileBak.renameTo(f);
-        }
-    }
-
-    @Test
     public void testCreateUser() {
         UserImpl user = new UserImpl(1, "matteo", "password", "Cashier");
         assertTrue(databaseConnection.createUser(user));
