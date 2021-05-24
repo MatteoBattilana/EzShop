@@ -190,6 +190,7 @@ public class SaleTransactionImplTest {
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.startReturnTransaction(2);
         assertTrue(sale.deleteReturnTransaction(2));
+        assertFalse(sale.deleteReturnTransaction(2));
         assertFalse(sale.deleteReturnTransaction(-1));
         assertFalse(sale.deleteReturnTransaction(4));
         ReturnTransaction returnT =  sale.startReturnTransaction(3);
