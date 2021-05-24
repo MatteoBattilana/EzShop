@@ -51,6 +51,7 @@ public class SaleTransactionImplTest {
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         assertTrue(sale.addProductToSale(product,2));
+        assertEquals(3,product.getQuantity(),1);
         assertTrue(sale.addProductToSale(product,3));
         assertFalse(sale.addProductToSale(null,1));
         assertFalse(sale.addProductToSale(product,1));
@@ -138,8 +139,9 @@ public class SaleTransactionImplTest {
         ProductTypeImpl product = new ProductTypeImpl(5, "shelves", "good", "red", "010003004367", 0.50, 50);
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
         sale.addProductToSale(product,3);
-        assertTrue(sale.deleteProductFromSale(product,2));
         assertTrue(sale.deleteProductFromSale(product,1));
+        assertEquals(4,product.getQuantity(),1);
+        assertTrue(sale.deleteProductFromSale(product,2));
         assertFalse(sale.deleteProductFromSale(null,1));
         assertFalse(sale.deleteProductFromSale(product,10));
         sale.setTransactionStatus("CLOSED");
@@ -186,6 +188,7 @@ public class SaleTransactionImplTest {
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         sale.startReturnTransaction(2);
         assertTrue(sale.deleteReturnTransaction(2));
+        assertFalse(sale.deleteReturnTransaction(2));
         assertFalse(sale.deleteReturnTransaction(-1));
         assertFalse(sale.deleteReturnTransaction(4));
         ReturnTransaction returnT =  sale.startReturnTransaction(3);
