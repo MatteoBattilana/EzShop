@@ -1183,7 +1183,7 @@ public class EZShop implements EZShopInterface {
         if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
 
         // Check discount rate
-        if(discountRate < 0.0 || discountRate > 1.0) throw new InvalidDiscountRateException();
+        if(discountRate < 0.0 || discountRate >= 1.0) throw new InvalidDiscountRateException();
 
         ProductType product = getProductTypeByBarCode(productCode);
         // Set discount rate to product on sale
@@ -1219,7 +1219,7 @@ public class EZShop implements EZShopInterface {
         if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
 
         // Check discount rate
-        if(discountRate < 0.0 || discountRate > 1.0) throw new InvalidDiscountRateException();
+        if(discountRate < 0.0 || discountRate >= 1.0) throw new InvalidDiscountRateException();
 
         // Set discount rate to sale
         SaleTransactionImpl transaction = allSales.get(transactionId);

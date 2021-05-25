@@ -1362,7 +1362,7 @@ public class EZShopTest {
         } catch (InvalidProductCodeException ignored) {} catch (Exception ignored) {fail();}
 
         try {
-            ezShop.applyDiscountRateToProduct(saleId, "1234567890128", 1.1);
+            ezShop.applyDiscountRateToProduct(saleId, "1234567890128", 1.0);
             fail();
         } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
         try {
@@ -1424,7 +1424,7 @@ public class EZShopTest {
             fail();
         } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
         try {
-            assertTrue(ezShop.applyDiscountRateToSale(saleId, 1.1));
+            assertTrue(ezShop.applyDiscountRateToSale(saleId, 1.0));
             fail();
         } catch (InvalidDiscountRateException ignored) {} catch (Exception ignored) {fail();}
     }

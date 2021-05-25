@@ -263,13 +263,14 @@ public class SaleTransactionImplTest {
     public void testReset() {
         
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
-        ReturnTransaction returnT =  sale.startReturnTransaction(3);
-        sale.startReturnTransaction(4);
-        sale.startReturnTransaction(5);
         ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);
         ProductTypeImpl cherry = new ProductTypeImpl(16, "1-A-12", "", "cherry", "012345678908765", 2.05, 2);
         sale.addProductToSale(apple,8);
         sale.addProductToSale(cherry,10);
+        sale.endSaleTransaction();
+        ReturnTransaction returnT = sale.startReturnTransaction(3);
+        sale.setReturnProduct(returnT.getBalanceId(), apple, 2);
+        sale.endReturnTransaction(returnT.getBalanceId(), true);
         sale.reset();
         List<ReturnTransaction> returns = new ArrayList<>();
         List<TransactionProduct> products = new ArrayList<>();
