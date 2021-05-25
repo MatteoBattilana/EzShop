@@ -2,7 +2,7 @@
 
 Authors: Battilana Matteo, Huang Chunbiao, Mondal Subhajit, Sabatini Claudia
 
-Date: 18/05/2021
+Date: 25/05/2021
 
 Version: 1.0
 
@@ -15,18 +15,18 @@ Version: 1.0
 - [Dependency graph](#dependency-graph)
 - [Integration approach](#integration-approach)
 - [Tests](#tests)
-  - [Step 1](#step-1)
-  - [Step 2](#step-2)
-  - [Step 3](#step-3)
-  - [Step 4](#step-4)
-  - [Step 5](#step-5)
-  - [Step 6 - API testing](#step-6---api-testing)
+    - [Step 1](#step-1)
+    - [Step 2](#step-2)
+    - [Step 3](#step-3)
+    - [Step 4](#step-4)
+    - [Step 5](#step-5)
+    - [Step 6 - API testing](#step-6---api-testing)
 - [Scenarios](#scenarios)
-        - [Scenario 1-4](#scenario-1-4)
-        - [Scenario 2-4](#scenario-2-4)
-        - [Scenario 3-4](#scenario-3-4)
-        - [Scenario 6-7](#scenario-6-7)
-        - [Scenario 8-3](#scenario-8-3)
+  - [Scenario 1-4](#scenario-1-4)
+  - [Scenario 2-4](#scenario-2-4)
+  - [Scenario 3-4](#scenario-3-4)
+  - [Scenario 6-7](#scenario-6-7)
+  - [Scenario 8-3](#scenario-8-3)
 - [Coverage of Scenarios and FR](#coverage-of-scenarios-and-fr)
 - [Coverage of Non Functional Requirements](#coverage-of-non-functional-requirements)
 
@@ -106,8 +106,8 @@ We adopted a bottom up approach divided in the following steps:
 
 #  Tests
 
-   <define below a table for each integration step. For each integration step report the group of classes under test, and the names of
-     JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
+<define below a table for each integration step. For each integration step report the group of classes under test, and the names of
+JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
 
 ## Step 1
 **This step is about Unit Testing, the documented can be found [here](./UnitTestReport.md).**
@@ -190,6 +190,7 @@ We adopted a bottom up approach divided in the following steps:
 |--|--|
 |	DatabaseConnection + UserImpl + OrderImpl + ProductTypeImpl + SaleTransactionImpl + ReturnTransactionImpl + CustomerCardImpl + CustomerImpl | DatabaseConnectionTest.testExecuteStartUpMultipleTimes() |
 ||DatabaseConnectionTest.testExecuteStartUpInvalidFile() |
+||DatabaseConnectionTest.testWrongSchemaSQL() |
 ||DatabaseConnectionTest.testCreateUser() |
 ||DatabaseConnectionTest.testSetUserRole() |
 ||DatabaseConnectionTest.testSetWrongRole() |
@@ -370,7 +371,7 @@ We adopted a bottom up approach divided in the following steps:
 
 
 <If needed, define here additional scenarios for the application. Scenarios should be named
- referring the UC in the OfficialRequirements that they detail>
+referring the UC in the OfficialRequirements that they detail>
 
 ##### Scenario 1-4
 
@@ -389,7 +390,7 @@ We adopted a bottom up approach divided in the following steps:
 | ------------- |:-------------:| 
 |  Precondition     | Account  for User U existing  |
 |     | U logged in  |
- | Account X exists |
+| Account X exists |
 |  Post condition     | U can't delete any account |
 | Step#        | Description  |
 |  1    |  A can't select  and delete account X because has no rights |
@@ -544,7 +545,7 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 
 
 
-           
+
 
 
 
