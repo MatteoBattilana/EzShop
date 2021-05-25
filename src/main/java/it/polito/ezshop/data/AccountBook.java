@@ -88,6 +88,8 @@ public class AccountBook {
                 databaseConnection.deleteBalanceOperation(op);
         }
         opList = new ArrayList<>();
+        balance = 0.0;
+        databaseConnection.updateBalance(balance);
     }
 
     /**

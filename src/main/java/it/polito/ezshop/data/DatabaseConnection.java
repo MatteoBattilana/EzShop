@@ -308,7 +308,7 @@ public class DatabaseConnection {
      * @param mProducts list of products
      * @return the map of all ticket entry
      */
-    private Map<ProductTypeImpl, TransactionProduct> getAllBySaleId(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
+    public Map<ProductTypeImpl, TransactionProduct> getAllBySaleId(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
         Map<ProductTypeImpl, TransactionProduct> all = new HashMap<>();
         if(saleTransactionId > 0) {
             try {
@@ -421,6 +421,11 @@ public class DatabaseConnection {
                                 if (!updateProductType(tp.getProductType())) {
                                     product.setQuantity(product.getQuantity() - tp.getAmount());
                                 }
+
+                                PreparedStatement ps2 = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
+                                ps2.setInt(1, transaction.getTicketNumber());
+                                ps2.setInt(2, product.getId());
+                                ps2.executeUpdate();
                             }
                         }
                     }

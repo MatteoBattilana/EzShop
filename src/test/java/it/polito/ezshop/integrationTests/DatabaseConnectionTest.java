@@ -277,10 +277,19 @@ public class DatabaseConnectionTest {
 
     @Test
     public void testDeleteSaleTransaction() {
+        ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);
+        Map<Integer, ProductTypeImpl> allProducts = new HashMap<>();
+        allProducts.put(apple.getId(), apple);
+        databaseConnection.createProductType(apple);
+
         SaleTransactionImpl saleTransaction = new SaleTransactionImpl(databaseConnection, 1);
+        saleTransaction.addProductToSale(apple, 5);
         databaseConnection.saveSaleTransaction(saleTransaction);
 
+        assertEquals(1, databaseConnection.getAllBySaleId(saleTransaction.getBalanceId(), allProducts).size());
         assertTrue(databaseConnection.deleteSaleTransaction(saleTransaction));
+        assertEquals(10, apple.getQuantity().intValue());
+        assertEquals(0, databaseConnection.getAllBySaleId(saleTransaction.getBalanceId(), allProducts).size());
         assertFalse(databaseConnection.deleteSaleTransaction(saleTransaction));
         assertFalse(databaseConnection.deleteSaleTransaction(null));
     }

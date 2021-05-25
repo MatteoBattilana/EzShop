@@ -88,9 +88,11 @@ public class AccountBookTest {
     public void testOpListReset(){
         BalanceOperationImpl balanceOperation = new BalanceOperationImpl(1, LocalDate.now(), 10.0, "SALE", "PAID");
         accountBook.add(balanceOperation);
+        accountBook.recordBalanceUpdate(100);
         accountBook.reset();
         List<BalanceOperation> creditAndDebits = accountBook.getCreditAndDebits(null, null);
         assertEquals(0,creditAndDebits.size());
+        assertEquals(0,accountBook.computeBalance(),0.1);
     }
 
     @Test

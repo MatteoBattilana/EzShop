@@ -265,19 +265,29 @@ public class SaleTransactionImplTest {
         SaleTransactionImpl sale = new SaleTransactionImpl(databaseConnection, 1);
         ProductTypeImpl apple = new ProductTypeImpl(10, "1-A-11", "", "apple", "012345678901280", 1.99, 1);
         ProductTypeImpl cherry = new ProductTypeImpl(16, "1-A-12", "", "cherry", "012345678908765", 2.05, 2);
+        Map<Integer, ProductTypeImpl> allProducts = new HashMap<>();
+        allProducts.put(apple.getId(), apple);
+        allProducts.put(apple.getId(), cherry);
+        databaseConnection.createProductType(apple);
+        databaseConnection.createProductType(cherry);
         sale.addProductToSale(apple,8);
         sale.addProductToSale(cherry,10);
         sale.endSaleTransaction();
+        databaseConnection.saveSaleTransaction(sale);
         ReturnTransaction returnT = sale.startReturnTransaction(3);
         sale.setReturnProduct(returnT.getBalanceId(), apple, 2);
         sale.endReturnTransaction(returnT.getBalanceId(), true);
+        assertEquals(2, databaseConnection.getAllBySaleId(sale.getBalanceId(), allProducts).size());
+        assertEquals(1, databaseConnection.getAllReturnTransaction(sale.getBalanceId(), allProducts, 0.1, databaseConnection.getAllBySaleId(sale.getBalanceId(), allProducts)).size());
+
         sale.reset();
         List<ReturnTransaction> returns = new ArrayList<>();
         List<TransactionProduct> products = new ArrayList<>();
         assertEquals(returns,sale.getReturnTransactions());
         assertEquals(products,sale.getTicketEntries());
 
-
+        assertEquals(0, databaseConnection.getAllBySaleId(sale.getBalanceId(), allProducts).size());
+        assertEquals(0, databaseConnection.getAllReturnTransaction(sale.getBalanceId(), allProducts, 0.1, databaseConnection.getAllBySaleId(sale.getBalanceId(), allProducts)).size());
     }
     @Test
     public void testEndSaleTransaction() {
