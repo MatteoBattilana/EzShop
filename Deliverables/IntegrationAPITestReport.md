@@ -15,18 +15,18 @@ Version: 1.0
 - [Dependency graph](#dependency-graph)
 - [Integration approach](#integration-approach)
 - [Tests](#tests)
-    - [Step 1](#step-1)
-    - [Step 2](#step-2)
-    - [Step 3](#step-3)
-    - [Step 4](#step-4)
-    - [Step 5](#step-5)
-    - [Step 6 - API testing](#step-6---api-testing)
+  - [Step 1](#step-1)
+  - [Step 2](#step-2)
+  - [Step 3](#step-3)
+  - [Step 4](#step-4)
+  - [Step 5](#step-5)
+  - [Step 6 - API testing](#step-6---api-testing)
 - [Scenarios](#scenarios)
-  - [Scenario 1-4](#scenario-1-4)
-  - [Scenario 2-4](#scenario-2-4)
-  - [Scenario 3-4](#scenario-3-4)
-  - [Scenario 6-7](#scenario-6-7)
-  - [Scenario 8-3](#scenario-8-3)
+        - [Scenario 1-4](#scenario-1-4)
+        - [Scenario 2-4](#scenario-2-4)
+        - [Scenario 3-4](#scenario-3-4)
+        - [Scenario 6-7](#scenario-6-7)
+        - [Scenario 8-3](#scenario-8-3)
 - [Coverage of Scenarios and FR](#coverage-of-scenarios-and-fr)
 - [Coverage of Non Functional Requirements](#coverage-of-non-functional-requirements)
 
@@ -390,7 +390,7 @@ referring the UC in the OfficialRequirements that they detail>
 | ------------- |:-------------:| 
 |  Precondition     | Account  for User U existing  |
 |     | U logged in  |
-| Account X exists |
+|| Account X exists |
 |  Post condition     | U can't delete any account |
 | Step#        | Description  |
 |  1    |  A can't select  and delete account X because has no rights |
