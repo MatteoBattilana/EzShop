@@ -595,4 +595,17 @@ public class DatabaseConnectionTest {
         assertFalse(databaseConnection.addProductToSale(null, null));
 
     }
+
+    @Test
+    public void deleteWrongParameterCustomerCard() {
+        assertFalse(databaseConnection.deleteCustomerCard(null));
+    }
+
+    @Test
+    public void deleteCustomerCard() {
+        CustomerCardImpl card = new CustomerCardImpl("0000000001", 1);
+        databaseConnection.createCustomerCard(card);
+        assertTrue(databaseConnection.deleteCustomerCard(card));
+        assertFalse(databaseConnection.deleteCustomerCard(card));
+    }
 }

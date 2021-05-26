@@ -2265,7 +2265,7 @@ public class EZShopTest {
     }
 
     @Test
-    public void testReset() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+    public void testReset() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidProductIdException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException, InvalidCustomerNameException, InvalidPasswordException, InvalidRoleException, InvalidUsernameException, InvalidCustomerIdException, InvalidCustomerCardException {
         loginAs("Administrator");
         // BALANCE UPDATE
         assertTrue(ezShop.recordBalanceUpdate(100));
@@ -2285,31 +2285,47 @@ public class EZShopTest {
         // ORDER
         ezShop.payOrderFor("1234567890128", 10, 1.99);
 
-        assertEquals(1, ezShop.getAllOrders().size());
-        assertEquals(2, ezShop.getAllProductTypes().size());
-        assertEquals(3, ezShop.getCreditsAndDebits(null, null).size());
-        assertNotNull(ezShop.getSaleTransaction(saleId));
+        // CUSTOMER
+        Integer matteo = ezShop.defineCustomer("matteo");
 
-        // Try simulate on-off-on
-        loginAs("Administrator");
+        // CUSTOMER CARD
+        String card = ezShop.createCard();
+        ezShop.attachCardToCustomer(card, matteo);
+
+        // USER
+        ezShop.createUser("user1", "password", "Cashier");
+
         assertEquals(1, ezShop.getAllOrders().size());
+        assertEquals(100 + 1*5 - 10*1.99, ezShop.computeBalance(), 0.1);
         assertEquals(2, ezShop.getAllProductTypes().size());
         assertEquals(3, ezShop.getCreditsAndDebits(null, null).size());
+        assertEquals(1, ezShop.getAllCustomers().size());
+        assertTrue(ezShop.getAllUsers().size() > 0);
+        assertNotNull(ezShop.login("user1", "password"));
+
         assertNotNull(ezShop.getSaleTransaction(saleId));
 
         ezShop.reset();
+        assertNull(ezShop.login("user1", "password"));
+        loginAs("Administrator");
         assertEquals(0, ezShop.getAllOrders().size());
         assertEquals(0, ezShop.getAllProductTypes().size());
         assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
+        assertEquals(0, ezShop.getAllCustomers().size());
+
         assertNull(ezShop.getSaleTransaction(saleId));
 
         ezShop.close();
         ezShop = new EZShop();
+        assertNull(ezShop.login("user1", "password"));
         loginAs("Administrator");
         assertEquals(0, ezShop.getAllOrders().size());
         assertEquals(0, ezShop.getAllProductTypes().size());
         assertEquals(0, ezShop.getCreditsAndDebits(null, null).size());
         assertEquals(0, ezShop.computeBalance(), 0.1);
+        assertEquals(0, ezShop.getAllCustomers().size());
+        assertEquals("0000000001", ezShop.createCard());
+
         assertNull(ezShop.getSaleTransaction(saleId));
     }
 

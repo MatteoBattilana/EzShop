@@ -890,4 +890,16 @@ public class DatabaseConnection {
             }
         }
     }
+
+    public boolean deleteCustomerCard(CustomerCardImpl card) {
+        if(card != null) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("DELETE FROM customer_card WHERE id = ?");
+                ps.setString(1, card.getCustomer());
+
+                return ps.executeUpdate() > 0;
+            } catch (Exception ignored) { }
+        }
+        return false;
+    }
 }

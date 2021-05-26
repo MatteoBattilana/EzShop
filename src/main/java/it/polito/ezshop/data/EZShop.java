@@ -63,6 +63,23 @@ public class EZShop implements EZShopInterface {
             databaseConnection.deleteProductType(productType);
         }
         products.clear();
+
+        for(User user : allUsers.values()){
+            databaseConnection.deleteUser(user);
+        }
+        allUsers.clear();
+
+        for(CustomerCardImpl card : customerCards.values()){
+            databaseConnection.deleteCustomerCard(card);
+        }
+        customerCards.clear();
+
+        for(CustomerImpl customer : customers.values()){
+            databaseConnection.deleteCustomer(customer);
+        }
+        customers.clear();
+
+        loggedUser = null;
     }
 
     /**
