@@ -428,7 +428,8 @@ public class EZShopTest {
         assertEquals(2.99, productTypeByBarCode.getPricePerUnit(), 0.1);
         assertEquals("note", productTypeByBarCode.getNote());
 
-        assertFalse(ezShop.updateProduct(apple, "banana", "1234567890128", 2.99, "note"));
+        Integer cherry = ezShop.createProductType("apple", "01234567890128", 1.99, null);
+        assertFalse(ezShop.updateProduct(apple, "banana", "01234567890128", 2.99, "note"));
         assertFalse(ezShop.updateProduct(100, "banana", "01234567890128", 2.99, "note"));
     }
 

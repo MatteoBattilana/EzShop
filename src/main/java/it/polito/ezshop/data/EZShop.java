@@ -363,7 +363,7 @@ public class EZShop implements EZShopInterface {
 
         // Check if barcode already exists
         for(ProductTypeImpl pt: products.values())
-            if (pt.getBarCode().equals(newCode))
+            if (pt.getId().intValue() != id && pt.getBarCode().equals(newCode))
                 return false;
 
         // Update product information
