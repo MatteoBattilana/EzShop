@@ -308,7 +308,7 @@ public class DatabaseConnection {
      * @param mProducts list of products
      * @return the map of all ticket entry
      */
-    private Map<ProductTypeImpl, TransactionProduct> getAllBySaleId(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
+    public Map<ProductTypeImpl, TransactionProduct> getAllBySaleId(int saleTransactionId, Map<Integer, ProductTypeImpl> mProducts) {
         Map<ProductTypeImpl, TransactionProduct> all = new HashMap<>();
         if(saleTransactionId > 0) {
             try {
@@ -374,12 +374,12 @@ public class DatabaseConnection {
         return all;
     }
 
-    private boolean addProductToSale(SaleTransactionImpl transaction, TicketEntry ticket, int productId) {
-        if(transaction != null && ticket != null && productId > 0) {
+    public boolean addProductToSale(SaleTransactionImpl transaction, TransactionProduct ticket) {
+        if(transaction != null && ticket != null) {
             try {
                 PreparedStatement ps = CON.prepareStatement("INSERT INTO transaction_product(id_sale, id_product, discount, quantity, price) VALUES(?,?,?,?,?)");
                 ps.setInt(1, transaction.getTicketNumber());
-                ps.setInt(2, productId);
+                ps.setInt(2, ticket.getProductType().getId());
                 ps.setDouble(3, ticket.getDiscountRate());
                 ps.setInt(4, ticket.getAmount());
                 ps.setDouble(5, ticket.getPricePerUnit());
@@ -392,7 +392,7 @@ public class DatabaseConnection {
     public boolean saveSaleTransaction(SaleTransactionImpl saleT) {
         if(createSaleTransaction(saleT)) {
             for(TransactionProduct ticket: saleT.getTicketEntries()) {
-                addProductToSale(saleT, ticket, ticket.getProductType().getId());
+                addProductToSale(saleT, ticket);
                 updateProductType(ticket.getProductType());
             }
             return true;
@@ -408,7 +408,7 @@ public class DatabaseConnection {
     public boolean deleteSaleTransaction(SaleTransactionImpl transaction) {
         if(transaction != null) {
             try {
-                CON.setAutoCommit(false);
+                setAutoCommit(false);
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
                 ps.setInt(1, transaction.getTicketNumber());
                 if (ps.executeUpdate() > 0) {
@@ -421,14 +421,21 @@ public class DatabaseConnection {
                                 if (!updateProductType(tp.getProductType())) {
                                     product.setQuantity(product.getQuantity() - tp.getAmount());
                                 }
+
+                                PreparedStatement ps2 = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
+                                ps2.setInt(1, transaction.getTicketNumber());
+                                ps2.setInt(2, product.getId());
+                                ps2.executeUpdate();
                             }
                         }
                     }
                     return true;
                 }
                 CON.commit();
-                CON.setAutoCommit(true);
             } catch (Exception ignored) { }
+            finally {
+                setAutoCommit(true);
+            }
         }
         return false;
     }
@@ -441,7 +448,7 @@ public class DatabaseConnection {
     public boolean updateSaleTransaction(SaleTransactionImpl transaction) {
         if(transaction != null) {
             try {
-                CON.setAutoCommit(false);
+                setAutoCommit(false);
                 PreparedStatement ps = CON.prepareStatement("UPDATE sale_transaction SET discount = ?, transaction_status = ?, date_op = ?,  type = ?, status = ? WHERE id = ?");
                 ps.setDouble(1, transaction.getDiscountRate());
                 ps.setString(2, transaction.getTransactionStatus());
@@ -459,15 +466,17 @@ public class DatabaseConnection {
                             ps1.setInt(4, transaction.getBalanceId());
                             ps1.setInt(5, tp.getProductType().getId());
                             if (ps1.executeUpdate() == 0) {
-                                addProductToSale(transaction, tp, tp.getProductType().getId());
+                                addProductToSale(transaction, tp);
                             }
                         }
                     }
                 }
                 CON.commit();
-                CON.setAutoCommit(true);
                 return true;
             } catch (Exception ignored) { }
+            finally {
+                setAutoCommit(true);
+            }
         }
         return false;
     }
@@ -543,7 +552,7 @@ public class DatabaseConnection {
     public boolean saveReturnTransaction(ReturnTransaction returnTransaction, Integer saleId) {
         if(returnTransaction != null && saleId > 0) {
             try {
-                CON.setAutoCommit(false);
+                setAutoCommit(false);
                 for (Map.Entry<TransactionProduct, Integer> entry : returnTransaction.getReturns().entrySet()) {
                     PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, type, status, id_product, amount,  id_sale) VALUES(?,?,?,?,?,?,?)");
                     ps.setInt(1, returnTransaction.getBalanceId());
@@ -556,12 +565,14 @@ public class DatabaseConnection {
                     ps.executeUpdate();
                 }
                 CON.commit();
-                CON.setAutoCommit(true);
                 return true;
             } catch (Exception ex) {
                 try {
                     CON.rollback();
                 } catch (SQLException ignored) {}
+            }
+            finally {
+                setAutoCommit(true);
             }
         }
         return false;
@@ -835,8 +846,7 @@ public class DatabaseConnection {
                 PreparedStatement ps = CON.prepareStatement("INSERT INTO balance(money) VALUES(?)");
                 ps.setDouble(1, newBalance);
                 return ps.executeUpdate() > 0;
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
         }
         return false;
     }
@@ -863,5 +873,33 @@ public class DatabaseConnection {
         }
         catch (Exception ignored) { }
         return 0.0;
+    }
+
+    public void setAutoCommit(boolean state) {
+        try {
+            CON.setAutoCommit(state);
+        } catch (SQLException ignore) { }
+    }
+
+    public void closeConnection(){
+        if(CON != null){
+            try {
+                CON.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
+
+    public boolean deleteCustomerCard(CustomerCardImpl card) {
+        if(card != null) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("DELETE FROM customer_card WHERE id = ?");
+                ps.setString(1, card.getCustomer());
+
+                return ps.executeUpdate() > 0;
+            } catch (Exception ignored) { }
+        }
+        return false;
     }
 }
