@@ -11,12 +11,12 @@ on April 30, discuss whether the design could be improved>
 <Applying Structure 101 to your project, version to be delivered on june 4, produce the Levelized structure map,
 with all elements explosed, all dependencies, NO tangles; and report it here as a picture>
 ```
-
+![](image/struct1.png)
 # Structural over complexity chart
 ```
 <Applying Structure 101 to your project, version to be delivered on june 4, produce the structural over complexity chart; and report it here as a picture>
 ```
-
+![](image/struct2.png)
 
 
 # Size metrics
@@ -29,11 +29,11 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 
 | Metric                                    | Measure |
 | ----------------------------------------- | ------- |
-| Packages                                  |         |
-| Classes (outer)                           |         |
-| Classes (all)                             |         |
-| NI (number of bytecode instructions)      |         |
-| LOC (non comment non blank lines of code) |         |
+| Packages                                  |   5      |
+| Classes (outer)                           |    42     |
+| Classes (all)                             |      42   |
+| NI (number of bytecode instructions)      |      6971   |
+| LOC (non comment non blank lines of code) |     2998    |
 
 
 
@@ -45,17 +45,17 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 
 | Item | Tangled | Fat  | Size | XS   |
 | ---- | ------- | ---- | ---- | ---- |
-|      |         |      |      |      |
-|      |         |      |      |      |
+| ezshop.it.polito.ezshop.data.EZShop     |         |   177   |  2836    |   913   |
 
 
 
 # Package level tangles
 
 ```
-<Report screen captures of the package-level tangles by opening the items in the "composition perspective" 
+<Report screen captures of the package-level tangles by opening the items in the "composition perspective"
 (double click on the tangle from the Views->Complexity page)>
 ```
+![](image/struct3.png)
 
 # Summary analysis
 ```
