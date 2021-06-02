@@ -61,4 +61,10 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 ```
 <Discuss here main differences of the current structure of your project vs the design delivered on April 30>
 <Discuss if the current structure shows weaknesses that should be fixed>
+
+ There are no substantial structural differences between the current Design and the one delivered on April 30th.
+ Apart from the addition, modification and removal of some methods in some classes (Return Transaction, Sale Transaction, Customer, Product Type), which occurred during the coding phase, the most relevant modification is the one made on the class once called "Singleton Database Connection" and now defined as "Database Connection", here all the necessary methods to make the data persistent in the system have been added.
+ As the structural over complexity chart shows, the program appears to be well structured, in fact, as it can be seen from it, the percentage of tangled code is almost zero,as there are only two items with a cyclic dependency.
+ The percentage of fat code, even if it can be improved, is still acceptable given the size and complexity of the code in question.
+ 
 ```
