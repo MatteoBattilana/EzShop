@@ -29,21 +29,23 @@ public class ReturnTransaction extends BalanceOperationImpl {
      * @return if the product has been added to the return map
      */
     public boolean addProduct(TransactionProduct prod, Product pt) {
-        if (returns.containsKey(prod) && !returns.get(prod).containsKey(pt.getRFID())) {
-            // If already present, increase the amount only if there are enough
-            if(prod.getAmount() - returns.get(prod).size() - 1 >= 0) {
-                Map<String, Product> stringProductMap = returns.get(prod);
-                if(!stringProductMap.containsKey(pt.getRFID())) {
+        if(prod != null && pt != null) {
+            if (returns.containsKey(prod) && !returns.get(prod).containsKey(pt.getRFID())) {
+                // If already present, increase the amount only if there are enough
+                if (prod.getAmount() - returns.get(prod).size() - 1 >= 0) {
+                    Map<String, Product> stringProductMap = returns.get(prod);
+                    if (!stringProductMap.containsKey(pt.getRFID())) {
+                        returns.get(prod).put(pt.getRFID(), pt);
+                        return true;
+                    }
+                }
+            } else {
+                // If not present, add only if the amount is withing the original order amount
+                if (prod.getAmount() - 1 >= 0) {
+                    returns.put(prod, new HashMap<>());
                     returns.get(prod).put(pt.getRFID(), pt);
                     return true;
                 }
-            }
-        } else {
-            // If not present, add only if the amount is withing the original order amount
-            if(prod.getAmount() - 1 >= 0) {
-                returns.put(prod, new HashMap<>());
-                returns.get(prod).put(pt.getRFID(), pt);
-                return true;
             }
         }
         return false;
