@@ -1638,23 +1638,15 @@ public class EZShop implements EZShopInterface {
         // Check RFID
         if (RFID == null || !Pattern.compile("[0-9]{10}").matcher(RFID).matches()) throw new InvalidRFIDException();
 
-        // Check if not unique
-        int RFIDVal = Integer.parseInt(RFID);
-        for (ProductTypeImpl pt: products.values()){
-            for (Product product : pt.getAllProducts()){
-                if(Integer.parseInt(product.getRFID()) >= RFIDVal && Integer.parseInt(product.getRFID()) <= RFIDVal + order.getQuantity())
-                    throw new InvalidRFIDException();
-            }
-        }
-
         // Check that the sold quantity is less than the returned one
         SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
 
         // Add te product to the return transaction
-        ProductTypeImpl prod = getProductByBarcode(productCode);
-        if(prod != null && sale != null && sale.getSoldQuantity(prod) >= amount){
-            return sale.setReturnProduct(returnId, prod, amount);
+        if(sale != null) {
+            //Find the product
+             return sale.setReturnProduct(returnId, RFID);
         }
+
         return false;
     }
 

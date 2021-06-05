@@ -8,7 +8,7 @@ public class ReturnTransaction extends BalanceOperationImpl {
     // Product discount rate
     private final double discountRate;
     // Map of all the transaction product used for returning the products
-    private final Map<TransactionProduct, Integer> returns;
+    private final Map<TransactionProduct, Map<String, Product>> returns;
 
     // Constructor used for the database
     public ReturnTransaction(int balanceId, LocalDate date, String type, String status, double discountRate) {
@@ -26,20 +26,23 @@ public class ReturnTransaction extends BalanceOperationImpl {
      * the TransactionProduct is larger or equal the amount
      *
      * @param prod product to be returned
-     * @param amount of product to be returned, must be lower than the original sale
      * @return if the product has been added to the return map
      */
-    public boolean addProduct(TransactionProduct prod, int amount) {
-        if (returns.containsKey(prod)) {
+    public boolean addProduct(TransactionProduct prod, Product pt) {
+        if (returns.containsKey(prod) && returns.get(prod).containsKey(pt.getRFID())) {
             // If already present, increase the amount only if there are enough
-            if(prod.getAmount() - returns.get(prod) - amount >= 0) {
-                returns.put(prod, returns.get(prod) + amount);
-                return true;
+            if(prod.getAmount() - returns.get(prod).size() - 1 >= 0) {
+                Map<String, Product> stringProductMap = returns.get(prod);
+                if(!stringProductMap.containsKey(pt.getRFID())) {
+                    returns.get(prod).put(pt.getRFID(), pt);
+                    return true;
+                }
             }
         } else {
             // If not present, add only if the amount is withing the original order amount
-            if(prod.getAmount() - amount >= 0) {
-                returns.put(prod, amount);
+            if(prod.getAmount() - 1 >= 0) {
+                returns.put(prod, new HashMap<>());
+                returns.get(prod).put(pt.getRFID(), pt);
                 return true;
             }
         }
@@ -64,9 +67,9 @@ public class ReturnTransaction extends BalanceOperationImpl {
     public double getMoney() {
         double sum = 0.0;
         // For all element to be returned, compute the price using the original discount price
-        for (Map.Entry<TransactionProduct, Integer> element : returns.entrySet()) {
+        for (Map.Entry<TransactionProduct, Map<String, Product>> element : returns.entrySet()) {
             double priceWithDiscount = element.getKey().getPricePerUnit() - element.getKey().getPricePerUnit() * element.getKey().getDiscountRate();
-            priceWithDiscount *= element.getValue();
+            priceWithDiscount *= element.getValue().size();
             sum -= priceWithDiscount - priceWithDiscount * discountRate;
         }
 
@@ -78,7 +81,11 @@ public class ReturnTransaction extends BalanceOperationImpl {
      *
      * @return the map of TransactionProduct
      */
-    public Map<TransactionProduct, Integer> getReturns() {
+    public Map<TransactionProduct, Map<String, Product>> getReturns() {
         return returns;
+    }
+
+    public void remove(TransactionProduct soldP, Product removed) {
+        returns.get(soldP).remove(removed.getRFID());
     }
 }

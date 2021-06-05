@@ -28,9 +28,10 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
 
     /**
      * Used to get the list of the return transaction
+     *
      * @return list of the return transaction
      */
-    public List<ReturnTransaction> getReturnTransactions(){
+    public List<ReturnTransaction> getReturnTransactions() {
         return new ArrayList<>(returnTransactions.values());
     }
 
@@ -54,21 +55,68 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * Add a product to the return transaction for the current sale
      *
      * @param returnId id of the return transaction
-     * @param prod the product to be returned
-     * @param amount of product to be returned
-     *
+     * @param prod     the product to be returned
+     * @param amount   of product to be returned
      * @return true if the product had been added to the sale transition as
-     *          a return product
+     * a return product
      */
     public boolean setReturnProduct(int returnId, ProductTypeImpl prod, int amount) {
-        if(returnId > 0 && prod != null) {
+        if (returnId > 0 && prod != null) {
             TransactionProduct soldP = prodList.get(prod);
             ReturnTransaction returnTransaction = returnTransactions.get(returnId);
             if (soldP != null && returnTransaction != null) {
-                return returnTransaction.addProduct(soldP, amount);
+                for (int i = 0; i < amount; i++) {
+                    List<Product> products = new ArrayList<>(soldP.getProducts());
+                    setReturnProduct(returnId, products.get(0).getRFID());
+                }
+                return true;
             }
         }
         return false;
+    }
+
+    public boolean setReturnProduct(int returnId, String RFID) {
+        if (returnId > 0 && RFID != null && hasBeenSold(RFID)) {
+            TransactionProduct soldP = prodList.get(getType(RFID));
+            ReturnTransaction returnTransaction = returnTransactions.get(returnId);
+            if (soldP != null && returnTransaction != null) {
+                if(returnTransaction.addProduct(soldP, getProduct(RFID))){
+                    soldP.removeProduct(getProduct(RFID));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Product getProduct(String RFID){
+        if (RFID != null) {
+            for (TransactionProduct tp : prodList.values()) {
+                if (tp.getProductType() != null) {
+                    for (Product pt : tp.getProducts()) {
+                        if (pt.getRFID().equals(RFID)) {
+                            return pt;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private ProductTypeImpl getType(String RFID){
+        if (RFID != null) {
+            for (TransactionProduct tp : prodList.values()) {
+                if (tp.getProductType() != null) {
+                    for (Product pt : tp.getProducts()) {
+                        if (pt.getRFID().equals(RFID)) {
+                            return tp.getProductType();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public List<TransactionProduct> getTicketEntries() {
@@ -99,7 +147,8 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     }
 
     @Override
-    public void setEntries(List<TicketEntry> entries) {}
+    public void setEntries(List<TicketEntry> entries) {
+    }
 
     @Override
     public double getDiscountRate() {
@@ -115,7 +164,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     public double getPrice() {
         double sum = 0.0;
         // Compute the price using the sale and product discounts
-        for (TicketEntry t: prodList.values()) {
+        for (TicketEntry t : prodList.values()) {
             sum += (t.getPricePerUnit() - t.getPricePerUnit() * t.getDiscountRate()) * t.getAmount();
         }
 
@@ -124,35 +173,36 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     }
 
     @Override
-    public void setPrice(double price) { }
+    public void setPrice(double price) {
+    }
 
     @Override
     public double getMoney() {
         return getPrice();
     }
 
-    public double computeTotal(){
+    public double computeTotal() {
         return getMoney();
     }
 
     @Override
-    public void setMoney(double money) {}
+    public void setMoney(double money) {
+    }
 
     /**
      * Add amount of product to a sale transaction, only if enough quantity.
      *
      * @param product product to be removed
      * @return true if the operation can be performed and if the number of product in the transaction are
-     *              more than amount
+     * more than amount
      */
     public boolean addProductToSale(ProductTypeImpl pt, Product product) {
         if (transactionStatus.equals("OPENED") && product != null) {
             TransactionProduct transactionProduct = prodList.get(pt);
-            if(transactionProduct != null) {
+            if (transactionProduct != null) {
                 transactionProduct.setAmount(transactionProduct.getAmount() + 1);
                 transactionProduct.addProduct(product);
-            }
-            else {
+            } else {
                 // First time
                 HashMap<String, Product> objectObjectHashMap = new HashMap<>();
                 objectObjectHashMap.put(product.getRFID(), product);
@@ -173,12 +223,12 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      *
      * @param product product to be removed
      * @return true if the operation can be performed and if the number of product in the transaction are
-     *              more than amount
+     * more than amount
      */
     public boolean deleteProductFromSale(ProductTypeImpl product, Product p) {
-        if (transactionStatus.equals("OPENED") && product != null && p!= null) {
+        if (transactionStatus.equals("OPENED") && product != null && p != null) {
             TransactionProduct transactionProduct = prodList.get(product);
-            if(transactionProduct != null && transactionProduct.getAmount() > 0) {
+            if (transactionProduct != null && transactionProduct.getAmount() > 0) {
                 // Remove the ticket entry if the remaining amount is 0
                 if (transactionProduct.getAmount() - 1 == 0) {
                     prodList.remove(product);
@@ -197,7 +247,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     /**
      * Apply the discout rate to a specific product
      *
-     * @param product to be applied the discount
+     * @param product      to be applied the discount
      * @param discountRate discount between 0 and 1
      * @return true if the discount has been applied and the transaction was still OPENED
      */
@@ -205,7 +255,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         // Check if open
         if (discountRate >= 0 && discountRate <= 1 && transactionStatus.equals("OPENED") && product != null) {
             TransactionProduct transactionProduct = prodList.get(product);
-            if(transactionProduct != null) {
+            if (transactionProduct != null) {
                 transactionProduct.applyDiscountRateToProduct(discountRate);
                 return true;
             }
@@ -220,7 +270,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * @return number of points
      */
     public int computePointsForSale() {
-        return (int) Math.floor(getMoney()/10.0);
+        return (int) Math.floor(getMoney() / 10.0);
     }
 
     public ReturnTransaction getReturnTransaction(int id) {
@@ -236,7 +286,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * @return true if the return transaction has been removed
      */
     public boolean deleteReturnTransaction(int returnId) {
-        if(returnId > 0) {
+        if (returnId > 0) {
             ReturnTransaction returnTransaction = returnTransactions.get(returnId);
             if (returnTransaction != null) {
                 if (returnTransaction.getStatus().equals("OPENED")) {
@@ -246,9 +296,9 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                     // Rollback quantities
                     returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
                         // Remove from the sale the products
-                        transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() - amount);
+                        transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() - amount.size());
                         databaseConnection.updateProductType(transactionProduct.getProductType());
-                        transactionProduct.setAmount(transactionProduct.getAmount() + amount);
+                        transactionProduct.setAmount(transactionProduct.getAmount() + amount.size());
                     });
                     returnTransactions.remove(returnId);
                     return true;
@@ -259,17 +309,16 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     }
 
 
-
     /**
      * Return the total to be returned to the customer in absolute value. This
      * method also check if the state is UNPAID
      *
      * @param returnId id of the return transaction
      * @return the total in positive value of the value to be returned
-     *          -1 otherwise
+     * -1 otherwise
      */
     public double getReturnTransactionTotal(int returnId) {
-        if(returnId > 0) {
+        if (returnId > 0) {
             ReturnTransaction retT = returnTransactions.get(returnId);
             if (retT != null && retT.getStatus().equals("CLOSED")) {
                 return retT.computeTotal();
@@ -284,7 +333,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * of the sale transaction is updated accordingly to the the number of products still present
      *
      * @param returnId id of the return transaction
-     * @param commit if true the transaction is stored, otherwise the operation is deleted and rolled back
+     * @param commit   if true the transaction is stored, otherwise the operation is deleted and rolled back
      * @return true if the operation has been saved/deleted correctly
      */
     public boolean endReturnTransaction(int returnId, boolean commit) {
@@ -298,9 +347,9 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                     // Update quantity of all products
                     returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
                         // Add to inventory the returned products
-                        transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() + amount);
+                        transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() + amount.size());
                         // Remove from the sale the products
-                        transactionProduct.setAmount(transactionProduct.getAmount() - amount);
+                        transactionProduct.setAmount(transactionProduct.getAmount() - amount.size());
                     });
                     databaseConnection.saveSaleTransaction(this);
                     databaseConnection.saveReturnTransaction(returnTransaction, getBalanceId());
@@ -320,7 +369,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * @return true if the DB has been updated
      */
     public boolean setPaidReturnTransaction(int returnId) {
-        if(returnId > 0) {
+        if (returnId > 0) {
             ReturnTransaction returnTransaction = returnTransactions.get(returnId);
             if (returnTransaction != null && returnTransaction.getStatus().equals("CLOSED")) {
                 returnTransaction.setStatus("PAID");
@@ -338,7 +387,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * Used to delete all the return transactions inside this sale
      */
     public void reset() {
-        for (ReturnTransaction ret : returnTransactions.values()){
+        for (ReturnTransaction ret : returnTransactions.values()) {
             databaseConnection.deleteReturnTransaction(ret);
         }
         returnTransactions.clear();
@@ -352,9 +401,9 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * @return true if everything is ok
      */
     public boolean endSaleTransaction() {
-        if(getTransactionStatus().equals("OPENED")){
+        if (getTransactionStatus().equals("OPENED")) {
             setTransactionStatus("CLOSED");
-            if(databaseConnection.saveSaleTransaction(this)){
+            if (databaseConnection.saveSaleTransaction(this)) {
                 return true;
             }
 
@@ -366,12 +415,27 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
     }
 
     public int getSoldQuantity(ProductTypeImpl prod) {
-        if(prod != null) {
+        if (prod != null) {
             TransactionProduct transactionProduct = prodList.get(prod);
             if (transactionProduct != null) {
                 return transactionProduct.quantity;
             }
         }
         return 0;
+    }
+
+    public boolean hasBeenSold(String RFID) {
+        if (RFID != null) {
+            for (TransactionProduct tp : prodList.values()) {
+                if (tp.getProductType() != null) {
+                    for (Product pt : tp.getProducts()) {
+                        if (pt.getRFID().equals(RFID)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

@@ -368,7 +368,7 @@ public class DatabaseConnection {
 
                     // Add product returned used to decrement the one in the sale transaction
                     ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
-                    retT.addProduct(soldProducts.get(product), resultSet.getInt("amount"));
+                    //retT.addProduct(soldProducts.get(product), resultSet.getInt("amount")); //TODO
                 }
             } catch (Exception ignored) { }
         }
@@ -554,14 +554,14 @@ public class DatabaseConnection {
         if(returnTransaction != null && saleId > 0) {
             try {
                 setAutoCommit(false);
-                for (Map.Entry<TransactionProduct, Integer> entry : returnTransaction.getReturns().entrySet()) {
+                for (Map.Entry<TransactionProduct, Map<String, Product>> entry : returnTransaction.getReturns().entrySet()) {
                     PreparedStatement ps = CON.prepareStatement("INSERT INTO return_transaction(id, date_op, type, status, id_product, amount,  id_sale) VALUES(?,?,?,?,?,?,?)");
                     ps.setInt(1, returnTransaction.getBalanceId());
                     ps.setDate(2, Date.valueOf(returnTransaction.getDate()));
                     ps.setString(3, returnTransaction.getType());
                     ps.setString(4, returnTransaction.getStatus());
                     ps.setInt(5, entry.getKey().getProductType().getId());
-                    ps.setInt(6, entry.getValue());
+                    ps.setInt(6, entry.getValue().size()); //TODO move to list
                     ps.setInt(7, saleId);
                     ps.executeUpdate();
                 }
