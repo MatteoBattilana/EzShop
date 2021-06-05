@@ -197,7 +197,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * more than amount
      */
     public boolean addProductToSale(ProductTypeImpl pt, Product product) {
-        if (transactionStatus.equals("OPENED") && product != null) {
+        if (transactionStatus.equals("OPENED") && product != null && pt != null && pt.getQuantity() - 1 >= 0) {
             TransactionProduct transactionProduct = prodList.get(pt);
             if (transactionProduct != null) {
                 transactionProduct.setAmount(transactionProduct.getAmount() + 1);

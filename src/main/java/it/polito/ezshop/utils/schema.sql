@@ -1,14 +1,31 @@
 CREATE TABLE IF NOT EXISTS version (
- rev text NOT NULL
+    rev text NOT NULL
 );
 DELETE FROM version;
 INSERT INTO version (rev) VALUES ('1.0');
+
+CREATE TABLE IF NOT EXISTS RFID (
+    id INTEGER
+);
 
 CREATE TABLE IF NOT EXISTS users (
  id INTEGER,
  username text NOT NULL,
  password text NOT NULL,
  role text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS transaction_product_rfid (
+    id_sale INTEGER,
+    id_product INTEGER,
+    rfid text
+);
+
+
+CREATE TABLE IF NOT EXISTS return_product_rfid (
+                                                        id_sale INTEGER,
+                                                        id_product INTEGER,
+                                                        rfid text
 );
 
 CREATE TABLE IF NOT EXISTS order_operation (

@@ -498,7 +498,8 @@ public class EZShop implements EZShopInterface {
                 // Database saved, update local object
                 productType.setQuantity(productType.getQuantity() + toBeAdded);
                 for(int i = 0; i < toBeAdded; i++) {
-                    productType.addProduct(String.format("%010d", lastRFID++));
+                    productType.addProduct(String.format("%010d", ++lastRFID));
+                    databaseConnection.updateLastRIFD(lastRFID);
                 }
                 // Try to save into the DB
                 if(databaseConnection.updateProductType(productType))
@@ -791,8 +792,8 @@ public class EZShop implements EZShopInterface {
                         throw new InvalidLocationException();
 
                     for(int i = 0; i < order.getQuantity(); i++ ){
-                        productType.addProduct(String.format("%010d", RFIDVal + 1));
-                        RFIDVal++;
+                        productType.addProduct(String.format("%010d", RFIDVal++));
+
                     }
 
                     productType.setQuantity(productType.getQuantity() + order.getQuantity());
@@ -1185,8 +1186,12 @@ public class EZShop implements EZShopInterface {
             if (product.getQuantity() >= amount) {
                 for (int i = 0; i < amount; i++ ){
                     try {
-                        addProductToSaleRFID(transactionId, product.getAllProducts().get(0).getRFID());
-                        product.removeOneProduct();
+                        if(addProductToSaleRFID(transactionId, product.getAllProducts().get(0).getRFID())){
+                            product.removeOneProduct();
+                        } else {
+                            return false;
+                        }
+
                     }
                     catch (InvalidRFIDException ignore) {}
                 }
@@ -1283,13 +1288,14 @@ public class EZShop implements EZShopInterface {
         ProductTypeImpl product = getProductByBarcode(productCode);
         if (transaction != null && product != null) {
             for(TransactionProduct tp: transaction.getTicketEntries()){
-                if(tp.getProductType().getBarCode().equals(productCode)){
-                    List<Product> products = tp.getProducts();
+                if(tp.getProductType().getBarCode().equals(productCode) && tp.getProducts().size() > 0){
                     for(int i = 0; i < amount; i++){
-                        tp.removeProduct(products.get(0));
+                        List<Product> products = tp.getProducts();
                         product.addProduct(products.get(0).getRFID());
-                        products.remove(0);
+                        tp.removeProduct(products.get(0));
+                        product.setQuantity(product.getQuantity() + 1);
                     }
+                    return true;
                 }
             }
         }

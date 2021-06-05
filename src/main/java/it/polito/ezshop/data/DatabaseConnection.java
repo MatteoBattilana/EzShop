@@ -325,12 +325,27 @@ public class DatabaseConnection {
                                     resultSet.getDouble("discount"),
                                     resultSet.getInt("quantity"),
                                     resultSet.getDouble("price"),
-                                    new HashMap<>()//TODO: fix
+                                    getAllRFID(saleTransactionId, resultSet.getInt("id_product"))
                             )
                     );
                 }
             } catch (Exception ignored) { }
         }
+        return all;
+    }
+
+    private Map<String, Product> getAllRFID(int saleTransactionId, int id_product) {
+        Map<String, Product> all = new HashMap<>();
+        try{
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM transaction_product_rfid WHERE id_sale = ? AND id_product = ?");
+            ps.setInt(1, saleTransactionId);
+            ps.setInt(2, id_product);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(resultSet.getString("rfid"), new Product(resultSet.getString("rfid")));
+            }
+
+        } catch (Exception ignored) { }
         return all;
     }
 
@@ -368,10 +383,25 @@ public class DatabaseConnection {
 
                     // Add product returned used to decrement the one in the sale transaction
                     ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
-                    //retT.addProduct(soldProducts.get(product), resultSet.getInt("amount")); //TODO
+                    retT.set(soldProducts.get(product), getAllReturnProducts(retT.getBalanceId(), product.getId()));
                 }
             } catch (Exception ignored) { }
         }
+        return all;
+    }
+
+    private Map<String, Product> getAllReturnProducts(int balanceId, int productid) {
+        Map<String, Product> all = new HashMap<>();
+        try{
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM return_product_rfid WHERE id_sale = ? AND id_product = ?");
+            ps.setInt(1, balanceId);
+            ps.setInt(2, productid);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(resultSet.getString("rfid"), new Product(resultSet.getString("rfid")));
+            }
+
+        } catch (Exception ignored) { }
         return all;
     }
 
@@ -384,7 +414,15 @@ public class DatabaseConnection {
                 ps.setDouble(3, ticket.getDiscountRate());
                 ps.setInt(4, ticket.getAmount());
                 ps.setDouble(5, ticket.getPricePerUnit());
-                return ps.executeUpdate() > 0;
+                if(ps.executeUpdate() > 0){
+                    for (Product p: ticket.getProducts()) {
+                        PreparedStatement ps2 = CON.prepareStatement("INSERT INTO transaction_product_rfid(id_sale, id_product, rfid) VALUES(?,?,?)");
+                        ps2.setInt(1, transaction.getTicketNumber());
+                        ps2.setInt(2, ticket.getProductType().getId());
+                        ps2.setString(3, p.getRFID());
+                    }
+                    return true;
+                }
             } catch (Exception ignored) { }
         }
         return false;
@@ -564,6 +602,7 @@ public class DatabaseConnection {
                     ps.setInt(6, entry.getValue().size()); //TODO move to list
                     ps.setInt(7, saleId);
                     ps.executeUpdate();
+                    saveRFIDReturn(returnTransaction.getBalanceId(), entry.getKey().getProductType().getId(), entry.getKey().getProducts());
                 }
                 CON.commit();
                 return true;
@@ -577,6 +616,19 @@ public class DatabaseConnection {
             }
         }
         return false;
+    }
+
+    private void saveRFIDReturn(int balanceId, Integer productId, List<Product> products) {
+        try {
+            for(Product p : products) {
+                PreparedStatement ps2 = CON.prepareStatement("INSERT INTO return_product_rfid(id_sale, id_product, rfid) VALUES(?,?,?)");
+                ps2.setInt(1, balanceId);
+                ps2.setInt(2, productId);
+                ps2.setString(3, p.getRFID());
+                ps2.executeUpdate();
+            }
+        }
+        catch (Exception ignore) {}
     }
 
     /**
@@ -905,16 +957,29 @@ public class DatabaseConnection {
     }
 
     public int getLastRIFD() {
-//TODO
+        try {
+            PreparedStatement ps = CON.prepareStatement("SELECT id FROM RFID");
+            ResultSet resultSet = ps.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getInt("id");
+            }
+        } catch (SQLException ignore) {}
         return -1;
     }
 
     public void updateLastRIFD(int lastRFID) {
-//TODO
+        removeLastRFID();
+        try {
+            PreparedStatement ps = CON.prepareStatement("INSERT INTO RFID(id) VALUES(?)");
+            ps.setInt(1, lastRFID);
+            ps.executeUpdate();
+        } catch (SQLException ignore) {}
     }
 
     public void removeLastRFID() {
-//TODO
-
+        try {
+            PreparedStatement ps = CON.prepareStatement("DELETE FROM RFID");
+            ps.executeUpdate();
+        } catch (SQLException ignore) {}
     }
 }
