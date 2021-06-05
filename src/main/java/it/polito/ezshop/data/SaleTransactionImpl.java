@@ -142,23 +142,26 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * Add amount of product to a sale transaction, only if enough quantity.
      *
      * @param product product to be removed
-     * @param amount quantity of product to be removed from the transaction
      * @return true if the operation can be performed and if the number of product in the transaction are
      *              more than amount
      */
-    public boolean addProductToSale(ProductTypeImpl product, int amount) {
-        if (transactionStatus.equals("OPENED") && product != null && product.getQuantity() - amount >= 0) {
-            TransactionProduct transactionProduct = prodList.get(product);
+    public boolean addProductToSale(ProductTypeImpl pt, Product product) {
+        if (transactionStatus.equals("OPENED") && product != null) {
+            TransactionProduct transactionProduct = prodList.get(pt);
             if(transactionProduct != null) {
-                transactionProduct.setAmount(transactionProduct.getAmount() + amount);
+                transactionProduct.setAmount(transactionProduct.getAmount() + 1);
+                transactionProduct.addProduct(product);
             }
             else {
+                // First time
+                HashMap<String, Product> objectObjectHashMap = new HashMap<>();
+                objectObjectHashMap.put(product.getRFID(), product);
                 prodList.put(
-                        product,
-                        new TransactionProduct(product, 0, amount, product.getPricePerUnit())
+                        pt,
+                        new TransactionProduct(pt, 0, 1, pt.getPricePerUnit(), objectObjectHashMap)
                 );
             }
-            product.setTemporaryQuantity(product.getQuantity() - amount);
+            pt.setQuantity(pt.getQuantity() - 1);
             return true;
         }
         return false;
@@ -169,22 +172,22 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
      * relative product must exists in the sale
      *
      * @param product product to be removed
-     * @param amount quantity of product to be removed from the transaction
      * @return true if the operation can be performed and if the number of product in the transaction are
      *              more than amount
      */
-    public boolean deleteProductFromSale(ProductTypeImpl product, int amount) {
-        if (transactionStatus.equals("OPENED") && product != null) {
+    public boolean deleteProductFromSale(ProductTypeImpl product, Product p) {
+        if (transactionStatus.equals("OPENED") && product != null && p!= null) {
             TransactionProduct transactionProduct = prodList.get(product);
-            if(transactionProduct != null && transactionProduct.getAmount() >= amount) {
+            if(transactionProduct != null && transactionProduct.getAmount() > 0) {
                 // Remove the ticket entry if the remaining amount is 0
-                if (transactionProduct.getAmount() - amount == 0) {
+                if (transactionProduct.getAmount() - 1 == 0) {
                     prodList.remove(product);
                 } else {
-                    transactionProduct.setAmount(transactionProduct.getAmount() - amount);
+                    transactionProduct.setAmount(transactionProduct.getAmount() - 1);
                 }
-
-                product.setQuantity(product.getQuantity() + amount);
+                product.addProduct(transactionProduct.getProducts().get(0).getRFID());
+                transactionProduct.removeProduct(p);
+                product.setQuantity(product.getQuantity() + 1);
                 return true;
             }
         }

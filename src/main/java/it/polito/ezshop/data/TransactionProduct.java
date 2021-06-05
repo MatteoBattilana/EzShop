@@ -1,16 +1,22 @@
 package it.polito.ezshop.data;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class TransactionProduct implements TicketEntry {
     private double pricePerUnit;
     private ProductTypeImpl productType;
     int quantity;
     double discount;
+    Map<String, Product> products;
 
-    public TransactionProduct(ProductTypeImpl productType, double discount, int quantity, double pricePerUnit) {
+    public TransactionProduct(ProductTypeImpl productType, double discount, int quantity, double pricePerUnit, Map<String, Product> products) {
         this.productType = productType;
         this.quantity = quantity;
         this.discount = discount;
         this.pricePerUnit = pricePerUnit;
+        this.products= products;
     }
 
     public ProductTypeImpl getProductType(){
@@ -71,5 +77,17 @@ public class TransactionProduct implements TicketEntry {
     public boolean applyDiscountRateToProduct(double discountRate) {
         setDiscountRate(discountRate);
         return true;
+    }
+
+    public List<Product> getProducts() {
+        return new ArrayList<>(products.values());
+    }
+
+    public void addProduct(Product product) {
+        products.put(product.getRFID(), product);
+    }
+
+    public void removeProduct(Product p) {
+        products.remove(p.getRFID());
     }
 }

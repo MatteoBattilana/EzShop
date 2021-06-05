@@ -324,7 +324,8 @@ public class DatabaseConnection {
                                     product,
                                     resultSet.getDouble("discount"),
                                     resultSet.getInt("quantity"),
-                                    resultSet.getDouble("price")
+                                    resultSet.getDouble("price"),
+                                    new HashMap<>()//TODO: fix
                             )
                     );
                 }
@@ -901,5 +902,19 @@ public class DatabaseConnection {
             } catch (Exception ignored) { }
         }
         return false;
+    }
+
+    public int getLastRIFD() {
+//TODO
+        return -1;
+    }
+
+    public void updateLastRIFD(int lastRFID) {
+//TODO
+    }
+
+    public void removeLastRFID() {
+//TODO
+
     }
 }
