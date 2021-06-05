@@ -827,11 +827,6 @@ public class EZShop implements EZShopInterface {
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
-    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, 
-InvalidLocationException, InvalidRFIDException {
-        return false;
-    }
-    @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
         // Check if the user is logged
         validateLoggedUser("ShopManager");
@@ -1278,11 +1273,6 @@ InvalidLocationException, InvalidRFIDException {
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
-    public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
-    }
-    
-    @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
         // Check logged user
         validateLoggedUser("Cashier");
@@ -1375,11 +1365,6 @@ InvalidLocationException, InvalidRFIDException {
      * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-    @Override
-    public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
-    }
-
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
         // Check logged user
@@ -1690,13 +1675,6 @@ InvalidLocationException, InvalidRFIDException {
      * @throws InvalidTransactionIdException if returnId is less than or equal to 0 or if it is null
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-    @Override
-    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException 
-    {
-        return false;
-    }
-
-
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
         // Check logged user
