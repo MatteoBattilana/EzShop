@@ -11,7 +11,7 @@ public class EZShop implements EZShopInterface {
     private final AccountBook accountBook;
     private final CreditCardCircuit creditCardCircuit;
     private final DatabaseConnection databaseConnection;
-    private int lastRFID = 0;
+    private int lastRFID = -1;
 
     private static final String CREDIT_CARD_FILE = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
 
@@ -793,8 +793,8 @@ public class EZShop implements EZShopInterface {
 
                     for(int i = 0; i < order.getQuantity(); i++ ){
                         productType.addProduct(String.format("%010d", RFIDVal++));
-
                     }
+                    databaseConnection.updateLastRIFD(RFIDVal - 1);
 
                     productType.setQuantity(productType.getQuantity() + order.getQuantity());
                     if(databaseConnection.updateProductType(productType)){
