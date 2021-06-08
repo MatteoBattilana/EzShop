@@ -208,6 +208,34 @@ public class DatabaseConnection {
                 ps.setString(5, prod.getBarCode());
                 ps.setDouble(6, prod.getPricePerUnit());
                 ps.setInt(7, prod.getId());
+                if(ps.executeUpdate() > 0) {
+                    for(Product product : prod.getAllProducts()){
+                        updateProduct(prod, product);
+                    }
+                    return true;
+                }
+            } catch (Exception ignored) { }
+        }
+        return false;
+    }
+
+    private boolean updateProduct(ProductTypeImpl pt, Product product) {
+        if(pt != null && product != null) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("INSERT INTO product (product_type_id, RFID) VALUES(?,?)");
+                ps.setInt(1, pt.getId());
+                ps.setString(2, product.getRFID());
+                return ps.executeUpdate() > 0;
+            } catch (Exception ignored) { }
+        }
+        return false;
+    }
+
+    private boolean deleteAllProduct(ProductTypeImpl productType) {
+        if(productType != null) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("DELETE FROM product WHERE product_type_id = ?");
+                ps.setInt(1, productType.getId());
                 return ps.executeUpdate() > 0;
             } catch (Exception ignored) { }
         }
@@ -244,6 +272,7 @@ public class DatabaseConnection {
     public boolean deleteProductType(ProductTypeImpl productType) {
         if(productType != null) {
             try {
+                deleteAllProduct(productType);
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM product_type WHERE id = ?");
                 ps.setInt(1, productType.getId());
                 return ps.executeUpdate() > 0;
@@ -450,12 +479,15 @@ public class DatabaseConnection {
                 setAutoCommit(false);
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
                 ps.setInt(1, transaction.getTicketNumber());
-                if (ps.executeUpdate() > 0) {
+                ps.executeUpdate();
                     // Rollback product quantities
                     for (TransactionProduct tp : transaction.getTicketEntries()) {
                         if(tp != null) {
                             ProductTypeImpl product = tp.getProductType();
                             if(product != null) {
+                                for (Product p : tp.getProducts()){
+                                    product.addProduct(p.getRFID());
+                                }
                                 product.setQuantity(product.getQuantity() + tp.getAmount());
                                 if (!updateProductType(tp.getProductType())) {
                                     product.setQuantity(product.getQuantity() - tp.getAmount());
@@ -468,9 +500,8 @@ public class DatabaseConnection {
                             }
                         }
                     }
-                    return true;
-                }
                 CON.commit();
+                return true;
             } catch (Exception ignored) { }
             finally {
                 setAutoCommit(true);

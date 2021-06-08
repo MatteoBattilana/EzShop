@@ -15,6 +15,11 @@ CREATE TABLE IF NOT EXISTS users (
  role text NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS product (
+    product_type_id INTEGER,
+    rfid text
+);
+
 CREATE TABLE IF NOT EXISTS transaction_product_rfid (
     id_sale INTEGER,
     id_product INTEGER,

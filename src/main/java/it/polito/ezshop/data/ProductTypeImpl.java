@@ -123,4 +123,8 @@ public class ProductTypeImpl implements ProductType {
             products.remove(new ArrayList<>(products.values()).get(0).getRFID());
         }
     }
+
+    public void removeByRFID(String rfid) {
+        products.remove(rfid);
+    }
 }

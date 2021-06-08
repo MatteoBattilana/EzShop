@@ -1186,9 +1186,7 @@ public class EZShop implements EZShopInterface {
             if (product.getQuantity() >= amount) {
                 for (int i = 0; i < amount; i++ ){
                     try {
-                        if(addProductToSaleRFID(transactionId, product.getAllProducts().get(0).getRFID())){
-                            product.removeOneProduct();
-                        } else {
+                        if(!addProductToSaleRFID(transactionId, product.getAllProducts().get(0).getRFID())){
                             return false;
                         }
 
@@ -1244,7 +1242,10 @@ public class EZShop implements EZShopInterface {
             for (ProductTypeImpl pt: products.values()){
                 for(Product product: pt.getAllProducts()){
                     if (product.getRFID().equals(RFID)) {
-                        return transaction.addProductToSale(pt, product);
+                        if(transaction.addProductToSale(pt, product)){
+                            pt.removeByRFID(RFID);
+                            return true;
+                        }
                     }
                 }
             }
@@ -1334,10 +1335,10 @@ public class EZShop implements EZShopInterface {
         SaleTransactionImpl transaction = allSales.get(transactionId);
         if (transaction != null) {
             //Find the product
-            for (ProductTypeImpl pt: products.values()){
-                for(Product product: pt.getAllProducts()){
+            for (TransactionProduct pt: transaction.getTicketEntries()){
+                for(Product product: pt.getProducts()){
                     if (product.getRFID().equals(RFID)) {
-                        return transaction.deleteProductFromSale(pt, product);
+                        return transaction.deleteProductFromSale(pt.getProductType(), product);
                     }
                 }
             }
@@ -1610,7 +1611,7 @@ public class EZShop implements EZShopInterface {
 
         // Add te product to the return transaction
         ProductTypeImpl prod = getProductByBarcode(productCode);
-        if(prod != null && sale != null && sale.getSoldQuantity(prod) >= amount){
+        if(prod != null && sale != null){
             return sale.setReturnProduct(returnId, prod, amount);
         }
         return false;

@@ -90,11 +90,10 @@ public class SaleTransactionImplTest {
         ProductTypeImpl product2 = new ProductTypeImpl(10, "top-shelves", "good", "blue", "010603984300", 0.60, 51);
         assertTrue(sale.addProductToSale(product,new Product("0000000000")));
         assertTrue(sale.addProductToSale(product,new Product("0000000001")));
-        sale.startReturnTransaction(2);
-        assertTrue(sale.setReturnProduct(2,product,1));
-        assertFalse(sale.setReturnProduct(2,product2,1));
-        assertFalse(sale.setReturnProduct(3,product,1));
-        assertFalse(sale.setReturnProduct(3,null,1));
+        ReturnTransaction returnTransaction = sale.startReturnTransaction(2);
+        assertTrue(sale.setReturnProduct(returnTransaction.getBalanceId(),product,1));
+        assertFalse(sale.setReturnProduct(returnTransaction.getBalanceId(),product2,1));
+        assertFalse(sale.setReturnProduct(returnTransaction.getBalanceId(),null,1));
         assertFalse(sale.setReturnProduct(-1,product,1));
 
     }

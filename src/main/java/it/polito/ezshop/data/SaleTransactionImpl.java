@@ -64,7 +64,12 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         if (returnId > 0 && prod != null) {
             TransactionProduct soldP = prodList.get(prod);
             ReturnTransaction returnTransaction = returnTransactions.get(returnId);
-            if (soldP != null && returnTransaction != null) {
+            int alreadyIn = 0;
+            if(returnTransaction.getReturns() != null && returnTransaction.getReturns().get(soldP)!= null){
+                alreadyIn = returnTransaction.getReturns().get(soldP).size();
+            }
+
+            if (soldP != null && returnTransaction != null && soldP.getAmount() - alreadyIn >= amount) {
                 for (int i = 0; i < amount; i++) {
                     List<Product> products = new ArrayList<>(soldP.getProducts());
                     setReturnProduct(returnId, products.get(0).getRFID());
@@ -290,11 +295,21 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             ReturnTransaction returnTransaction = returnTransactions.get(returnId);
             if (returnTransaction != null) {
                 if (returnTransaction.getStatus().equals("OPENED")) {
+                    returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
+                        for(Product p : amount.values()){
+                            transactionProduct.addProduct(p);
+                        }
+                        // Remove from the sale the products
+                        //transactionProduct.setAmount(transactionProduct.getAmount() + amount.size());
+                    });
                     returnTransactions.remove(returnId);
                     return true;
                 } else if (returnTransaction.getStatus().equals("CLOSED")) {
                     // Rollback quantities
                     returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
+                        for(Product p : amount.values()){
+                            transactionProduct.addProduct(p);
+                        }
                         // Remove from the sale the products
                         transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() - amount.size());
                         databaseConnection.updateProductType(transactionProduct.getProductType());
@@ -346,6 +361,10 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                     returnTransaction.setStatus("CLOSED");
                     // Update quantity of all products
                     returnTransaction.getReturns().forEach((transactionProduct, amount) -> {
+                        for(Product p : amount.values()){
+                            transactionProduct.getProductType().addProduct(p.getRFID());
+                        }
+
                         // Add to inventory the returned products
                         transactionProduct.getProductType().setQuantity(transactionProduct.getProductType().getQuantity() + amount.size());
                         // Remove from the sale the products
