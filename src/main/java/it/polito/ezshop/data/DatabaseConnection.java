@@ -208,6 +208,35 @@ public class DatabaseConnection {
                 ps.setString(5, prod.getBarCode());
                 ps.setDouble(6, prod.getPricePerUnit());
                 ps.setInt(7, prod.getId());
+                deleteAllProduct(prod);
+                if(ps.executeUpdate() > 0) {
+                    for(Product product : prod.getAllProducts()){
+                        updateProduct(prod, product);
+                    }
+                    return true;
+                }
+            } catch (Exception ignored) { }
+        }
+        return false;
+    }
+
+    private boolean updateProduct(ProductTypeImpl pt, Product product) {
+        if(pt != null && product != null) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("INSERT INTO product (product_type_id, RFID) VALUES(?,?)");
+                ps.setInt(1, pt.getId());
+                ps.setString(2, product.getRFID());
+                return ps.executeUpdate() > 0;
+            } catch (Exception ignored) { }
+        }
+        return false;
+    }
+
+    private boolean deleteAllProduct(ProductTypeImpl productType) {
+        if(productType != null) {
+            try {
+                PreparedStatement ps = CON.prepareStatement("DELETE FROM product WHERE product_type_id = ?");
+                ps.setInt(1, productType.getId());
                 return ps.executeUpdate() > 0;
             } catch (Exception ignored) { }
         }
@@ -244,6 +273,7 @@ public class DatabaseConnection {
     public boolean deleteProductType(ProductTypeImpl productType) {
         if(productType != null) {
             try {
+                deleteAllProduct(productType);
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM product_type WHERE id = ?");
                 ps.setInt(1, productType.getId());
                 return ps.executeUpdate() > 0;
@@ -324,12 +354,28 @@ public class DatabaseConnection {
                                     product,
                                     resultSet.getDouble("discount"),
                                     resultSet.getInt("quantity"),
-                                    resultSet.getDouble("price")
+                                    resultSet.getDouble("price"),
+                                    getAllRFID(saleTransactionId, resultSet.getInt("id_product"))
                             )
                     );
                 }
             } catch (Exception ignored) { }
         }
+        return all;
+    }
+
+    private Map<String, Product> getAllRFID(int saleTransactionId, int id_product) {
+        Map<String, Product> all = new HashMap<>();
+        try{
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM transaction_product_rfid WHERE id_sale = ? AND id_product = ?");
+            ps.setInt(1, saleTransactionId);
+            ps.setInt(2, id_product);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(resultSet.getString("rfid"), new Product(resultSet.getString("rfid")));
+            }
+
+        } catch (Exception ignored) { }
         return all;
     }
 
@@ -367,10 +413,25 @@ public class DatabaseConnection {
 
                     // Add product returned used to decrement the one in the sale transaction
                     ProductTypeImpl product = mProducts.get(resultSet.getInt("id_product"));
-                    retT.addProduct(soldProducts.get(product), resultSet.getInt("amount"));
+                    //retT.set(soldProducts.get(product), getAllReturnProducts(retT.getBalanceId(), product.getId())); TODO: enable
                 }
             } catch (Exception ignored) { }
         }
+        return all;
+    }
+
+    private Map<String, Product> getAllReturnProducts(int balanceId, int productid) {
+        Map<String, Product> all = new HashMap<>();
+        try{
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM return_product_rfid WHERE id_sale = ? AND id_product = ?");
+            ps.setInt(1, balanceId);
+            ps.setInt(2, productid);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                all.put(resultSet.getString("rfid"), new Product(resultSet.getString("rfid")));
+            }
+
+        } catch (Exception ignored) { }
         return all;
     }
 
@@ -383,7 +444,15 @@ public class DatabaseConnection {
                 ps.setDouble(3, ticket.getDiscountRate());
                 ps.setInt(4, ticket.getAmount());
                 ps.setDouble(5, ticket.getPricePerUnit());
-                return ps.executeUpdate() > 0;
+                if(ps.executeUpdate() > 0){
+                    for (Product p: ticket.getProducts()) {
+                        PreparedStatement ps2 = CON.prepareStatement("INSERT INTO transaction_product_rfid(id_sale, id_product, rfid) VALUES(?,?,?)");
+                        ps2.setInt(1, transaction.getTicketNumber());
+                        ps2.setInt(2, ticket.getProductType().getId());
+                        ps2.setString(3, p.getRFID());
+                    }
+                    return true;
+                }
             } catch (Exception ignored) { }
         }
         return false;
@@ -411,27 +480,29 @@ public class DatabaseConnection {
                 setAutoCommit(false);
                 PreparedStatement ps = CON.prepareStatement("DELETE FROM sale_transaction WHERE id = ?");
                 ps.setInt(1, transaction.getTicketNumber());
-                if (ps.executeUpdate() > 0) {
-                    // Rollback product quantities
-                    for (TransactionProduct tp : transaction.getTicketEntries()) {
-                        if(tp != null) {
-                            ProductTypeImpl product = tp.getProductType();
-                            if(product != null) {
-                                product.setQuantity(product.getQuantity() + tp.getAmount());
-                                if (!updateProductType(tp.getProductType())) {
-                                    product.setQuantity(product.getQuantity() - tp.getAmount());
-                                }
-
-                                PreparedStatement ps2 = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
-                                ps2.setInt(1, transaction.getTicketNumber());
-                                ps2.setInt(2, product.getId());
-                                ps2.executeUpdate();
+                ps.executeUpdate();
+                // Rollback product quantities
+                for (TransactionProduct tp : transaction.getTicketEntries()) {
+                    if(tp != null) {
+                        ProductTypeImpl product = tp.getProductType();
+                        if(product != null) {
+                            for (Product p : tp.getProducts()){
+                                product.addProduct(p.getRFID());
                             }
+                            product.setQuantity(product.getQuantity() + tp.getAmount());
+                            if (!updateProductType(tp.getProductType())) {
+                                product.setQuantity(product.getQuantity() - tp.getAmount());
+                            }
+
+                            PreparedStatement ps2 = CON.prepareStatement("DELETE FROM transaction_product WHERE id_sale = ? AND id_product = ?");
+                            ps2.setInt(1, transaction.getTicketNumber());
+                            ps2.setInt(2, product.getId());
+                            ps2.executeUpdate();
                         }
                     }
-                    return true;
                 }
                 CON.commit();
+                return true;
             } catch (Exception ignored) { }
             finally {
                 setAutoCommit(true);
