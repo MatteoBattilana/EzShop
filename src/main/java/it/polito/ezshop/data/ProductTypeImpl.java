@@ -118,12 +118,6 @@ public class ProductTypeImpl implements ProductType {
         products.put(RFID, new Product(RFID));
     }
 
-    public void removeOneProduct() {
-        if(products.size() > 0){
-            products.remove(new ArrayList<>(products.values()).get(0).getRFID());
-        }
-    }
-
     public void removeByRFID(String rfid) {
         products.remove(rfid);
     }

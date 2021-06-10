@@ -77,7 +77,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             TransactionProduct soldP = prodList.get(getProductType(RFID));
             ReturnTransaction returnTransaction = returnTransactions.get(returnId);
             if (soldP != null && soldP.containsProduct(RFID) && returnTransaction != null) {
-                if(returnTransaction.addProduct(soldP, 1)){
+                if(returnTransaction.addProduct(soldP, getProduct(RFID))){
                     soldP.removeProduct(getProduct(RFID));
                     return true;
                 }
@@ -341,6 +341,14 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             if (returnTransaction != null) {
                 if (returnTransaction.getStatus().equals("OPENED")) {
                     returnTransactions.remove(returnId);
+
+                    returnTransaction.getAllInReturnProducts().forEach((transactionProduct, productList) -> {
+                        // Re-add to the sold products
+                        for(Product p: productList){
+                            transactionProduct.addProduct(p);
+                        }
+                    });
+
                     return true;
                 } else if (returnTransaction.getStatus().equals("CLOSED")) {
                     // Rollback quantities
@@ -350,6 +358,14 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                         databaseConnection.updateProductType(transactionProduct.getProductType());
                         transactionProduct.setAmount(transactionProduct.getAmount() + amount);
                     });
+
+                    returnTransaction.getAllInReturnProducts().forEach((transactionProduct, productList) -> {
+                        // Re-add to the sold products
+                        for(Product p: productList){
+                            transactionProduct.addProduct(p);
+                        }
+                    });
+
                     returnTransactions.remove(returnId);
                     return true;
                 }
