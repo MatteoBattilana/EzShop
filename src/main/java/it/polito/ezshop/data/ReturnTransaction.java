@@ -1,7 +1,9 @@
 package it.polito.ezshop.data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ReturnTransaction extends BalanceOperationImpl {
@@ -9,12 +11,14 @@ public class ReturnTransaction extends BalanceOperationImpl {
     private final double discountRate;
     // Map of all the transaction product used for returning the products
     private final Map<TransactionProduct, Integer> returns;
+    private final Map<TransactionProduct, List<Product>> returns2;
 
     // Constructor used for the database
     public ReturnTransaction(int balanceId, LocalDate date, String type, String status, double discountRate) {
         super(balanceId, date, type, status);
         this.discountRate = discountRate;
-        this. returns = new HashMap<>();
+        this.returns = new HashMap<>();
+        this.returns2 = new HashMap<>();
     }
 
     public ReturnTransaction(int balanceId, double discountRate) {
@@ -43,6 +47,18 @@ public class ReturnTransaction extends BalanceOperationImpl {
                 return true;
             }
         }
+        return false;
+    }
+
+    public boolean addProduct(TransactionProduct prod, Product p) {
+        if(addProduct(prod, 1)){
+            if(returns2.get(prod) == null) {
+                returns2.put(prod, new ArrayList<>());
+            }
+            returns2.get(prod).add(p);
+            return true;
+        }
+
         return false;
     }
 
@@ -80,5 +96,9 @@ public class ReturnTransaction extends BalanceOperationImpl {
      */
     public Map<TransactionProduct, Integer> getReturns() {
         return returns;
+    }
+
+    public Map<TransactionProduct, List<Product>> getAllInReturnProducts() {
+        return returns2;
     }
 }

@@ -290,7 +290,7 @@ public class DatabaseConnectionTest {
         assertTrue(databaseConnection.deleteSaleTransaction(saleTransaction));
         assertEquals(10, apple.getQuantity().intValue());
         assertEquals(0, databaseConnection.getAllBySaleId(saleTransaction.getBalanceId(), allProducts).size());
-        assertFalse(databaseConnection.deleteSaleTransaction(saleTransaction));
+        assertTrue(databaseConnection.deleteSaleTransaction(saleTransaction));
         assertFalse(databaseConnection.deleteSaleTransaction(null));
     }
 

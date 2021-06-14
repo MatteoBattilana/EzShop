@@ -761,6 +761,62 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    @Override
+    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, 
+InvalidLocationException, InvalidRFIDException {
+        // Check if the user is logged
+        validateLoggedUser("ShopManager");
+
+        // Check order id
+        if (orderId == null || orderId <= 0) throw new InvalidOrderIdException();
+
+        // Check RFID
+        if (RFIDfrom == null || !Pattern.compile("[0-9]{12}").matcher(RFIDfrom).matches()) throw new InvalidRFIDException();
+
+        OrderImpl order = orders.get(orderId);
+        if (order != null && order.getOrderStatus().equals("PAYED")) {
+            // Check if not unique
+            int RFIDVal = Integer.parseInt(RFIDfrom);
+            for (ProductTypeImpl pt: products.values()){
+                for (Product product : pt.getAllProducts()){
+                    if(Integer.parseInt(product.getRFID()) >= RFIDVal && Integer.parseInt(product.getRFID()) <= RFIDVal + order.getQuantity())
+                        throw new InvalidRFIDException();
+                }
+            }
+
+            try {
+                ProductTypeImpl productType = getProductByBarcode(order.getProductCode());
+
+                // Check if the product has a location
+                if (productType != null) {
+                    if (productType.getLocation() == null || productType.getLocation().isEmpty())
+                        throw new InvalidLocationException();
+
+                    for(int i = 0; i < order.getQuantity(); i++ ){
+                        productType.addProduct(String.format("%012d", RFIDVal++));
+                    }
+
+                    productType.setQuantity(productType.getQuantity() + order.getQuantity());
+                    if(databaseConnection.updateProductType(productType)){
+                        order.recordOrderArrival();
+                        if(databaseConnection.updateOrder(order))
+                            return true;
+                        else {
+                            order.setOrderStatus("PAYED");
+                            productType.setQuantity(productType.getQuantity() - order.getQuantity());
+                            databaseConnection.updateProductType(productType);
+                        }
+                    }
+
+                    loadProductsFromDb();
+                }
+
+            } catch (InvalidProductCodeException ignore) {}
+        }
+
+        return false;
+    }
+
     /**
      * This method return the list of all orders ISSUED, ORDERED and COMLPETED.
      * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
@@ -769,11 +825,6 @@ public class EZShop implements EZShopInterface {
      *
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-    @Override
-    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, 
-InvalidLocationException, InvalidRFIDException {
-        return false;
-    }
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
         // Check if the user is logged
@@ -1137,6 +1188,47 @@ InvalidLocationException, InvalidRFIDException {
         return false;
     }
 
+    @Override
+    public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check RFID
+        if (RFID == null || !Pattern.compile("[0-9]{12}").matcher(RFID).matches()) throw new InvalidRFIDException();
+
+        // Check if no other transactions uses that RFID
+        for(SaleTransactionImpl transaction : allSales.values()){
+            for(TransactionProduct tp : transaction.getTicketEntries()){
+                for (Product p: tp.getProducts()){
+                    if(p.getRFID().equals(RFID))
+                        return false;
+                }
+            }
+        }
+
+        // Add the product to sale
+        SaleTransactionImpl transaction = allSales.get(transactionId);
+        if (transaction != null) {
+            //Find the product
+            for (ProductTypeImpl pt: products.values()){
+                for(Product product: pt.getAllProducts()){
+                    if (product.getRFID().equals(RFID)) {
+                        if(transaction.addProductToSale(pt, product)){
+                            pt.removeByRFID(RFID);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+
+    }
+
     /**
      * This method deletes a product from a sale transaction increasing the temporary amount of product available on the
      * shelves for other customers.
@@ -1157,11 +1249,6 @@ InvalidLocationException, InvalidRFIDException {
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     @Override
-    public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
-    }
-    
-    @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
         // Check logged user
         validateLoggedUser("Cashier");
@@ -1177,6 +1264,33 @@ InvalidLocationException, InvalidRFIDException {
         ProductTypeImpl product = getProductByBarcode(productCode);
         if (transaction != null && product != null) {
             return transaction.deleteProductFromSale(product, amount);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (transactionId == null || transactionId <= 0) throw new InvalidTransactionIdException();
+
+        // Check RFID
+        if (RFID == null || !Pattern.compile("[0-9]{12}").matcher(RFID).matches()) throw new InvalidRFIDException();
+
+        // Add the product to sale
+        SaleTransactionImpl transaction = allSales.get(transactionId);
+        if (transaction != null) {
+            //Find the product
+            for (TransactionProduct pt: transaction.getTicketEntries()){
+                for(Product product: pt.getProducts()){
+                    if (product.getRFID().equals(RFID)) {
+                        return transaction.deleteProductFromSale(pt.getProductType(), product);
+                    }
+                }
+            }
         }
 
         return false;
@@ -1201,11 +1315,6 @@ InvalidLocationException, InvalidRFIDException {
      * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-    @Override
-    public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
-    }
-
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
         // Check logged user
@@ -1457,6 +1566,30 @@ InvalidLocationException, InvalidRFIDException {
         return false;
     }
 
+    @Override
+    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException 
+    {
+        // Check logged user
+        validateLoggedUser("Cashier");
+
+        // Check transaction id
+        if (returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        // Check RFID
+        if (RFID == null || !Pattern.compile("[0-9]{12}").matcher(RFID).matches()) throw new InvalidRFIDException();
+
+        // Check that the sold quantity is less than the returned one
+        SaleTransactionImpl sale = getSaleTransactionByReturnTransactionId(returnId);
+
+        // Add te product to the return transaction
+        if(sale != null) {
+            //Find the product
+            return sale.setReturnProduct(returnId, RFID);
+        }
+
+        return false;
+    }
+
     /**
      * This method closes a return transaction. A closed return transaction can be committed (i.e. <commit> = true) thus
      * it increases the product quantity available on the shelves or not (i.e. <commit> = false) thus the whole trasaction
@@ -1476,13 +1609,6 @@ InvalidLocationException, InvalidRFIDException {
      * @throws InvalidTransactionIdException if returnId is less than or equal to 0 or if it is null
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-    @Override
-    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException 
-    {
-        return false;
-    }
-
-
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
         // Check logged user

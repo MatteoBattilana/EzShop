@@ -1,5 +1,10 @@
 package it.polito.ezshop.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class ProductTypeImpl implements ProductType {
     private int quantity;
     private String position;
@@ -9,6 +14,7 @@ public class ProductTypeImpl implements ProductType {
     private double pricePerUnit;
     private double discountRate;
     private int id;
+    private Map<String, Product> products;
 
     public ProductTypeImpl(int quantity, String position, String note, String description, String barcode, double pricePerUnit, int id) {
         this.quantity = quantity;
@@ -19,6 +25,11 @@ public class ProductTypeImpl implements ProductType {
         this.pricePerUnit = pricePerUnit;
         this.id = id;
         this.discountRate = 0.0;
+        this.products = new HashMap<>();
+    }
+
+    public List<Product> getAllProducts() {
+        return new ArrayList<>(products.values());
     }
 
     @Override
@@ -101,5 +112,13 @@ public class ProductTypeImpl implements ProductType {
     @Override
     public void setId(Integer id) {
         if(id != null && id > 0) this.id = id;
+    }
+
+    public void addProduct(String RFID) {
+        products.put(RFID, new Product(RFID));
+    }
+
+    public void removeByRFID(String rfid) {
+        products.remove(rfid);
     }
 }

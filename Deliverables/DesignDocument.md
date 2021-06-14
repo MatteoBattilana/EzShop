@@ -64,7 +64,8 @@ Packages:
 
 ```plantuml
 
-  left to right direction
+ 
+left to right direction
 package it.polito.ezshop.data {
 
     class DatabaseConnection {
@@ -77,12 +78,16 @@ package it.polito.ezshop.data {
       + createOrder(Order order): Boolean
       + getAllProducts(): List<ProductType>
       + updateProductType(prod: ProductType): Boolean
+     - updateProduct(pt: ProductType, product: Product): Boolean
       + createProductType(prod: ProductType): Boolean
+      + deleteAllProduct(product: ProductType): Boolean
       + deleteProductType(prod: ProductType): Boolean
       + createSaleTransaction(sale: SaleTransaction): Boolean
       + getAllSaleTransaction(): List<SaleTransaction>
       + getAllBySaleId(id: Integer): SaleTransaction
+      - getAllRFID(saleTransactionId: Integer, id_product:Integer) : Map<String, Product>
       + getAllReturnTransaction(): List<ReturnTransaction>
+      -getAllReturnProducts( balanceId: Integer, productid: Integer): Map<String, Product> 
       + addProductToSale(sale: SaleTransaction, ticket: TicketEntry, productId: Integer): Boolean
       + saveSaleTransaction(sale: SaleTransaction): Boolean
       + deleteSaleTransaction(sale: SaleTransaction): Boolean
@@ -91,6 +96,7 @@ package it.polito.ezshop.data {
       + getAllBalanceOperations(): List<BalanceOperation>
       + deleteBalanceOperation(op: BalanceOperation): Boolean
       + saveReturnTransaction(returnT: ReturnTransaction): Boolean
+      - saveRFIDReturn( balanceId: Integer, productId: Integer, products:List<Product>)
       + setStatusReturnTransaction(retT: ReturnTransaction): Boolean
       + updateOrder(o: Order): Boolean
       + getAllOrders(): List<Order>
@@ -107,6 +113,13 @@ package it.polito.ezshop.data {
       + updateBalance(balance: Double): Boolean
       + deleteBalance(): Boolean
       + getBalance(): Double
+      + setAutoCommit(state:boolean)
+      + closeConnection()
+      + deleteCustomerCard(card: CustomerCard)
+      + getLastRIFD(): Integer
+      + updateLastRIFD(lastRFID:Integer)
+      + removeLastRFID()
+
     }
   class CreditCardCircuit {
     + validateCreditCart(creditCardId: String): Boolean
@@ -133,13 +146,14 @@ package it.polito.ezshop.data {
 + deleteProductType(id: Integer): Boolean
 + getAllProductTypes(): List<ProductType>
 + getProductTypeByBarCode(barCode: String): ProductType
-+ getProductTypesByDescription(description: String): List<ProductType>
++getProductTypesByDescription(description: String): List<ProductType>
 + updateQuantity(productId: Integer, toBeAdded: Integer): Boolean
 + updatePosition(productId: Integer, newPos: String): Boolean
 + issueOrder(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
 + payOrderFor(productCode: String, quantity: Integer, pricePerUnit: Double): Integer
 + payOrder(orderId: Integer): Boolean
 + recordOrderArrival(orderId: Integer): Boolean
++ recordOrderArrivalRFID(orderId: Integer,  RFIDfrom:String): Boolean
 + getAllOrders(): List<Order>
 + defineCustomer(customerName: String): Integer
 + modifyCustomer(id: Integer, newCustomerName: String, newCustomerCard: String): Boolean
@@ -151,8 +165,10 @@ package it.polito.ezshop.data {
 + modifyPointsOnCard(customerCard: String, pointsToBeAdded: Integer): Boolean
 + startSaleTransaction(): Integer
 + addProductToSale(transactionId: Integer, productCode: String, amount: Integer): Boolean
++ addProductToSaleRFID(transactionId: Integer, RFID: String): Boolean
 + deleteProductFromSale(transactionId: Integer, productCode: String, amount: Integer): Boolean
-+ applyDiscountRateToProduct(transactionId: Integer, productCode: String, discountRate: Double): Boolean
++ deleteProductFromSaleRFID(transactionId: Integer, RFID: String): Boolean
++applyDiscountRateToProduct(transactionId: Integer, productCode: String, discountRate: Double): Boolean
 + applyDiscountRateToSale(transactionId: Integer, discountRate: Double): Boolean
 + computePointsForSale(transactionId: Integer): Integer
 + endSaleTransaction(transactionId: Integer): Boolean
@@ -160,6 +176,7 @@ package it.polito.ezshop.data {
 + getSaleTransaction(transactionId: Integer): SaleTransaction
 + startReturnTransaction(transactionID: Integer): Integer
 + returnProduct(returnId: Integer, productCode: String, amount: Integer): Boolean
++ returnProductRFID(returnId: Integer, RFID: String): Boolean
 + endReturnTransaction(returnId: Integer, Boolean commit): Boolean
 + deleteReturnTransaction(returnId: Integer): Boolean
 + receiveCashPayment(transactionID: Integer, cash: Double): Double
@@ -188,6 +205,9 @@ package it.polito.ezshop.model {
     - status: String
     - date: LocalDate
     - type: String
+    + setStatus(status:String)
+    + getStatus():String
+
   }
   class User {
     - id: Integer
@@ -208,7 +228,13 @@ package it.polito.ezshop.model {
       - position: String
       - note: String
       - quantity: Integer
-      + updateTemporaryQuantity(toBeAdded: Integer): Boolean
+      + setTemporaryQuantity(quantity: Integer): Boolean
+      + getAllProducts():List<Product>
+      + setPosition(location:String)
+      + addProduct(RFID:String)
+      + removeByRFID(rfid:String)
+
+  
   }
   class Order {
     - id: Integer
@@ -217,7 +243,7 @@ package it.polito.ezshop.model {
     - quantity: Integer
     - status: String
     - arrival: LocalDate
-    + recordOrderArrival(): Boolean
+    + recordOrderArrival()  
   }
   class CustomerCard {
       - id: String
@@ -238,8 +264,8 @@ package it.polito.ezshop.model {
       - returnTransactions: Map<Integer, ReturnTransaction>
       - prodList: Map<ProductType, TransactionProduct>
       - status: String
-      + setCustomerCard(CustomerCard): Boolean
       + addProductToSale(product: ProductType, amount: Integer): Boolean
+      + deleteProductFromSale(product: String, p: Product): Boolean
       + deleteProductFromSale(product: String, amount: Integer): Boolean
       + applyDiscountRateToProduct(product: ProductType, discountRate: Double): Boolean
       + applyDiscountRateToSale(discountRate: Double): Boolean
@@ -257,6 +283,9 @@ package it.polito.ezshop.model {
       + getReturnTransaction(id: Integer): ReturnTransaction
       + getReturnTransactions(): List<ReturnTransaction>
       + commitAllTemporaryQuantity()
+      - getProductType(RFID:String): ProductTypeImpl 
+      - getProduct(RFID:String): Product 
+      + hasBeenSold(RFID:String): Boolean
       + reset()
   }
   class ReturnTransaction {
@@ -264,14 +293,23 @@ package it.polito.ezshop.model {
     - quantity: Integer
     - committed: String
     - status: Boolean
-    + addProduct(t: TicketEntry, amount: Integer)
-    + getReturns(): Mao<TicketEntry, Integer>
+    + addProduct(prod:TransactionProduct, amount: Integer): Boolean
+        + addProductprod:TransactionProduct, p: Product): Boolean
+    + getReturns(): Map<TransactionProduct, Integer>
+    + getAllReturns(): Map<TransactionProduct, List<Product>>
     + computeTotal(): Double
   }
   class TransactionProduct {
     - quantity: Integer
-    - discountRate: Double
+    - discount: Double
+    - pricePerUnit: Double
     + applyDiscountRateToProduct(discountRate: Double): Boolean
+    + getProductType():ProductType
+    + addProduct(product:Product) 
+    + removeProduct(product:Product)
+    + containsProduct(String:RFID)
+
+
   }
 
   class AccountBook{
@@ -281,8 +319,13 @@ package it.polito.ezshop.model {
     + add(BalanceOperation): Boolean
     + getCreditsAndDebits(LocalDate from, LocalDate to): List<BalanceOperation>
     + computeBalance(): Double
+    + reset()
+    + loadFromFromDb(sales:Map<Integer, SaleTransaction> )
   }
-
+class Product {
+    - RFID: String
+   
+  }
 
   ReturnTransaction --|> BalanceOperation
   SaleTransaction --|> BalanceOperation
@@ -295,6 +338,7 @@ SaleTransaction --"*" TransactionProduct
 TransactionProduct "*" -- ProductType
 CustomerCard "0..1"-- Customer
 SaleTransaction -- "0..1" CustomerCard
+ProductType--"*"Product 
 
 Order -right- ProductType
 ReturnTransaction -- ProductType

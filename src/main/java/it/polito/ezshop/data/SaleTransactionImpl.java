@@ -71,6 +71,67 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         return false;
     }
 
+    public boolean setReturnProduct(int returnId, String RFID) {
+        if (returnId > 0 && RFID != null && hasBeenSold(RFID)) {
+
+            TransactionProduct soldP = prodList.get(getProductType(RFID));
+            ReturnTransaction returnTransaction = returnTransactions.get(returnId);
+            if (soldP != null && soldP.containsProduct(RFID) && returnTransaction != null) {
+                if(returnTransaction.addProduct(soldP, getProduct(RFID))){
+                    soldP.removeProduct(getProduct(RFID));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private ProductTypeImpl getProductType(String RFID){
+        if (RFID != null) {
+            for (TransactionProduct tp : prodList.values()) {
+                if (tp.getProductType() != null) {
+                    for (Product pt : tp.getProducts()) {
+                        if (pt.getRFID().equals(RFID)) {
+                            return tp.getProductType();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Product getProduct(String RFID){
+        if (RFID != null) {
+            for (TransactionProduct tp : prodList.values()) {
+                if (tp.getProductType() != null) {
+                    for (Product pt : tp.getProducts()) {
+                        if (pt.getRFID().equals(RFID)) {
+                            return pt;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean hasBeenSold(String RFID) {
+        if (RFID != null) {
+            for (TransactionProduct tp : prodList.values()) {
+                if (tp.getProductType() != null) {
+                    for (Product pt : tp.getProducts()) {
+                        if (pt.getRFID().equals(RFID)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
     public List<TransactionProduct> getTicketEntries() {
         return new ArrayList<>(prodList.values());
     }
@@ -164,6 +225,28 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         return false;
     }
 
+    public boolean addProductToSale(ProductTypeImpl pt, Product product) {
+        if (transactionStatus.equals("OPENED") && product != null && pt != null && pt.getQuantity() - 1 >= 0) {
+            TransactionProduct transactionProduct = prodList.get(pt);
+            if (transactionProduct != null) {
+                transactionProduct.setAmount(transactionProduct.getAmount() + 1);
+                transactionProduct.addProduct(product);
+            } else {
+                // First time
+                HashMap<String, Product> objectObjectHashMap = new HashMap<>();
+                objectObjectHashMap.put(product.getRFID(), product);
+                prodList.put(
+                        pt,
+                        new TransactionProduct(pt, 0, 1, pt.getPricePerUnit(), objectObjectHashMap)
+                );
+            }
+            pt.setQuantity(pt.getQuantity() - 1);
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * Remove an amount of product from a sale transaction. The transaction must be OPENED and the
      * relative product must exists in the sale
@@ -190,6 +273,26 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
         }
         return false;
     }
+
+    public boolean deleteProductFromSale(ProductTypeImpl product, Product p) {
+        if (transactionStatus.equals("OPENED") && product != null && p != null) {
+            TransactionProduct transactionProduct = prodList.get(product);
+            if (transactionProduct != null && transactionProduct.getAmount() > 0) {
+                // Remove the ticket entry if the remaining amount is 0
+                if (transactionProduct.getAmount() - 1 == 0) {
+                    prodList.remove(product);
+                } else {
+                    transactionProduct.setAmount(transactionProduct.getAmount() - 1);
+                }
+                product.addProduct(transactionProduct.getProducts().get(0).getRFID());
+                transactionProduct.removeProduct(p);
+                product.setQuantity(product.getQuantity() + 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Apply the discout rate to a specific product
@@ -238,6 +341,14 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
             if (returnTransaction != null) {
                 if (returnTransaction.getStatus().equals("OPENED")) {
                     returnTransactions.remove(returnId);
+
+                    returnTransaction.getAllInReturnProducts().forEach((transactionProduct, productList) -> {
+                        // Re-add to the sold products
+                        for(Product p: productList){
+                            transactionProduct.addProduct(p);
+                        }
+                    });
+
                     return true;
                 } else if (returnTransaction.getStatus().equals("CLOSED")) {
                     // Rollback quantities
@@ -247,6 +358,14 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements SaleTra
                         databaseConnection.updateProductType(transactionProduct.getProductType());
                         transactionProduct.setAmount(transactionProduct.getAmount() + amount);
                     });
+
+                    returnTransaction.getAllInReturnProducts().forEach((transactionProduct, productList) -> {
+                        // Re-add to the sold products
+                        for(Product p: productList){
+                            transactionProduct.addProduct(p);
+                        }
+                    });
+
                     returnTransactions.remove(returnId);
                     return true;
                 }
